@@ -30,6 +30,8 @@ setup_automation_environment() {
  # Clone automation-scripting repository if not exists
  if [ ! -d "/usr/local/automation-scripting" ]; then
   git clone https://github.com/dexterleslie1/automation-scripting.git /usr/local/automation-scripting
+ else
+  ( cd /usr/local/automation-scripting && git pull )
  fi
 }
 
