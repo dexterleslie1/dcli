@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Shell for setup automation environment
+# Shell for setup dcli
 
 ########################
 # Install git cli
@@ -24,15 +24,21 @@ setup_install_git_cli() {
 }
 
 ########################
-# Setup automation environment
+# Setup dcli
 ########################
-setup_automation_environment() {
- # Clone automation-scripting repository if not exists
- if [ ! -d "/usr/local/automation-scripting" ]; then
-  git clone https://github.com/dexterleslie1/automation-scripting.git /usr/local/automation-scripting
+setup_dcli() {
+ # Clone dcli repository if not exists
+ if [ ! -d "/tmp/dcli" ]; then
+  git clone https://github.com/dexterleslie1/dcli.git /tmp/dcli
  else
-  ( cd /usr/local/automation-scripting && git pull )
+  ( cd /tmp/dcli && git pull )
  fi
+ 
+ cp -r /tmp/dcli /usr/bin/dcli-env
+ if [ ! -f /usr/bin/dcli ]; then
+  ln -s /usr/bin/dcli-env/dcli.py /usr/bin/dcli
+ fi
+ chmod +x /usr/bin/dcli
 }
 
 ########################
@@ -40,7 +46,7 @@ setup_automation_environment() {
 ########################
 main() {
  setup_install_git_cli
- setup_automation_environment
+ setup_dcli
 }
 
 main
