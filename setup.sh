@@ -50,11 +50,21 @@ setup_ansible() {
 }
 
 ########################
+# Setup python
+########################
+setup_python() {
+  yum -y install epel-release
+  yum -y install python-pip
+  pip install fire
+}
+
+########################
 # Main
 ########################
 main() {
   setup_ansible
   setup_install_git_cli
+  setup_python
   setup_dcli
 }
 
