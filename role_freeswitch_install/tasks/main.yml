@@ -1,0 +1,81 @@
+---
+- name: Download freeswitch-release-repo-0-1.noarch.rpm
+  get_url:
+   url: https://files.freeswitch.org/repo/yum/centos-release/freeswitch-release-repo-0-1.noarch.rpm
+   dest: /tmp/freeswitch-release-repo-0-1.noarch.rpm
+
+- name: Install freeswitch official yum repository
+  yum:
+    name: /tmp/freeswitch-release-repo-0-1.noarch.rpm
+    state: installed
+
+- name: yum install freeswitch-config-vanilla
+  yum:
+    name: freeswitch-config-vanilla
+    state: installed
+
+- name: "Replace default_password=1234 in /etc/freeswitch/vars.xml"
+  replace:
+    path: /etc/freeswitch/vars.xml
+    regexp: default_password=1234
+    replace: default_password={{ lookup('password', '/dev/null length=15 chars=ascii_letters') }}
+
+- name: "Modify external_auth_calls=true in /etc/freeswitch/vars.xml"
+  replace:
+    path: /etc/freeswitch/vars.xml
+    regexp: external_auth_calls=false
+    replace: external_auth_calls=true
+
+- name: "Modify log-auth-failures=true in /etc/freeswitch/sip_profiles/internal.xml"
+  replace:
+    path: /etc/freeswitch/sip_profiles/internal.xml
+    regexp: '<param name="log-auth-failures" value="false"/>'
+    replace: '<param name="log-auth-failures" value="true"/>'
+
+- name: "Remove ipv6 support"
+  shell: rm -rf /etc/freeswitch/sip_profiles/*ipv6*
+
+- name: "Modify listen-ip=127.0.0.1 in /etc/freeswitch/autoload_configs/event_socket.conf.xml"
+  replace:
+    path: /etc/freeswitch/autoload_configs/event_socket.conf.xml
+    regexp: value="::"
+    replace: value="127.0.0.1"
+
+- name: "Replace target /etc/freeswitch/autoload_configs/acl.conf.xml with template acl.conf.xml"
+  template:
+   src: acl.conf.xml
+   dest: /etc/freeswitch/autoload_configs/acl.conf.xml
+   group: daemon
+   owner: freeswitch
+   mode: u=rw,g=r
+- shell: cat /etc/freeswitch/sip_profiles/internal.xml | grep '^<param name="apply-inbound-acl" value="twilio"/>' | wc -l
+  register: var_result
+- name: 'Config twilio acl'
+  lineinfile:
+   path: /etc/freeswitch/sip_profiles/internal.xml
+   insertbefore: </settings>
+   line: <param name="apply-inbound-acl" value="twilio"/>
+  when: var_result.stdout == "0"
+
+- shell: cat /etc/freeswitch/sip_profiles/internal.xml | grep '^<param name="apply-inbound-acl" value="voxbone"/>' | wc -l
+  register: var_result
+- name: 'Config voxbone acl'
+  lineinfile:
+   path: /etc/freeswitch/sip_profiles/internal.xml
+   insertbefore: </settings>
+   line: <param name="apply-inbound-acl" value="voxbone"/>
+  when: var_result.stdout == "0"
+
+- shell: cat /etc/freeswitch/sip_profiles/internal.xml | grep '^<param name="apply-inbound-acl" value="cm"/>' | wc -l
+  register: var_result
+- name: 'Config cm acl'
+  lineinfile:
+   path: /etc/freeswitch/sip_profiles/internal.xml
+   insertbefore: </settings>
+   line: <param name="apply-inbound-acl" value="cm"/>
+  when: var_result.stdout == "0"
+
+- name: "system enable freeswitch"
+  systemd:
+   name: freeswitch
+   enabled: yes

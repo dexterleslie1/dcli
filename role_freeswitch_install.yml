@@ -1,0 +1,6 @@
+---
+- name: Install freeswitch server
+  hosts: localhost
+  become: yes
+  roles:
+    - role: role_freeswitch_install

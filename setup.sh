@@ -42,11 +42,20 @@ setup_dcli() {
 }
 
 ########################
+# Setup ansible
+########################
+setup_ansible() {
+  yum -y install epel-release
+  yum -y install ansible
+}
+
+########################
 # Main
 ########################
 main() {
- setup_install_git_cli
- setup_dcli
+  setup_ansible
+  setup_install_git_cli
+  setup_dcli
 }
 
 main
