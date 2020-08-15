@@ -27,6 +27,9 @@ setup_install_git_cli() {
 # Setup dcli
 ########################
 setup_dcli() {
+ # Remove *.pyc
+ rm -rf /usr/bin/dcli-env/*.pyc
+
  # Clone dcli repository if not exists
  if [ ! -d "/tmp/dcli" ]; then
   git clone https://github.com/dexterleslie1/dcli.git /tmp/dcli
