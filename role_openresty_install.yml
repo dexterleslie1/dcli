@@ -1,0 +1,9 @@
+---
+
+- name: "Install openresty from source code"
+  hosts: localhost
+  become: yes
+  roles:
+    - role: role_os_firewall
+    - role: role_os_timezone
+    - role: role_openresty_install
