@@ -1,4 +1,24 @@
 ---
+
+- name: "When var_socks5 is defined remove line startwith proxy=socks5 firstly"
+  lineinfile:
+   path: /etc/yum.conf
+   regexp: "proxy=socks5"
+   state: absent
+  when: var_socks5|length>0
+- name: "When var_socks5 is defined remove line startwith #proxy=socks5 firstly"
+  lineinfile:
+   path: /etc/yum.conf
+   regexp: "#proxy=socks5"
+   state: absent
+  when: var_socks5|length>0
+- name: "When var_socks5 is defined setup yum socks5 proxy in /etc/yum.conf file"
+  lineinfile:
+    path: /etc/yum.conf
+    line: "proxy={{ var_socks5 }}"
+    state: present
+  when: var_socks5|length>0
+
 - name: Download freeswitch-release-repo-0-1.noarch.rpm
   get_url:
    url: https://files.freeswitch.org/repo/yum/centos-release/freeswitch-release-repo-0-1.noarch.rpm
@@ -13,6 +33,12 @@
   yum:
     name: freeswitch-config-vanilla
     state: installed
+
+- name: Remove yum socks5 proxy configuration in /etc/yum.conf file
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: "proxy=socks5"
+    state: absent
 
 - name: "Replace default_password=1234 in /etc/freeswitch/vars.xml"
   replace:
