@@ -1,6 +1,6 @@
 ---
 - name: Install freeswitch server
-  hosts: localhost
+  hosts: all
   become: yes
   roles:
     - role: role_os_timezone

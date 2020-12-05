@@ -1,0 +1,23 @@
+---
+- name: "yum install mariadb-server -y"
+  yum:
+   name: mariadb-server
+   state: installed
+- name: "systemctl restart mariadb"
+  systemd:
+   name: mariadb
+   state: restarted
+- name: "systemctl enable mariadb"
+  systemd:
+    name: mariadb
+    state: enabled
+
+- name: "wget -O /etc/yum.repos.d/kamailio.repo http://download.opensuse.org/repositories/home:/kamailio:/v5.3.x-rpms/Fedora_29/home:kamailio:v5.3.x-rpms.repo"
+  shell: wget -O /etc/yum.repos.d/kamailio.repo http://download.opensuse.org/repositories/home:/kamailio:/v5.3.x-rpms/Fedora_29/home:kamailio:v5.3.x-rpms.repo
+
+- name: "yum install vim kamailio kamailio-presence kamailio-ldap kamailio-mysql kamailio-debuginfo kamailio-xmpp kamailio-unixodbc kamailio-utils kamailio-tls kamailio-outbound kamailio-gzcompress -y"
+  yum:
+   name: vim,kamailio,kamailio-presence,kamailio-ldap,kamailio-mysql,kamailio-debuginfo,kamailio-xmpp,kamailio-unixodbc,kamailio-utils,kamailio-tls,kamailio-outbound,kamailio-gzcompress
+   state: installed
+
+
