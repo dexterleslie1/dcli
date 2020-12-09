@@ -101,6 +101,18 @@
    line: <param name="apply-inbound-acl" value="cm"/>
   when: var_result.stdout == "0"
 
+# Install sngrep
+- name: "Copy sngrep.repo file to /etc/yum.repos.d/sngrep.repo"
+  template:
+   src: sngrep.repo
+   dest: /etc/yum.repos.d/sngrep.repo
+- name: "rpm --import http://packages.irontec.com/public.key"
+  shell: rpm --import http://packages.irontec.com/public.key
+- name: "yum install -y sngrep"
+  yum:
+   name: sngrep
+   state: installed
+
 - name: "system enable freeswitch"
   systemd:
    name: freeswitch
