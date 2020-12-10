@@ -44,13 +44,34 @@
   replace:
     path: /etc/freeswitch/vars.xml
     regexp: default_password=1234
-    replace: default_password={{ lookup('password', '/dev/null length=15 chars=ascii_letters') }}
+    replace: default_password={{ var_default_password }}
+  when: var_default_password is defined and var_default_password|length>0
 
 - name: "Modify external_auth_calls=true in /etc/freeswitch/vars.xml"
   replace:
     path: /etc/freeswitch/vars.xml
     regexp: external_auth_calls=false
     replace: external_auth_calls=true
+
+- name: "Modify external_rtp_ip=stun:stun.freeswitch.org"
+  replace:
+   path: /etc/freeswitch/vars.xml
+   regexp: "external_rtp_ip=stun:stun.freeswitch.org"
+   replace: "external_rtp_ip={{ var_external_ip }}"
+  when: var_external_ip is defined and var_external_ip|length>0
+- name: "Modify external_sip_ip=stun:stun.freeswitch.org"
+  replace:
+   path: /etc/freeswitch/vars.xml
+   regexp: "external_sip_ip=stun:stun.freeswitch.org"
+   replace: "external_sip_ip={{ var_external_ip }}"
+  when: var_external_ip is defined and var_external_ip|length>0
+
+- name: "Modify internal_sip_port"
+  replace:
+   path: /etc/freeswitch/vars.xml
+   regexp: "internal_sip_port=5060"
+   replace: "internal_sip_port={{ var_listen_port }}"
+  when: var_listen_port is defined and var_listen_port|length>0
 
 - name: "Modify log-auth-failures=true in /etc/freeswitch/sip_profiles/internal.xml"
   replace:
@@ -113,7 +134,34 @@
    name: sngrep
    state: installed
 
-- name: "system enable freeswitch"
+- name: "systemctl enable freeswitch"
   systemd:
    name: freeswitch
    enabled: yes
+
+- name: "systemctl restart freeswitch"
+  systemd:
+   name: freeswitch
+   state: restarted
+
+# Install fail2ban
+- name: "yum install fail2ban"
+  yum:
+   name: fail2ban
+   state: installed
+- name: "Delete /etc/fail2ban/jail.d/00-firewalld.conf"
+  file:
+   path: /etc/fail2ban/jail.d/00-firewalld.conf
+   state: absent
+- name: "Copy freeswitch.local"
+  template:
+   src: freeswitch.local
+   dest: /etc/fail2ban/jail.d/freeswitch.local
+- name: "systemctl enable fail2ban"
+  systemd:
+   name: fail2ban
+   enabled: yes
+- name: "systemctl restart fail2ban"
+  systemd:
+   name: fail2ban
+   state: restarted

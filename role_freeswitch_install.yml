@@ -2,6 +2,16 @@
 - name: Install freeswitch server
   hosts: all
   become: yes
+  vars_prompt:
+    - name: "var_default_password"
+      prompt: "Enter default password"
+      private: yes
+    - name: "var_external_ip"
+      prompt: "Enter external ip"
+      private: no
+    - name: "var_listen_port"
+      prompt: "Enter listen port"
+      private: no
   roles:
     - role: role_os_timezone
     - role: role_os_firewall
