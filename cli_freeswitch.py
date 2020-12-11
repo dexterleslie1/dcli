@@ -4,7 +4,7 @@ import os
 
 class FreeswitchCli(object):
     """
-    Cli for managing freeswitch.
+    Cli for managing freeswitch. OS support: centOS7
     """
 
     def setup(self, socks5=None, remote_hosts="127.0.0.1,", remote_user="root"):

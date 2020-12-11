@@ -4,10 +4,10 @@ import os
 
 class KamailioCli(object):
     """
-    Cli for managing kamailio.
+    Cli for managing kamailio. OS support: centOS8
     """
 
-    def setup(self, socks5=None, remote_hosts="127.0.0.1,", remote_user="root"):
+    def install(self, socks5=None, remote_hosts="127.0.0.1,", remote_user="root"):
         """
         Call ansible role_kamailio_install role to install kamailio.
 

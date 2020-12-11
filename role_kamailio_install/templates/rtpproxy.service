@@ -1,0 +1,32 @@
+[Unit]
+Description=RTPProxy media server
+After=network.target
+Requires=network.target
+
+[Service]
+Type=simple
+PIDFile=/var/run/rtpproxy/rtpproxy.pid
+Environment='OPTIONS= -f -A {{ var_external_ip }} -l {{ var_internal_ip }} -d INFO -s udp:*:7722'
+
+Restart=always
+RestartSec=5
+
+ExecStartPre=-/bin/mkdir /var/run/rtpproxy
+ExecStartPre=-/bin/chown rtpproxy:rtpproxy /var/run/rtpproxy
+
+ExecStart=/usr/local/bin/rtpproxy -p /var/run/rtpproxy/rtpproxy.pid -s unix:/var/run/rtpproxy/rtpproxy.sock \
+ -u rtpproxy rtpproxy -n unix:/var/run/rtpproxy/rtpproxy_timeout.sock $OPTIONS
+ExecStop=/usr/bin/pkill -F /var/run/rtpproxy/rtpproxy.pid
+
+ExecStopPost=-/bin/rm -R /var/run/rtpproxy
+
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=rtpproxy
+SyslogFacility=local5
+
+TimeoutStartSec=10
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

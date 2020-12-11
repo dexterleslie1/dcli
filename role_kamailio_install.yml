@@ -1,7 +1,17 @@
 ---
-- name: Install kamailio standalone server
+- name: "Install kamailio standalone server"
   hosts: all
   become: yes
+  vars_prompt:
+    - name: "var_sip_domain"
+      prompt: "Enter sip domain"
+      private: no
+    - name: "var_external_ip"
+      prompt: "Enter external ip"
+      private: no
+#    - name: "var_internal_ip"
+#      prompt: "Enter internal ip"
+#      private: no
   roles:
     - role: role_os_timezone
     - role: role_os_firewall
