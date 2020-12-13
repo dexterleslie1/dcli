@@ -3,6 +3,10 @@
   hosts: all
   become: yes
   vars_prompt:
+    - name: "var_sip_port"
+      prompt: "Enter sip port"
+      default: 5060
+      private: no
     - name: "var_sip_domain"
       prompt: "Enter sip domain"
       private: no
