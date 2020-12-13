@@ -13,9 +13,9 @@
     - name: "var_external_ip"
       prompt: "Enter external ip"
       private: no
-#    - name: "var_internal_ip"
-#      prompt: "Enter internal ip"
-#      private: no
+    - name: "var_internal_ip"
+      prompt: "Enter internal ip"
+      private: no
   roles:
     - role: role_os_timezone
     - role: role_os_firewall

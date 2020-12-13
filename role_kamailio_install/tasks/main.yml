@@ -125,50 +125,49 @@
    name: sngrep
    state: installed
 
-# NOTE: No need to deploy rtpproxy. Kamailio can work standalone.
 # https://blog.csdn.net/weixin_30394633/article/details/98763188
 # https://www.rtpproxy.org/doc/master/user_manual.html#rtpproxy.service
 # Deploy rtpproxy
-#- name: "Create rtpproxy group"
-#  group:
-#   name: rtpproxy
-#   state: present
-#- name: "Create rtpproxy user"
-#  user:
-#   name: rtpproxy
-#   shell: /sbin/nologin
-#   groups: rtpproxy
-#   state: present
-#- stat: path=/usr/rtpproxy
-#  register: var_rtpproxy_exists
-#- name: "yum install gcc"
-#  yum:
-#   name: gcc
-#   state: installed
-#- name: "Download rtpproxy source code"
-#  get_url:
-#   url: https://github.com/sippy/rtpproxy/archive/v2.1.1.zip
-#   dest: /usr/rtpproxy.zip
-#   checksum: md5:94b64171be682784112b3381cc09d5ea
-#- name: "unzip rtpproxy.zip -d ."
-#  shell: cd /usr && unzip rtpproxy.zip -d . && mv rtpproxy-2.1.1 rtpproxy
-#  when: not var_rtpproxy_exists.stat.exists
-#- name: "Compile rtpproxy"
-#  shell: cd /usr/rtpproxy && ./configure && make && make install
-#  when: not var_rtpproxy_exists.stat.exists
-#- name: "Delete file /usr/rtpproxy.zip"
-#  file:
-#   path: /usr/rtpproxy.zip
-#   state: absent
-#- name: "Copy /usr/lib/systemd/system/rtpproxy.service"
-#  template:
-#   src: rtpproxy.service
-#   dest: /usr/lib/systemd/system/rtpproxy.service
-#- name: "systemctl enable rtpproxy"
-#  systemd:
-#   name: rtpproxy
-#   enabled: yes
-#- name: "systemctl restart rtpproxy"
-#  systemd:
-#   name: rtpproxy
-#   state: restarted
+- name: "Create rtpproxy group"
+  group:
+   name: rtpproxy
+   state: present
+- name: "Create rtpproxy user"
+  user:
+   name: rtpproxy
+   shell: /sbin/nologin
+   groups: rtpproxy
+   state: present
+- stat: path=/usr/rtpproxy
+  register: var_rtpproxy_exists
+- name: "yum install gcc"
+  yum:
+   name: gcc
+   state: installed
+- name: "Download rtpproxy source code"
+  get_url:
+   url: https://github.com/sippy/rtpproxy/archive/v2.1.1.zip
+   dest: /usr/rtpproxy.zip
+   checksum: md5:94b64171be682784112b3381cc09d5ea
+- name: "unzip rtpproxy.zip -d ."
+  shell: cd /usr && unzip rtpproxy.zip -d . && mv rtpproxy-2.1.1 rtpproxy
+  when: not var_rtpproxy_exists.stat.exists
+- name: "Compile rtpproxy"
+  shell: cd /usr/rtpproxy && ./configure && make && make install
+  when: not var_rtpproxy_exists.stat.exists
+- name: "Delete file /usr/rtpproxy.zip"
+  file:
+   path: /usr/rtpproxy.zip
+   state: absent
+- name: "Copy /usr/lib/systemd/system/rtpproxy.service"
+  template:
+   src: rtpproxy.service
+   dest: /usr/lib/systemd/system/rtpproxy.service
+- name: "systemctl enable rtpproxy"
+  systemd:
+   name: rtpproxy
+   enabled: yes
+- name: "systemctl restart rtpproxy"
+  systemd:
+   name: rtpproxy
+   state: restarted
