@@ -36,7 +36,8 @@ setup_dcli() {
  else
   ( cd /tmp/dcli && git pull )
  fi
- 
+
+ rm -rf /usr/bin/dcli-env
  cp -r /tmp/dcli /usr/bin/dcli-env
  if [ ! -f /usr/bin/dcli ]; then
   ln -s /usr/bin/dcli-env/dcli.py /usr/bin/dcli
