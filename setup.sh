@@ -57,8 +57,8 @@ setup_ansible() {
 ########################
 setup_python() {
   yum -y install epel-release
-  yum -y install python-pip
-  pip install fire
+  yum -y install python2-pip
+  pip2 install fire
 }
 
 ########################
