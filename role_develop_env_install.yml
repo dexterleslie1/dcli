@@ -1,0 +1,23 @@
+---
+
+- name: "Install develop environment"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_os_firewall
+    - role: role_os_timezone
+    - role: role_jdk_install
+      when: var_include_jdk|default(false)
+    - role: role_git_install
+      when: var_include_git|default(false)
+    - role: role_maven_install
+      when: var_include_maven|default(false)
+    - role: role_xrdp_install
+    - role: role_mariadb_install
+      when: var_include_mariadb|default(false)
+    - role: role_redis_install
+      when: var_include_redis|default(false)
+    - role: role_intellij_install
+      when: var_include_intellij|default(false)
+    - role: role_smartgit_install
+      when: var_include_smartgit|default(false)

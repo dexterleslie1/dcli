@@ -1,0 +1,9 @@
+---
+# 安装redis
+- yum:
+   name: redis
+   state: installed
+- systemd:
+   name: redis
+   state: started
+   enabled: yes

@@ -1,0 +1,18 @@
+---
+# 安装xrdp
+- name: "安装epel-release仓库"
+  yum:
+   name: epel-release
+   state: installed
+- name: 安装xrdp
+  yum:
+   name: xrdp
+   state: installed
+- copy:
+   src: ./xrdp.ini
+   dest: /etc/xrdp/xrdp.ini
+- name: 启动xrdp服务
+  systemd:
+   name: xrdp
+   state: started
+   enabled: yes

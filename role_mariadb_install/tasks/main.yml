@@ -1,0 +1,53 @@
+---
+- package_facts:
+   manager: auto
+  when: ansible_distribution == "CentOS"
+
+# 安装mariadb
+- get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mariadb-10.4.12-1.el8.x86_64/{{ item }}
+   dest: /tmp/{{ item }}
+  with_items:
+   - MariaDB-client-10.4.12-1.el8.x86_64.rpm
+   - MariaDB-common-10.4.12-1.el8.x86_64.rpm
+   - MariaDB-server-10.4.12-1.el8.x86_64.rpm
+   - galera-4-26.4.3-1.rhel8.0.el8.x86_64.rpm
+  when: "'MariaDB-server' not in ansible_facts.packages"
+- yum:
+   name: /tmp/MariaDB-client-10.4.12-1.el8.x86_64.rpm,/tmp/MariaDB-common-10.4.12-1.el8.x86_64.rpm,/tmp/MariaDB-server-10.4.12-1.el8.x86_64.rpm,/tmp/galera-4-26.4.3-1.rhel8.0.el8.x86_64.rpm
+   state: installed
+   disable_gpg_check: yes
+  when: "'MariaDB-server' not in ansible_facts.packages"
+- file:
+    path: /tmp/{{ item }}
+    state: absent
+  with_items:
+   - MariaDB-client-10.4.12-1.el8.x86_64.rpm
+   - MariaDB-common-10.4.12-1.el8.x86_64.rpm
+   - MariaDB-server-10.4.12-1.el8.x86_64.rpm
+   - galera-4-26.4.3-1.rhel8.0.el8.x86_64.rpm
+- file:
+   path: /data
+   state: directory
+- copy:
+   src: /var/lib/mysql
+   dest: /data/
+   remote_src: yes
+   group: mysql
+   owner: mysql
+   force: no
+- copy:
+   src: ./server.cnf
+   dest: /etc/my.cnf.d/server.cnf
+- systemd:
+   name: mariadb
+   state: started
+   enabled: yes
+- pip:
+   name: pymysql
+   state: present
+- mysql_user:
+   name: ''
+   host_all: yes
+   state: absent
+   login_unix_socket: /var/lib/mysql/mysql.sock

@@ -1,0 +1,59 @@
+---
+- package_facts:
+   manager: auto
+  when: ansible_distribution == "CentOS"
+
+# centOS安装jdk
+- name: 下载jdk rpm
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jdk/jdk-8u144-linux-x64.rpm
+   dest: /tmp/jdk-8u144-linux-x64.rpm
+  when: ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
+
+- name: 安装jdk
+  yum:
+   name: /tmp/jdk-8u144-linux-x64.rpm
+   state: installed
+   disable_gpg_check: yes
+  when: ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
+
+# debian10安装和配置jdk
+- stat: path=/usr/local/jdk1.8.0_271
+  register: var_folder_jdk
+  when: ansible_distribution == "Debian"
+
+- name: "下载jdk-8u271-linux-x64.tar.gz"
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jdk/jdk-8u271-linux-x64.tar.gz
+   dest: /tmp/jdk-8u271-linux-x64.tar.gz
+  when: ansible_distribution == "Debian" and not var_folder_jdk.stat.exists
+
+- name: "解压/tmp/jdk-8u271-linux-x64.tar.gz到/usr/local目录"
+  shell: tar -xvzf /tmp/jdk-8u271-linux-x64.tar.gz -C /usr/local
+  when: ansible_distribution == "Debian" and not var_folder_jdk.stat.exists
+
+- name: "确保/etc/environment文件存在JAVA_HOME变量"
+  lineinfile:
+   path: /etc/environment
+   regexp: "^JAVA_HOME="
+   line: "JAVA_HOME="
+  when: ansible_distribution == "Debian"
+
+- name: "修改/etc/environment配置jdk环境变量"
+  replace:
+   path: /etc/environment
+   regexp: "^JAVA_HOME="
+   replace: "JAVA_HOME=/usr/local/jdk1.8.0_271"
+  when: ansible_distribution == "Debian"
+
+- name: "执行update-alternatives --install '/usr/bin/java' 'java' '/usr/local/jdk1.8.0_271/bin/java' 1500"
+  shell: update-alternatives --install "/usr/bin/java" "java" "/usr/local/jdk1.8.0_271/bin/java" 1500
+  when: ansible_distribution == "Debian"
+
+- name: "执行update-alternatives --install '/usr/bin/javac' 'javac' '/usr/local/jdk1.8.0_271/bin/javac' 1500"
+  shell: update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/jdk1.8.0_271/bin/javac" 1500
+  when: ansible_distribution == "Debian"
+
+- file:
+   path: /tmp/jdk-8u144-linux-x64.rpm
+   state: absent

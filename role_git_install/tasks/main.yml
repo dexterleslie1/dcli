@@ -1,0 +1,6 @@
+---
+- name: "yum install -y git"
+  yum:
+   name: git
+   state: installed
+  when: ansible_distribution == "CentOS"

@@ -1,0 +1,26 @@
+---
+# 安装配置maven
+- name: 下载maven
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/apache-maven-3.5.4-bin.tar.gz
+   dest: /tmp/apache-maven-3.5.4-bin.tar.gz
+   checksum: md5:89eea39183139e5f8a0c1601d495b3b6
+- name: 解压maven
+  shell: tar -xvzf /tmp/apache-maven-3.5.4-bin.tar.gz -C /tmp
+- name: 移动maven到/usr/local目录
+  shell: mv -n /tmp/apache-maven-3.5.4 /usr/local
+- name: 检查~/.bash_profile是否已配置maven环境变量
+  shell: cat ~/.bash_profile | grep 'export PATH=$PATH:/usr/local/apache-maven-3.5.4/bin' | wc -l
+  register: var_grep_result
+- name: 配置~/.bash_profile maven环境变量
+  lineinfile:
+   path: ~/.bash_profile
+   line: 'export PATH=$PATH:/usr/local/apache-maven-3.5.4/bin'
+  when: var_grep_result.stdout == "0"
+# 配置maven jvm 内存
+- shell: cat ~/.bash_profile | grep 'export MAVEN_OPTS="-Xmx1024m"' | wc -l
+  register: var_grep_result
+- lineinfile:
+   path: ~/.bash_profile
+   line: 'export MAVEN_OPTS="-Xmx1024m"'
+  when: var_grep_result.stdout == "0"

@@ -7,7 +7,7 @@ class FreeswitchCli(object):
     Cli for managing freeswitch. OS support: centOS7
     """
 
-    def setup(self, socks5=None, remote_hosts="127.0.0.1,", remote_user="root"):
+    def install(self, socks5=None, remote_hosts="127.0.0.1,", remote_user="root"):
         """
         Call ansible role_freeswitch_install role to install freeswitch.
 
