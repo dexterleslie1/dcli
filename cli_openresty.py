@@ -22,12 +22,12 @@ class OpenrestyCli(object):
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
         if from_source:
-            # # Compile openresty on compile machine
-            # logging.info("########################### Compile openresty ##############################")
-            # var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml"
-            # var_command = var_command + " --user root"
-            # var_command = var_command + " --ask-pass"
-            # cli_common.execute_command(var_command)
+            # Compile openresty on compile machine
+            logging.info("########################### Compile openresty ##############################")
+            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml"
+            var_command = var_command + " --user root"
+            var_command = var_command + " --ask-pass"
+            cli_common.execute_command(var_command)
 
             # Deploy openresty to target machine
             logging.info("########################### Deploy openresty ##############################")
