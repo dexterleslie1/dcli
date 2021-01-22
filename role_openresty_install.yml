@@ -1,7 +1,14 @@
 ---
+- name: "Install openresty"
+  hosts: localhost
+  vars_prompt:
+    - name: "var_host_deploy"
+      prompt: "Enter ip address of deploy host(Example:192.168.1.20:33890)"
+      private: no
+  pre_tasks:
+    - add_host: name="{{ var_host_deploy }}" groups=host_deploy
 
-- name: "Install openresty from source code"
-  hosts: all
+- hosts: host_deploy
   become: yes
   roles:
     - role: role_os_firewall

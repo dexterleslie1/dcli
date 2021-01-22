@@ -1,0 +1,15 @@
+---
+
+- name: "Compile openresty"
+  hosts: localhost
+  vars_prompt:
+    - name: "var_host_compile"
+      prompt: "Enter ip address of compile host(Example:192.168.1.20:33890)"
+      private: no
+  pre_tasks:
+    - add_host: name="{{ var_host_compile }}" groups=host_compile
+
+- hosts: host_compile
+  become: yes
+  roles:
+    - role: role_openresty_compile
