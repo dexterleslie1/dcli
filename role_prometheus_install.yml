@@ -1,0 +1,17 @@
+---
+- name: "Install prometheus server"
+  become: yes
+  hosts: localhost
+  vars_prompt:
+    - name: "var_host_target"
+      prompt: "Enter target host of deploying prometheus (Example:192.168.1.20:33890)"
+      private: no
+  pre_tasks:
+    - add_host: name="{{ var_host_target }}" groups=host_target
+
+- hosts: host_target
+  become: yes
+  roles:
+    - role: role_os_timezone
+    - role: role_os_firewall
+    - role: role_prometheus_install

@@ -1,0 +1,64 @@
+- name: "systemctl stop prometheus"
+  systemd:
+    name: prometheus
+    state: stopped
+  ignore_errors: yes
+
+- name: "Create prometheus group"
+  group:
+    name: prometheus
+    state: present
+- name: "Create prometheus user"
+  user:
+    name: prometheus
+    shell: /sbin/nologin
+    group: prometheus
+    state: present
+
+- name: "Create folder /etc/prometheus"
+  file:
+    path: /etc/prometheus
+    state: directory
+
+- name: "Create folder /var/lib/prometheus"
+  file:
+    path: /var/lib/prometheus
+    owner: prometheus
+    group: prometheus
+    state: directory
+
+- name: "Download prometheus binary distribution package"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/prometheus/prometheus-2.24.1.linux-amd64.tar.gz
+    dest: /tmp/prometheus-2.24.1.linux-amd64.tar.gz
+    checksum: md5:da32d4573cee35d9305539267c4a84bf
+- name: "Delete /tmp/prometheus-2.24.1.linux-amd64 folder"
+  file:
+    path: /tmp/prometheus-2.24.1.linux-amd64
+    state: absent
+- name: "cd /tmp && tar -xvzf prometheus-2.24.1.linux-amd64.tar.gz"
+  shell: cd /tmp && tar -xvzf prometheus-2.24.1.linux-amd64.tar.gz
+
+- name: "cd /tmp/prometheus-2.24.1.linux-amd64 && cp prometheus /usr/local/bin"
+  shell: cd /tmp/prometheus-2.24.1.linux-amd64 && cp prometheus /usr/local/bin
+- name: "cd /tmp/prometheus-2.24.1.linux-amd64 && cp promtool /usr/local/bin"
+  shell: cd /tmp/prometheus-2.24.1.linux-amd64 && cp promtool /usr/local/bin
+
+- name: "Copy prometheus.yml to /etc/prometheus/prometheus.yml"
+  template:
+    src: prometheus.yml
+    dest: /etc/prometheus/prometheus.yml
+
+- name: "Copy prometheus.service to /etc/systemd/system/prometheus.service"
+  template:
+    src: prometheus.service
+    dest: /etc/systemd/system/prometheus.service
+
+- name: "systemctl daemon-reload"
+  shell: systemctl daemon-reload
+
+- name: "systemctl restart promethues and systemctl enable prometheus"
+  systemd:
+    name: prometheus
+    state: restarted
+    enabled: yes
