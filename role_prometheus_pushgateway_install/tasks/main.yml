@@ -1,0 +1,47 @@
+- name: "systemctl stop pushgateway"
+  systemd:
+    name: pushgateway
+    state: stopped
+  ignore_errors: yes
+
+- name: "Create pushgateway group"
+  group:
+    name: pushgateway
+    state: present
+- name: "Create pushgateway user"
+  user:
+    name: pushgateway
+    shell: /sbin/nologin
+    group: pushgateway
+    state: present
+
+- name: "Download pushgateway binary distribution package"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/prometheus/pushgateway-1.4.0.linux-amd64.tar.gz
+    dest: /tmp/pushgateway-1.4.0.linux-amd64.tar.gz
+    checksum: md5:9cc345ede71336391f1fb5d477783472
+- name: "Delete /tmp/pushgateway-1.4.0.linux-amd64 folder"
+  file:
+    path: /tmp/pushgateway-1.4.0.linux-amd64
+    state: absent
+- name: "cd /tmp && tar -xvzf pushgateway-1.4.0.linux-amd64.tar.gz"
+  shell: cd /tmp && tar -xvzf pushgateway-1.4.0.linux-amd64.tar.gz
+
+- name: "cd /tmp/pushgateway-1.4.0.linux-amd64 && cp pushgateway /usr/local/bin"
+  shell: cd /tmp/pushgateway-1.4.0.linux-amd64 && cp pushgateway /usr/local/bin
+- name: "chown pushgateway:pushgateway /usr/local/bin/pushgateway"
+  shell: chown pushgateway:pushgateway /usr/local/bin/pushgateway
+
+- name: "Copy pushgateway.service to /etc/systemd/system/pushgateway.service"
+  template:
+    src: pushgateway.service
+    dest: /etc/systemd/system/pushgateway.service
+
+- name: "systemctl daemon-reload"
+  shell: systemctl daemon-reload
+
+- name: "systemctl restart pushgateway and systemctl enable pushgateway"
+  systemd:
+    name: pushgateway
+    state: restarted
+    enabled: yes

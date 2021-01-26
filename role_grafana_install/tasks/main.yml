@@ -1,0 +1,19 @@
+- name: "Download https://bucketxy.oss-cn-hangzhou.aliyuncs.com/grafana/grafana-7.3.7-1.x86_64.rpm"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/grafana/grafana-7.3.7-1.x86_64.rpm
+    dest: /tmp/grafana-7.3.7-1.x86_64.rpm
+    checksum: md5:a3b41ba7a6ce6c572d1bce12a19ffbc0
+
+- name: "yum install grafana-7.3.7-1.x86_64.rpm"
+  yum:
+    name: /tmp/grafana-7.3.7-1.x86_64.rpm
+    state: present
+
+- name: "systemctl daemon-reload"
+  shell: systemctl daemon-reload
+
+- name: "systemctl enable grafana-server and systemctl start grafana-server"
+  systemd:
+    name: grafana-server
+    state: started
+    enabled: yes

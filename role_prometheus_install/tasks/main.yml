@@ -41,6 +41,8 @@
 
 - name: "cd /tmp/prometheus-2.24.1.linux-amd64 && cp prometheus /usr/local/bin"
   shell: cd /tmp/prometheus-2.24.1.linux-amd64 && cp prometheus /usr/local/bin
+- name: "chown prometheus:prometheus /usr/local/bin/prometheus"
+  shell: chown prometheus:prometheus /usr/local/bin/prometheus
 - name: "cd /tmp/prometheus-2.24.1.linux-amd64 && cp promtool /usr/local/bin"
   shell: cd /tmp/prometheus-2.24.1.linux-amd64 && cp promtool /usr/local/bin
 

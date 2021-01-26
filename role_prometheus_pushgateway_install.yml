@@ -1,0 +1,7 @@
+- name: "Install pushgateway server"
+  become: yes
+  hosts: all
+  roles:
+    - role: role_os_timezone
+    - role: role_os_firewall
+    - role: role_prometheus_pushgateway_install

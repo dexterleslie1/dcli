@@ -7,6 +7,7 @@ import cli_openresty
 import cli_kamailio
 import cli_develop_env
 import cli_prometheus
+import cli_grafana
 import logging
 
 
@@ -17,6 +18,7 @@ class Dcli(object):
         self.kamailio = cli_kamailio.KamailioCli()
         self.develop_env = cli_develop_env.DevelopEnvCli()
         self.prometheus = cli_prometheus.PrometheusCli()
+        self.grafana = cli_grafana.GrafanaCli()
 
 
 if __name__ == "__main__":
