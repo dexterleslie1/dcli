@@ -1,5 +1,5 @@
 # dcli
-A cli tool named dcli to make work more handy
+A cli tool named dcli to make work more handy, Support OS: centOS8
 
 Use curl to download setup.sh
 curl --proxy socks5h://host:port https://raw.githubusercontent.com/dexterleslie1/dcli/master/setup.sh --output /tmp/setup.sh
