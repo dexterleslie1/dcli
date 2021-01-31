@@ -1,3 +1,7 @@
+#- name: "ansible-galaxy collection install community.grafana"
+#  shell: ansible-galaxy collection install community.grafana
+#  connection: local
+
 - name: "Download https://bucketxy.oss-cn-hangzhou.aliyuncs.com/grafana/grafana-7.3.7-1.x86_64.rpm"
   get_url:
     url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/grafana/grafana-7.3.7-1.x86_64.rpm
@@ -8,6 +12,20 @@
   yum:
     name: /tmp/grafana-7.3.7-1.x86_64.rpm
     state: present
+
+## Change default administrator name and password
+#- name: "Change ;admin_user = admin in /etc/grafana/grafana.ini"
+#  replace:
+#    path: /etc/grafana/grafana.ini
+#    regexp: ";admin_user = admin"
+#    replace: ";admin_user = {{ var_grafana_admin }}"
+#  when: var_grafana_admin is defined and (var_grafana_admin|length>0)
+#- name: "Change ;admin_password = admin in /etc/grafana/grafana.ini"
+#  replace:
+#    path: /etc/grafana/grafana.ini
+#    regexp: ";admin_password = admin"
+#    replace: ";admin_password = {{ var_grafana_admin_password }}"
+#  when: var_grafana_admin_password is defined and (var_grafana_admin_password|length>0)
 
 - name: "systemctl daemon-reload"
   shell: systemctl daemon-reload
