@@ -1,0 +1,28 @@
+- name: "Download elasticsearch rpm package"
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/elasticsearch-rpms/elasticsearch-6.7.1.rpm
+   dest: /tmp/elasticsearch-6.7.1.rpm
+   checksum: md5:a37405d5f0c5f1f63a3abac8e1040b6a
+- name: "yum install -y /tmp/elasticsearch-6.7.1.rpm"
+  yum:
+    name: /tmp/elasticsearch-6.7.1.rpm
+    state: installed
+    disable_gpg_check: yes
+- name: "Replace #network.host: 192.168.0.1 in /etc/elasticsearch/elasticsearch.yml"
+  replace:
+    path: /etc/elasticsearch/elasticsearch.yml
+    regexp: "#network.host: 192.168.0.1"
+    replace: "network.host: 0.0.0.0"
+- name: "Append http.cors.enabled: true to /etc/elasticsearch/elasticsearch.yml"
+  lineinfile:
+   path: /etc/elasticsearch/elasticsearch.yml
+   line: "http.cors.enabled: true"
+- name: "Append http.cors.allow-origin: \"*\" to /etc/elasticsearch/elasticsearch.yml"
+  lineinfile:
+   path: /etc/elasticsearch/elasticsearch.yml
+   line: "http.cors.allow-origin: \"*\""
+- name: "systemctl enable elasticsearch and systemctl start elasticsearch"
+  systemd:
+    name: elasticsearch
+    state: started
+    enabled: yes
