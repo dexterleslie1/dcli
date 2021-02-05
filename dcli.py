@@ -9,6 +9,7 @@ import cli_develop_env
 import cli_prometheus
 import cli_grafana
 import cli_elk
+import cli_mongodb
 import logging
 
 
@@ -21,6 +22,7 @@ class Dcli(object):
         self.prometheus = cli_prometheus.PrometheusCli()
         self.grafana = cli_grafana.GrafanaCli()
         self.elk = cli_elk.ElkCli()
+        self.mongodb = cli_mongodb.MongodbCli()
 
 
 if __name__ == "__main__":

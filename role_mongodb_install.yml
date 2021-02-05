@@ -1,0 +1,8 @@
+---
+- name: Install mongodb server
+  hosts: all
+  become: yes
+  roles:
+    - role: role_os_timezone
+    - role: role_os_firewall
+    - role: role_mongodb_install

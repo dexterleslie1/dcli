@@ -1,0 +1,25 @@
+- name: "Download https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mongodb-rpms/mongodb-org-server-4.2.7-1.el8.x86_64.rpm"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mongodb-rpms/mongodb-org-server-4.2.7-1.el8.x86_64.rpm
+    dest: /tmp/mongodb-org-server-4.2.7-1.el8.x86_64.rpm
+    checksum: md5:be5020afb344fa66443d4f7d4bcdd3bd
+- name: "Download https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mongodb-rpms/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mongodb-rpms/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm
+    dest: /tmp/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm
+    checksum: md5:07fa3b0ce5948a04687d53dd570203b1
+- name: "yum install -y /tmp/mongodb-org-server-4.2.7-1.el8.x86_64.rpm /tmp/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm"
+  yum:
+    name: /tmp/mongodb-org-server-4.2.7-1.el8.x86_64.rpm,/tmp/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm
+    state: installed
+    disable_gpg_check: yes
+- name: "Replace bindIp: 127.0.0.1 in /etc/mongod.conf"
+  replace:
+    path: /etc/mongod.conf
+    regexp: "bindIp: 127.0.0.1"
+    replace: "bindIp: 0.0.0.0"
+- name: "systemctl enable mongod and systemctl start mongod"
+  systemd:
+    name: mongod
+    state: restarted
+    enabled: yes
