@@ -8,9 +8,14 @@
     url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mongodb-rpms/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm
     dest: /tmp/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm
     checksum: md5:07fa3b0ce5948a04687d53dd570203b1
-- name: "yum install -y /tmp/mongodb-org-server-4.2.7-1.el8.x86_64.rpm /tmp/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm"
+- name: "Download https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mongodb-rpms/mongodb-org-tools-4.2.7-1.el8.x86_64.rpm"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mongodb-rpms/mongodb-org-tools-4.2.7-1.el8.x86_64.rpm
+    dest: /tmp/mongodb-org-tools-4.2.7-1.el8.x86_64.rpm
+    checksum: md5:0bb43d33db0589592aad04e8c78b2a15
+- name: "yum install -y /tmp/mongodb-org-server-4.2.7-1.el8.x86_64.rpm /tmp/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm,/tmp/mongodb-org-tools-4.2.7-1.el8.x86_64.rpm"
   yum:
-    name: /tmp/mongodb-org-server-4.2.7-1.el8.x86_64.rpm,/tmp/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm
+    name: /tmp/mongodb-org-server-4.2.7-1.el8.x86_64.rpm,/tmp/mongodb-org-shell-4.2.7-1.el8.x86_64.rpm,/tmp/mongodb-org-tools-4.2.7-1.el8.x86_64.rpm
     state: installed
     disable_gpg_check: yes
 - name: "Replace bindIp: 127.0.0.1 in /etc/mongod.conf"
