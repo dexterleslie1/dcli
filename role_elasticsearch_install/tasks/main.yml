@@ -1,11 +1,11 @@
 - name: "Download elasticsearch rpm package"
   get_url:
-   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/elasticsearch-rpms/elasticsearch-6.7.1.rpm
-   dest: /tmp/elasticsearch-6.7.1.rpm
-   checksum: md5:a37405d5f0c5f1f63a3abac8e1040b6a
-- name: "yum install -y /tmp/elasticsearch-6.7.1.rpm"
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/elasticsearch-rpms/elasticsearch-6.8.13.rpm
+   dest: /tmp/elasticsearch-6.8.13.rpm
+   checksum: md5:cfa55c790423e594505a7b68f7a850fc
+- name: "yum install -y /tmp/elasticsearch-6.8.13.rpm"
   yum:
-    name: /tmp/elasticsearch-6.7.1.rpm
+    name: /tmp/elasticsearch-6.8.13.rpm
     state: installed
     disable_gpg_check: yes
 - name: "Replace #network.host: 192.168.0.1 in /etc/elasticsearch/elasticsearch.yml"

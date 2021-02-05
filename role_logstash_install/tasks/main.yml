@@ -1,0 +1,19 @@
+- name: "Download logstash rpm package"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/logstash-rpms/logstash-6.8.13.rpm
+    dest: /tmp/logstash-6.8.13.rpm
+    checksum: md5:62f01e759b1685721f9698281d23da7e
+- name: "yum install -y /tmp/logstash-6.8.13.rpm"
+  yum:
+    name: /tmp/logstash-6.8.13.rpm
+    state: installed
+    disable_gpg_check: yes
+- name: "copy logstash.conf /etc/logstash/conf.d/logstash.conf"
+  copy:
+    src: logstash.conf
+    dest: /etc/logstash/conf.d/logstash.conf
+- name: "systemctl enable logstash and systemctl start logstash"
+  systemd:
+    name: logstash
+    state: restarted
+    enabled: yes

@@ -1,0 +1,25 @@
+- name: "Download kibana rpm package"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/kibana-rpms/kibana-6.8.13-x86_64.rpm
+    dest: /tmp/kibana-6.8.13-x86_64.rpm
+    checksum: md5:1bf9246a4a6e07dd913692c2c089f357
+- name: "yum install -y /tmp/kibana-6.8.13-x86_64.rpm"
+  yum:
+    name: /tmp/kibana-6.8.13-x86_64.rpm
+    state: installed
+    disable_gpg_check: yes
+- name: "Replace #server.host: \"localhost\" in /etc/kibana/kibana.yml"
+  replace:
+    path: /etc/kibana/kibana.yml
+    regexp: "#server.host: \"localhost\""
+    replace: "server.host: \"0.0.0.0\""
+- name: "Replace #elasticsearch.hosts: [\"http://localhost:9200\"] in /etc/kibana/kibana.yml"
+  replace:
+    path: /etc/kibana/kibana.yml
+    regexp: "^#elasticsearch.hosts:"
+    replace: "elasticsearch.hosts:"
+- name: "systemctl enable kibana and systemctl start kibana"
+  systemd:
+    name: kibana
+    state: restarted
+    enabled: yes
