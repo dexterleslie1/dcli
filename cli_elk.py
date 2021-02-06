@@ -10,7 +10,8 @@ class ElkCli(object):
     def install(self):
         """
         Install elasticsearch, logstash, kibana.
-        Access http://localhost:9200 for detemining if getting elasticsearch installed successfully.
+        Access http://localhost:9200 for determining if getting elasticsearch installed successfully.
+        Access http://localhost:5601 for determining if getting kibana installed successfully.
 
         :return:
         """
