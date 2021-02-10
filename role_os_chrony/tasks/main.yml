@@ -1,0 +1,13 @@
+- name: "yum install -y chrony"
+  yum:
+    name: chrony
+    state: installed
+- name: "systemctl enable chronyd and systemctl start chronyd"
+  systemd:
+    name: chronyd
+    state: restarted
+    enabled: yes
+- name: "yum install -y ntpstat"
+  yum:
+    name: ntpstat
+    state: installed

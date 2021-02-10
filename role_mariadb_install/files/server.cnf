@@ -19,6 +19,11 @@ slow_query_log=0
 long_query_time=1
 slow_query_log_file=slow-query.log
 skip-name-resolve=1
+log_bin=mariadb-bin
+expire_logs_days=10
+binlog_format=statement
+max_binlog_size=300m
+log_basename=master1
 
 #
 # * Galera-related settings

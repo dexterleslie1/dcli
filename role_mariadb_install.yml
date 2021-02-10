@@ -1,0 +1,9 @@
+---
+- name: Install mariadb server
+  hosts: all
+  become: yes
+  roles:
+    - role: role_os_timezone
+    - role: role_os_firewall
+    - role: role_os_chrony
+    - role: role_mariadb_install
