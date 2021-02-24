@@ -1,0 +1,51 @@
+- package_facts:
+   manager: auto
+
+# 安装RabbitMQ
+- name: "Download erlang-21.3.4-1.el6.x86_64.rpm"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/rabbitmq-rpms/erlang-21.3.4-1.el6.x86_64.rpm
+    dest: /tmp/erlang-21.3.4-1.el6.x86_64.rpm
+    checksum: md5:3df7b4786a3554f8f616c9ebf23a485f
+- name: "Download rabbitmq-server-3.7.14-1.el7.noarch.rpm"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/rabbitmq-rpms/rabbitmq-server-3.7.14-1.el7.noarch.rpm
+    dest: /tmp/rabbitmq-server-3.7.14-1.el7.noarch.rpm
+    checksum: md5:f360f0babac230335919826b32b24751
+- name: 安装rabbitmq
+  yum:
+   name: /tmp/erlang-21.3.4-1.el6.x86_64.rpm,/tmp/rabbitmq-server-3.7.14-1.el7.noarch.rpm
+   state: installed
+   disable_gpg_check: yes
+  when: "'rabbitmq-server' not in ansible_facts.packages"
+- name: 下载rabbitmq rabbitmq_delayed_message_exchange-20171201-3.7.x.ez插件
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/rabbitmq-rpms/rabbitmq_delayed_message_exchange-20171201-3.7.x.ez
+   dest: /usr/lib/rabbitmq/lib/rabbitmq_server-3.7.14/plugins/rabbitmq_delayed_message_exchange-20171201-3.7.x.ez
+   checksum: md5:57633c721a45045b784862ceba2f41e1
+- name: 启用rabbitmq 插件
+  shell: rabbitmq-plugins enable --offline {{ item }} <<< 'y'
+  with_items:
+   - rabbitmq_management
+   - rabbitmq_management_agent
+   - rabbitmq_delayed_message_exchange
+- name: 复制rabbitmq.config
+  copy:
+   src: rabbitmq.config
+   dest: /etc/rabbitmq/rabbitmq.config
+   group: rabbitmq
+   owner: rabbitmq
+   mode: u=r,g=r,o=r
+- name: 启动rabbitmq
+  systemd:
+   name: rabbitmq-server
+   state: started
+   enabled: yes
+
+- name: "创建用户{{ var_rabbitmq_username }}"
+  shell: rabbitmqctl add_user {{ var_rabbitmq_username }} '{{ var_rabbitmq_password }}'
+  ignore_errors: yes
+  when: var_rabbitmq_username is defined and var_rabbitmq_username|length>0
+- name: "设置用户{{ var_rabbitmq_username }}权限"
+  shell: rabbitmqctl set_permissions -p / {{ var_rabbitmq_username }} ".*" ".*" ".*"
+  when: var_rabbitmq_username is defined and var_rabbitmq_username|length>0

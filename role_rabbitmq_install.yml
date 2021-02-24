@@ -1,0 +1,16 @@
+---
+- name: "Install rabbitmq server"
+  hosts: all
+  become: yes
+  vars_prompt:
+    - name: "var_rabbitmq_username"
+      prompt: "Enter rabbitmq username"
+      private: no
+    - name: "var_rabbitmq_password"
+      prompt: "Enter rabbitmq password"
+      private: yes
+  roles:
+    - role: role_os_timezone
+    - role: role_os_firewall
+    - role: role_os_chrony
+    - role: role_rabbitmq_install
