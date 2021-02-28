@@ -10,6 +10,8 @@ class RabbitmqCli(object):
     def install(self):
         """
         Call ansible role_rabbitmq_install role to install rabbitmq.
+
+        Access url http://192.168.1.180:15672/ with login user and password guest/guest
         :return:
         """
 
