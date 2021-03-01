@@ -1,0 +1,19 @@
+- name: "Download jmeter from url https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jmeter/apache-jmeter-5.1.1.tgz"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jmeter/apache-jmeter-5.1.1.tgz
+    dest: /tmp/apache-jmeter-5.1.1.tgz
+    checksum: md5:197b71d7f3691a4347300cda83099965
+- name: "Check if jmeter already installed"
+  stat: path=/usr/local/jmeter
+  register: jmeter_folder
+- name: "rm -rf /tmp/apache-jmeter-5.1.1"
+  file:
+    path: /tmp/apache-jmeter-5.1.1
+    state: absent
+  when: not jmeter_folder.stat.exists
+- name: "tar -xvzf apache-jmeter-5.1.1.tgz"
+  shell: cd /tmp && tar -xvzf apache-jmeter-5.1.1.tgz
+  when: not jmeter_folder.stat.exists
+- name: "mv /tmp/apache-jmeter-5.1.1 /usr/local/jmeter"
+  shell: mv /tmp/apache-jmeter-5.1.1 /usr/local/jmeter
+  when: not jmeter_folder.stat.exists

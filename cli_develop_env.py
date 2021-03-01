@@ -17,7 +17,8 @@ class DevelopEnvCli(object):
                 include_redis=False,
                 include_intellij=False,
                 include_smartgit=False,
-                include_xrdp=False):
+                include_xrdp=False,
+                include_jmeter=False):
         """
         Install develop environment.
 
@@ -47,5 +48,9 @@ class DevelopEnvCli(object):
             var_command = var_command + " -e var_include_smartgit=true"
         if include_xrdp:
             var_command = var_command + " -e var_include_xrdp=true"
+        if include_jmeter:
+            var_command = var_command + " -e var_include_jmeter=true"
+            if not include_jdk:
+                var_command = var_command + " -e var_include_jdk=true"
 
         cli_common.execute_command(var_command)

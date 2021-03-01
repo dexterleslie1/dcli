@@ -22,3 +22,5 @@
       when: var_include_intellij|default(false)
     - role: role_smartgit_install
       when: var_include_smartgit|default(false)
+    - role: role_jmeter_install
+      when: var_include_jmeter|default(false)
