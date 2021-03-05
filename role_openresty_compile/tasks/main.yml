@@ -38,8 +38,8 @@
 - name: "cd /tmp && tar -xzf naxsi-0.56.tar.gz"
   shell: cd /tmp && tar -xzf naxsi-0.56.tar.gz
 
-- name: "cd /tmp/openresty-1.15.8.1 && ./configure --add-module=/tmp/naxsi-0.56/naxsi_src"
-  shell: cd /tmp/openresty-1.15.8.1 && ./configure --add-module=/tmp/naxsi-0.56/naxsi_src
+- name: "cd /tmp/openresty-1.15.8.1 && ./configure --add-module=/tmp/naxsi-0.56/naxsi_src --with-http_v2_module"
+  shell: cd /tmp/openresty-1.15.8.1 && ./configure --add-module=/tmp/naxsi-0.56/naxsi_src --with-http_v2_module
 - name: "cd /tmp/openresty-1.15.8.1 && make install"
   shell: cd /tmp/openresty-1.15.8.1 && make install
 
