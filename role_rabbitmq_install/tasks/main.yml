@@ -46,6 +46,9 @@
   shell: rabbitmqctl add_user {{ var_rabbitmq_username }} '{{ var_rabbitmq_password }}'
   ignore_errors: yes
   when: var_rabbitmq_username is defined and var_rabbitmq_username|length>0
+- name: "修改用户{{ var_rabbitmq_username }}密码"
+  shell: rabbitmqctl change_password {{ var_rabbitmq_username }} '{{ var_rabbitmq_password }}'
+  when: var_rabbitmq_username is defined and var_rabbitmq_username|length>0
 - name: "设置用户{{ var_rabbitmq_username }}权限"
   shell: rabbitmqctl set_permissions -p / {{ var_rabbitmq_username }} ".*" ".*" ".*"
   when: var_rabbitmq_username is defined and var_rabbitmq_username|length>0
