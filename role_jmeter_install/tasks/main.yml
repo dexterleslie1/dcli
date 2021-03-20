@@ -17,3 +17,15 @@
 - name: "mv /tmp/apache-jmeter-5.4.1 /usr/local/jmeter"
   shell: mv /tmp/apache-jmeter-5.4.1 /usr/local/jmeter
   when: not jmeter_folder.stat.exists
+- name: "Change #server.rmi.ssl.disable=false to server.rmi.ssl.disable=true"
+  lineinfile:
+    path: /usr/local/jmeter/bin/jmeter.properties
+    regexp: "#server.rmi.ssl.disable="
+    line: "server.rmi.ssl.disable=true"
+    insertbefore: "# resolve links"
+- name: "Change HEAP -Xmx"
+  lineinfile:
+    path: /usr/local/jmeter/bin/jmeter
+    regexp: "HEAP="
+    line: "HEAP=\"-Xms1g -Xmx{{ var_heap_mx }}g\""
+    insertbefore: "# resolve links"
