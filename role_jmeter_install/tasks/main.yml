@@ -29,3 +29,11 @@
     regexp: "HEAP="
     line: "HEAP=\"-Xms1g -Xmx{{ var_heap_mx }}g\""
     insertbefore: "# resolve links"
+- copy:
+   src: jmeter-server.service
+   dest: /usr/lib/systemd/system/jmeter-server.service
+- name: "systemctl enable jmeter-server && systemctl start jmeter-server"
+  systemd:
+    name: jmeter-server
+    state: restarted
+    enabled: yes
