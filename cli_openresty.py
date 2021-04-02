@@ -22,19 +22,23 @@ class OpenrestyCli(object):
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
         if from_source:
-            # Compile openresty on compile machine
-            logging.info("########################### Compile openresty ##############################")
-            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml"
-            var_command = var_command + " --user root"
-            var_command = var_command + " --ask-pass"
-            cli_common.execute_command(var_command)
+            var_compile = raw_input("Compile Openresty? [y/n]: ")
+            var_install = raw_input("Install Openresty? [y/n]: ")
+            if var_compile.lower() == "y":
+                # Compile openresty on compile machine
+                logging.info("########################### Compile openresty ##############################")
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml"
+                var_command = var_command + " --user root"
+                var_command = var_command + " --ask-pass"
+                cli_common.execute_command(var_command)
 
-            # Deploy openresty to target machine
-            logging.info("########################### Deploy openresty ##############################")
-            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml"
-            var_command = var_command + " --user root"
-            var_command = var_command + " --ask-pass"
-            cli_common.execute_command(var_command)
+            if var_install.lower() == "y":
+                # Deploy openresty to target machine
+                logging.info("########################### Deploy openresty ##############################")
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml"
+                var_command = var_command + " --user root"
+                var_command = var_command + " --ask-pass"
+                cli_common.execute_command(var_command)
         else:
             # TODO: Install openresty from yum repository
             raise Exception, "Install openresty from yum repository not implement yet."
