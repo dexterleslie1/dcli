@@ -12,6 +12,7 @@ import cli_elk
 import cli_mongodb
 import cli_mariadb
 import cli_rabbitmq
+import cli_shadowsocks
 import logging
 
 
@@ -26,7 +27,8 @@ class Dcli(object):
         self.elk = cli_elk.ElkCli()
         self.mongodb = cli_mongodb.MongodbCli()
         self.mariadb = cli_mariadb.MariadbCli()
-        self.rabbitmq = cli_rabbitmq.RabbitmqCli();
+        self.rabbitmq = cli_rabbitmq.RabbitmqCli()
+        self.shadowsocks = cli_shadowsocks.ShadowsocksCli()
 
 
 if __name__ == "__main__":

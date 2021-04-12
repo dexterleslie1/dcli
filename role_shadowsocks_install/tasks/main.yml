@@ -1,0 +1,21 @@
+- name: "Download outman-shadowsocks-libev-epel-8.repo"
+  get_url:
+   url: https://copr.fedorainfracloud.org/coprs/outman/shadowsocks-libev/repo/epel-8/outman-shadowsocks-libev-epel-8.repo
+   dest: /etc/yum.repos.d/outman-shadowsocks-libev-epel-8.repo
+- name: "yum install -y epel-release"
+  yum:
+    name: epel-release
+    state: installed
+- name: "yum install -y shadowsocks-libev"
+  yum:
+    name: shadowsocks-libev
+    state: installed
+- name: "Copy config.json to /etc/shadowsocks-libev/config.json"
+  template:
+    src: config.json
+    dest: /etc/shadowsocks-libev/config.json
+- name: "systemctl restart shadowsocks-libev && systemctl enable shadowsocks-libev"
+  systemd:
+    name: shadowsocks-libev
+    state: restarted
+    enabled: yes
