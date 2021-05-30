@@ -1,0 +1,37 @@
+- name: "yum install yum-utils -y"
+  yum:
+    name: yum-utils
+    state: installed
+- name: "yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+- name: "yum remove podman-manpages"
+  yum:
+    name: podman-manpages
+    state: removed
+- name: "yum remove podman"
+  yum:
+    name: podman
+    state: removed
+
+- name: "Download docker-ce-20.10.6-3.el8.x86_64.rpm"
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-ce-20.10.6-3.el8.x86_64.rpm
+   dest: /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm
+   checksum: md5:653317773036a6d924e708e5c4e008a8
+
+- name: "yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing"
+  shell: yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing
+
+- name: "mkdir -p /etc/docker"
+  shell: mkdir -p /etc/docker
+- name: "copy daemon.json to /etc/docker/daemon.json"
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: "systemctl enable docker and systemctl start docker"
+  systemd:
+    name: docker
+    state: started
+    enabled: yes

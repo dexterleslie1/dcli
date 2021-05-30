@@ -13,6 +13,7 @@ import cli_mongodb
 import cli_mariadb
 import cli_rabbitmq
 import cli_shadowsocks
+import cli_docker
 import logging
 
 
@@ -29,6 +30,7 @@ class Dcli(object):
         self.mariadb = cli_mariadb.MariadbCli()
         self.rabbitmq = cli_rabbitmq.RabbitmqCli()
         self.shadowsocks = cli_shadowsocks.ShadowsocksCli()
+        self.docker = cli_docker.DockerCli()
 
 
 if __name__ == "__main__":
