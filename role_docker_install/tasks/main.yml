@@ -35,3 +35,16 @@
     name: docker
     state: started
     enabled: yes
+
+- name: "Download docker-compose-Linux-x86_64"
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-compose-Linux-x86_64
+   dest: /tmp/docker-compose-Linux-x86_64
+   checksum: md5:8f68ae5d2334eecb0ee50b809b5cec58
+- name: "cp /tmp/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose"
+  shell: cp /tmp/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose
+- name: "ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose"
+  shell: ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+  ignore_errors: yes
+- name: "chmod +x /usr/local/bin/docker-compose"
+  shell: chmod +x /usr/local/bin/docker-compose
