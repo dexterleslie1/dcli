@@ -2,21 +2,13 @@
 - name: "Install kamailio standalone server"
   hosts: all
   become: yes
+  vars_files:
+    - role_kamailio_install/vars.yml
   vars_prompt:
-    - name: "var_sip_port"
-      prompt: "Enter sip port"
-      default: 5060
-      private: no
-    - name: "var_sip_domain"
-      prompt: "Enter sip domain"
-      private: no
-    - name: "var_external_ip"
-      prompt: "Enter external ip"
-      private: no
-    - name: "var_internal_ip"
-      prompt: "Enter internal ip"
+    - name: "var_kamailio_listen_port"
+      prompt: "Enter kamailio listen port"
+      default: 5098
       private: no
   roles:
     - role: role_os_timezone
-    - role: role_os_firewall
     - role: role_kamailio_install

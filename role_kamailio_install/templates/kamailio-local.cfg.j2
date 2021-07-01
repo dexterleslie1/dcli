@@ -1,0 +1,30 @@
+#!KAMAILIO
+#----------侦听地址----------------------------
+#!substdef "!INTERNAL_IP_ADDR!{{ var_internal_kamailio_ip }}!g"
+#!substdef "!EXTERNAL_IP_ADDR!{{ var_external_kamailio_ip }}!g"
+#!substdef "!EXTERNAL_FQDN!{{ var_external_kamailio_ip }}!g"
+#-----------MySQL数据库设置---------------------
+#!subst "!DB_HOST!localhost!g"
+#!subst "!DB_NAME!kamailio!g"
+#!subst "!DB_USER!{{ var_kamailio_db_user_rw }}!g"
+#!subst "!DB_PASSWORD!{{ var_kamailio_db_user_rw_password }}!g"
+#!subst "!DB_PORT!3306!g"
+#----------Http服务器设置-----------------------------
+##!define WITH_HTTP
+#!substdef "!HTTP_SERVER!xxxx!g"
+#!substdef "!HTTP_PORT!8080!g"
+#!substdef "!HTTP_USERNAME!secret!g"
+#!substdef "!HTTP_PASSWORD!secret!g"
+#!define HTTP_VALIDATE_URL "/api/v1/voip/kamailio/validate"
+#!define HTTP_WAKEUP_URL "http://HTTP_SERVER:HTTP_PORT/api/v1/voip/kamailio/wakeup"
+#----------侦听端口设置(缺省设置)-----------------------
+#!substdef "!SIP_PORT!{{ var_kamailio_listen_port|default(5098) }}!g"
+#!substdef "!SIPS_PORT!5061!g"
+#!substdef "!DMQ_PORT!5090!g"
+#!substdef "!WSS_PORT!4443!g"
+#!substdef "!KAMAILIONAME!YYD SIP Server 1.0!g"
+#-------------荷马服务器配置----------------------------
+##!define WITH_HOMER
+#!substdef "!HOMER_SERVER!xxxx!g"
+#!substdef "!HOMER_PORT!8080!g"
+#!define ALERT

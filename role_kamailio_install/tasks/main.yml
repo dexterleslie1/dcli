@@ -1,173 +1,304 @@
----
-- name: "yum install mariadb-server -y"
-  yum:
-   name: mariadb-server
-   state: installed
-- name: "systemctl restart mariadb"
+#- name: "yum install mariadb-server -y"
+#  yum:
+#   name: mariadb-server
+#   state: installed
+#- name: "systemctl restart mariadb"
+#  systemd:
+#   name: mariadb
+#   state: restarted
+#- name: "systemctl enable mariadb"
+#  systemd:
+#   name: mariadb
+#   enabled: yes
+#
+#- name: "wget -O /etc/yum.repos.d/kamailio.repo http://download.opensuse.org/repositories/home:/kamailio:/v5.3.x-rpms/Fedora_29/home:kamailio:v5.3.x-rpms.repo"
+#  shell: wget -O /etc/yum.repos.d/kamailio.repo http://download.opensuse.org/repositories/home:/kamailio:/v5.3.x-rpms/Fedora_29/home:kamailio:v5.3.x-rpms.repo
+#
+#- name: "yum install vim kamailio kamailio-presence kamailio-ldap kamailio-mysql kamailio-debuginfo kamailio-xmpp kamailio-unixodbc kamailio-utils kamailio-tls kamailio-outbound kamailio-gzcompress -y"
+#  yum:
+#   name: vim,kamailio,kamailio-presence,kamailio-ldap,kamailio-mysql,kamailio-debuginfo,kamailio-xmpp,kamailio-unixodbc,kamailio-utils,kamailio-tls,kamailio-outbound,kamailio-gzcompress
+#   state: installed
+#
+## Modify /etc/kamailio/kamctlrc
+#- name: "Modify SIP_DOMAIN /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# SIP_DOMAIN="
+#    line: "SIP_DOMAIN={{ var_sip_domain }}"
+#  when: var_sip_domain is defined and var_sip_domain|length>0
+#- name: "Modify DBENGINE /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBENGINE="
+#    line: "DBENGINE=MYSQL"
+#- name: "Modify DBHOST /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBHOST="
+#    line: "DBHOST=localhost"
+#- name: "Modify DBPORT /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBPORT="
+#    line: "DBPORT=3306"
+#- name: "Modify DBNAME /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBNAME="
+#    line: "DBNAME=kamailio"
+#- name: "Modify DBRWUSER /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBRWUSER="
+#    line: "DBRWUSER=\"kamailio\""
+#- name: "Modify DBRWPW /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBRWPW="
+#    line: "DBRWPW=\"kamailiorw\""
+#- name: "Modify DBROUSER /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBROUSER="
+#    line: "DBROUSER=\"kamailioro\""
+#- name: "Modify DBROPW /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBROPW="
+#    line: "DBROPW=\"kamailioro\""
+#- name: "Modify DBROOTUSER /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^# DBROOTUSER="
+#    line: "DBROOTUSER=\"root\""
+#- name: "Modify CHARSET /etc/kamailio/kamctlrc"
+#  lineinfile:
+#    path: /etc/kamailio/kamctlrc
+#    regexp: "^#CHARSET="
+#    line: "CHARSET=\"utf8mb4\""
+#
+## Initialize kamailio database
+#- yum:
+#   name: epel-release
+#   state: installed
+#- name: "install python2-pip"
+#  yum:
+#   name: python2-pip
+#   state: installed
+#- name: "pip install pexpect"
+#  pip:
+#   name: pexpect
+#- name: "kamdbctl create"
+#  expect:
+#   command: kamdbctl create
+#   responses:
+#    MySQL password for root: ""
+#    Install presence related tables: "y"
+#    rtpproxy rtpengine secfilter: "y"
+#    Install tables for uid_auth_db uid_avp_db uid_domain uid_gflags: "y"
+#  ignore_errors: yes
+#
+#- name: "Replace /etc/kamailio/kamailio.cfg"
+#  template:
+#   src: kamailio.cfg
+#   dest: /etc/kamailio/kamailio.cfg
+#
+#- name: "systemctl enable kamailio"
+#  systemd:
+#   name: kamailio
+#   enabled: yes
+#- name: "systemctl restart kamailio"
+#  systemd:
+#   name: kamailio
+#   state: restarted
+#
+## Install sngrep
+#- name: "Copy sngrep.repo file to /etc/yum.repos.d/sngrep.repo"
+#  template:
+#   src: sngrep.repo
+#   dest: /etc/yum.repos.d/sngrep.repo
+#- name: "rpm --import http://packages.irontec.com/public.key"
+#  shell: rpm --import http://packages.irontec.com/public.key
+#- name: "yum install -y sngrep"
+#  yum:
+#   name: sngrep
+#   state: installed
+#
+## https://blog.csdn.net/weixin_30394633/article/details/98763188
+## https://www.rtpproxy.org/doc/master/user_manual.html#rtpproxy.service
+## Deploy rtpproxy
+#- name: "Create rtpproxy group"
+#  group:
+#   name: rtpproxy
+#   state: present
+#- name: "Create rtpproxy user"
+#  user:
+#   name: rtpproxy
+#   shell: /sbin/nologin
+#   groups: rtpproxy
+#   state: present
+#- stat: path=/usr/rtpproxy
+#  register: var_rtpproxy_exists
+#- name: "yum install gcc"
+#  yum:
+#   name: gcc
+#   state: installed
+#- name: "Download rtpproxy source code"
+#  get_url:
+#   url: https://github.com/sippy/rtpproxy/archive/v2.1.1.zip
+#   dest: /usr/rtpproxy.zip
+#   checksum: md5:94b64171be682784112b3381cc09d5ea
+#- name: "unzip rtpproxy.zip -d ."
+#  shell: cd /usr && unzip rtpproxy.zip -d . && mv rtpproxy-2.1.1 rtpproxy
+#  when: not var_rtpproxy_exists.stat.exists
+#- name: "Compile rtpproxy"
+#  shell: cd /usr/rtpproxy && ./configure && make && make install
+#  when: not var_rtpproxy_exists.stat.exists
+#- name: "Delete file /usr/rtpproxy.zip"
+#  file:
+#   path: /usr/rtpproxy.zip
+#   state: absent
+#- name: "Copy /usr/lib/systemd/system/rtpproxy.service"
+#  template:
+#   src: rtpproxy.service
+#   dest: /usr/lib/systemd/system/rtpproxy.service
+#- name: "systemctl enable rtpproxy"
+#  systemd:
+#   name: rtpproxy
+#   enabled: yes
+#- name: "systemctl restart rtpproxy"
+#  systemd:
+#   name: rtpproxy
+#   state: restarted
+
+- name: "apt-get install default-libmysqlclient-dev libssl-dev libsystemd-dev libxmlrpc-core-c3-dev libcurl4-openssl-dev libevent-dev libpcap0.8-dev libspandsp-dev gperf iptables-dev libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev libbencode-perl libcrypt-openssl-rsa-perl libcrypt-rijndael-perl libhiredis-dev libio-multiplex-perl libio-socket-inet6-perl libjson-glib-dev libdigest-crc-perl libdigest-hmac-perl libnet-interface-perl libnet-interface-perl  markdown unzip nfs-common dkms"
+  apt:
+   name: default-libmysqlclient-dev,libssl-dev,libsystemd-dev,libxmlrpc-core-c3-dev,libcurl4-openssl-dev,libevent-dev,libpcap0.8-dev,libspandsp-dev,gperf,iptables-dev,libavcodec-dev,libavfilter-dev,libavformat-dev,libavutil-dev,libbencode-perl,libcrypt-openssl-rsa-perl,libcrypt-rijndael-perl,libhiredis-dev,libio-multiplex-perl,libio-socket-inet6-perl,libjson-glib-dev,libdigest-crc-perl,libdigest-hmac-perl,libnet-interface-perl,libnet-interface-perl,markdown,unzip,nfs-common,dkms
+   state: present
+
+# 安装mysql
+- name: "apt-get install default-mysql-server"
+  apt:
+   name: default-mysql-server
+   state: present
+
+- name: "下载https://bucketxy.oss-cn-hangzhou.aliyuncs.com/kamailio/kamailio_deb.tar.gz"
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/kamailio/kamailio_deb.tar.gz
+   dest: /tmp/kamailio_deb.tar.gz
+   checksum: md5:33229aab182dc06bfe69a0ce05783305
+
+- name: "tar -xvzf kamailio_deb.tar.gz"
+  shell: cd /tmp && tar -xvzf kamailio_deb.tar.gz
+
+- name: "dpkg -i --force-confold *.deb"
+  shell: cd /tmp/kamailio && dpkg -i --force-confold *.deb
+  ignore_errors: yes
+
+- name: "apt --fix-broken install"
+  shell: apt --fix-broken install -y
+- name: "systemctl enable kamailio"
   systemd:
-   name: mariadb
-   state: restarted
-- name: "systemctl enable mariadb"
-  systemd:
-   name: mariadb
+   name: kamailio
    enabled: yes
 
-- name: "wget -O /etc/yum.repos.d/kamailio.repo http://download.opensuse.org/repositories/home:/kamailio:/v5.3.x-rpms/Fedora_29/home:kamailio:v5.3.x-rpms.repo"
-  shell: wget -O /etc/yum.repos.d/kamailio.repo http://download.opensuse.org/repositories/home:/kamailio:/v5.3.x-rpms/Fedora_29/home:kamailio:v5.3.x-rpms.repo
+- name: "systemctl stop kamailio"
+  systemd:
+   name: kamailio
+   state: stopped
 
-- name: "yum install vim kamailio kamailio-presence kamailio-ldap kamailio-mysql kamailio-debuginfo kamailio-xmpp kamailio-unixodbc kamailio-utils kamailio-tls kamailio-outbound kamailio-gzcompress -y"
-  yum:
-   name: vim,kamailio,kamailio-presence,kamailio-ldap,kamailio-mysql,kamailio-debuginfo,kamailio-xmpp,kamailio-unixodbc,kamailio-utils,kamailio-tls,kamailio-outbound,kamailio-gzcompress
-   state: installed
+- name: "echo \"local0.* /var/log/kamailio.log\" > /etc/rsyslog.d/kamailio.conf"
+  shell: echo "local0.* /var/log/kamailio.log" > /etc/rsyslog.d/kamailio.conf
+- name: "echo \"& stop\" >> /etc/rsyslog.d/kamailio.conf"
+  shell: echo "& stop" >> /etc/rsyslog.d/kamailio.conf
 
-# Modify /etc/kamailio/kamctlrc
-- name: "Modify SIP_DOMAIN /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# SIP_DOMAIN="
-    line: "SIP_DOMAIN={{ var_sip_domain }}"
-  when: var_sip_domain is defined and var_sip_domain|length>0
-- name: "Modify DBENGINE /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBENGINE="
-    line: "DBENGINE=MYSQL"
-- name: "Modify DBHOST /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBHOST="
-    line: "DBHOST=localhost"
-- name: "Modify DBPORT /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBPORT="
-    line: "DBPORT=3306"
-- name: "Modify DBNAME /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBNAME="
-    line: "DBNAME=kamailio"
-- name: "Modify DBRWUSER /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBRWUSER="
-    line: "DBRWUSER=\"kamailio\""
-- name: "Modify DBRWPW /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBRWPW="
-    line: "DBRWPW=\"kamailiorw\""
-- name: "Modify DBROUSER /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBROUSER="
-    line: "DBROUSER=\"kamailioro\""
-- name: "Modify DBROPW /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBROPW="
-    line: "DBROPW=\"kamailioro\""
-- name: "Modify DBROOTUSER /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^# DBROOTUSER="
-    line: "DBROOTUSER=\"root\""
-- name: "Modify CHARSET /etc/kamailio/kamctlrc"
-  lineinfile:
-    path: /etc/kamailio/kamctlrc
-    regexp: "^#CHARSET="
-    line: "CHARSET=\"utf8mb4\""
+- name: "systemctl restart rsyslog"
+  systemd:
+   name: rsyslog
+   state: restarted
+- name: "systemctl start kamailio"
+  systemd:
+   name: kamailio
+   state: started
 
-# Initialize kamailio database
-- yum:
-   name: epel-release
-   state: installed
-- name: "install python2-pip"
-  yum:
-   name: python2-pip
-   state: installed
+- name: "取消#port=3306注释"
+  replace:
+   path: /etc/mysql/mariadb.conf.d/50-server.cnf
+   regexp: "^#port"
+   replace: "port"
+- name: "替换127.0.0.1为0.0.0.0"
+  replace:
+   path: /etc/mysql/mariadb.conf.d/50-server.cnf
+   regexp: "127.0.0.1"
+   replace: "0.0.0.0"
+
+# mysql新增配置event_scheduler=ON
+- shell: cat /etc/mysql/mariadb.conf.d/50-server.cnf | grep 'event_scheduler=ON' | wc -l
+  register: var_grep_result
+- name: "mysql新增配置event_scheduler=ON"
+  lineinfile:
+   path: /etc/mysql/mariadb.conf.d/50-server.cnf
+   insertafter: "bind-address"
+   line: "event_scheduler=ON"
+  when: var_grep_result.stdout == "0"
+
+- name: "systemctl restart mysql"
+  systemd:
+   name: mysql
+   state: restarted
+
+- name: "替换/etc/kamailio/kamctlrc"
+  template:
+   src: kamctlrc.j2
+   dest: /etc/kamailio/kamctlrc
+- name: "install python-pip"
+  apt:
+   name: python-pip
+   state: present
+- name: "install python3-pip"
+  apt:
+   name: python3-pip
+   state: present
 - name: "pip install pexpect"
   pip:
    name: pexpect
+
 - name: "kamdbctl create"
   expect:
    command: kamdbctl create
    responses:
     MySQL password for root: ""
-    Install presence related tables: "y"
+    Create the presence related tables: "y"
     rtpproxy rtpengine secfilter: "y"
-    Install tables for uid_auth_db uid_avp_db uid_domain uid_gflags: "y"
+    Create the tables for uid_auth_db uid_avp_db uid_domain uid_gflags: "y"
   ignore_errors: yes
 
-- name: "Replace /etc/kamailio/kamailio.cfg"
+- name: "安装pymysql"
+  pip:
+   name: pymysql
+   state: present
+   executable: pip3
+- name: "复制install.sql"
+  template:
+   src: install.sql
+   dest: /tmp/install.sql
+- name: "执行install.sql脚本"
+  mysql_db:
+   name: all
+   state: import
+   login_unix_socket: /run/mysqld/mysqld.sock
+   target: /tmp/install.sql
+
+- name: "替换/etc/kamailio/kamailio.cfg"
   template:
    src: kamailio.cfg
    dest: /etc/kamailio/kamailio.cfg
+- name: "替换/etc/kamailio/kamailio-local.cfg"
+  template:
+   src: kamailio-local.cfg.j2
+   dest: /etc/kamailio/kamailio-local.cfg
 
-- name: "systemctl enable kamailio"
+- name: "重启kamailio"
   systemd:
    name: kamailio
-   enabled: yes
-- name: "systemctl restart kamailio"
-  systemd:
-   name: kamailio
-   state: restarted
-
-# Install sngrep
-- name: "Copy sngrep.repo file to /etc/yum.repos.d/sngrep.repo"
-  template:
-   src: sngrep.repo
-   dest: /etc/yum.repos.d/sngrep.repo
-- name: "rpm --import http://packages.irontec.com/public.key"
-  shell: rpm --import http://packages.irontec.com/public.key
-- name: "yum install -y sngrep"
-  yum:
-   name: sngrep
-   state: installed
-
-# https://blog.csdn.net/weixin_30394633/article/details/98763188
-# https://www.rtpproxy.org/doc/master/user_manual.html#rtpproxy.service
-# Deploy rtpproxy
-- name: "Create rtpproxy group"
-  group:
-   name: rtpproxy
-   state: present
-- name: "Create rtpproxy user"
-  user:
-   name: rtpproxy
-   shell: /sbin/nologin
-   groups: rtpproxy
-   state: present
-- stat: path=/usr/rtpproxy
-  register: var_rtpproxy_exists
-- name: "yum install gcc"
-  yum:
-   name: gcc
-   state: installed
-- name: "Download rtpproxy source code"
-  get_url:
-   url: https://github.com/sippy/rtpproxy/archive/v2.1.1.zip
-   dest: /usr/rtpproxy.zip
-   checksum: md5:94b64171be682784112b3381cc09d5ea
-- name: "unzip rtpproxy.zip -d ."
-  shell: cd /usr && unzip rtpproxy.zip -d . && mv rtpproxy-2.1.1 rtpproxy
-  when: not var_rtpproxy_exists.stat.exists
-- name: "Compile rtpproxy"
-  shell: cd /usr/rtpproxy && ./configure && make && make install
-  when: not var_rtpproxy_exists.stat.exists
-- name: "Delete file /usr/rtpproxy.zip"
-  file:
-   path: /usr/rtpproxy.zip
-   state: absent
-- name: "Copy /usr/lib/systemd/system/rtpproxy.service"
-  template:
-   src: rtpproxy.service
-   dest: /usr/lib/systemd/system/rtpproxy.service
-- name: "systemctl enable rtpproxy"
-  systemd:
-   name: rtpproxy
-   enabled: yes
-- name: "systemctl restart rtpproxy"
-  systemd:
-   name: rtpproxy
    state: restarted

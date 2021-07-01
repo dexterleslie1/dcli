@@ -1,0 +1,10 @@
+[rtpengine]
+table = -1
+interface = {{ var_internal_kamailio_ip }}!{{ var_external_kamailio_ip }}
+listen-ng = 0.0.0.0:7722
+port-min = 20000
+port-max = 60000
+log-level = 4
+log-facility = local2
+log-facility-cdr = local2
+log-facility-rtcp = local2

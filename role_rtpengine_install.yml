@@ -1,0 +1,7 @@
+---
+- name: "Install rtpengine"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_os_timezone
+    - role: role_rtpengine_install

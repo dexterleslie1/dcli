@@ -1,0 +1,39 @@
+- name: "apt-get install default-libmysqlclient-dev libssl-dev libsystemd-dev libxmlrpc-core-c3-dev libcurl4-openssl-dev libevent-dev libpcap0.8-dev libspandsp-dev gperf iptables-dev libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev libbencode-perl libcrypt-openssl-rsa-perl libcrypt-rijndael-perl libhiredis-dev libio-multiplex-perl libio-socket-inet6-perl libjson-glib-dev libdigest-crc-perl libdigest-hmac-perl libnet-interface-perl libnet-interface-perl  markdown unzip nfs-common dkms"
+  apt:
+   name: default-libmysqlclient-dev,libssl-dev,libsystemd-dev,libxmlrpc-core-c3-dev,libcurl4-openssl-dev,libevent-dev,libpcap0.8-dev,libspandsp-dev,gperf,iptables-dev,libavcodec-dev,libavfilter-dev,libavformat-dev,libavutil-dev,libbencode-perl,libcrypt-openssl-rsa-perl,libcrypt-rijndael-perl,libhiredis-dev,libio-multiplex-perl,libio-socket-inet6-perl,libjson-glib-dev,libdigest-crc-perl,libdigest-hmac-perl,libnet-interface-perl,libnet-interface-perl,markdown,unzip,nfs-common,dkms
+   state: present
+
+# 部署rtpengine
+- name: "下载rtpengine_deb.tar.gz"
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/rtpengine/rtpengine_deb.tar.gz
+   dest: /tmp/rtpengine_deb.tar.gz
+- name: "解压rtpengine_deb.tar.gz"
+  shell: cd /tmp && tar -xvzf rtpengine_deb.tar.gz
+- name: "dpkg -i libbcg729-*.deb"
+  shell: cd /tmp/rtpengine_deb && dpkg -i libbcg729-*.deb
+  ignore_errors: yes
+- name: "dpkg -i ngcp-rtpengine-daemon_*.deb ngcp-rtpengine-iptables_*.deb ngcp-rtpengine-kernel-dkms_*.deb"
+  shell: cd /tmp/rtpengine_deb && dpkg -i ngcp-rtpengine-daemon_*.deb ngcp-rtpengine-iptables_*.deb ngcp-rtpengine-kernel-dkms_*.deb
+  ignore_errors: yes
+- name: "apt --fix-broken install"
+  shell: apt --fix-broken install -y
+
+- name: "echo \"local2.*  -/var/log/rtpengine.log\" > /etc/rsyslog.d/rtpengine.conf"
+  shell: echo "local2.*  -/var/log/rtpengine.log" > /etc/rsyslog.d/rtpengine.conf
+- name: "echo \"& stop\" >> /etc/rsyslog.d/rtpengine.conf"
+  shell: echo "& stop" >> /etc/rsyslog.d/rtpengine.conf
+
+- name: "systemctl restart rsyslog"
+  systemd:
+   name: rsyslog
+   state: restarted
+
+- name: "替换/etc/rtpengine/rtpengine.conf"
+  template:
+   src: rtpengine.conf.j2
+   dest: /etc/rtpengine/rtpengine.conf
+- name: "systemctl restart rtpengine"
+  systemd:
+   name: rtpengine
+   state: restarted

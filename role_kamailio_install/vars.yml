@@ -1,0 +1,8 @@
+# kamailio读写用户
+var_kamailio_db_user_rw: "kamailio"
+# kamailio读写用户密码
+var_kamailio_db_user_rw_password: "kamailiorw"
+# kamailio只读用户
+var_kamailio_db_user_ro: "kamailioro"
+# kamailio只读用户密码
+var_kamailio_db_user_ro_password: "kamailioro"
