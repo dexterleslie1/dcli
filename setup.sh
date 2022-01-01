@@ -55,9 +55,9 @@ setup_ansible() {
   # 配置ansible mitogen插件
   grep -q '^strategy_plugins =' /etc/ansible/ansible.cfg
   if [[ $? -eq 0 ]]; then
-    sed -i 's/^strategy_plugins =.*$/strategy_plugins = \/usr\/bin\/dcli-evnv\/mitogen-0.2.10-rc.0\/ansible_mitogen\/plugins\/strategy/' /etc/ansible/ansible.cfg
+    sed -i 's/^strategy_plugins =.*$/strategy_plugins = \/usr\/bin\/dcli-env\/mitogen-0.2.10-rc.0\/ansible_mitogen\/plugins\/strategy/' /etc/ansible/ansible.cfg
   else
-    sed -i '/^\[defaults\]/a strategy_plugins = \/usr\/bin\/dcli-evnv\/mitogen-0.2.10-rc.0\/ansible_mitogen\/plugins\/strategy' /etc/ansible/ansible.cfg
+    sed -i '/^\[defaults\]/a strategy_plugins = \/usr\/bin\/dcli-env\/mitogen-0.2.10-rc.0\/ansible_mitogen\/plugins\/strategy' /etc/ansible/ansible.cfg
   fi
 
   grep -q '^strategy =' /etc/ansible/ansible.cfg
@@ -81,6 +81,8 @@ setup_python() {
 # Main
 ########################
 main() {
+  set -x
+
   setup_ansible
   setup_install_git_cli
   setup_python
