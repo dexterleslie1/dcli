@@ -1,0 +1,7 @@
+---
+
+- name: "Install Smartgit"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_smartgit_install

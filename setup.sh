@@ -32,7 +32,7 @@ setup_dcli() {
 
  # Clone dcli repository if not exists
  if [ ! -d "/tmp/dcli" ]; then
-  git clone https://github.com/dexterleslie1/dcli.git /tmp/dcli
+  git clone https://github.118899.net/dexterleslie1/dcli.git /tmp/dcli
  else
   ( cd /tmp/dcli && git pull )
  fi
@@ -51,6 +51,21 @@ setup_dcli() {
 setup_ansible() {
   yum -y install epel-release
   yum -y install ansible
+
+  # 配置ansible mitogen插件
+  grep -q '^strategy_plugins =' /etc/ansible/ansible.cfg
+  if [[ $? -eq 0 ]]; then
+    sed -i 's/^strategy_plugins =.*$/strategy_plugins = \/usr\/bin\/dcli-evnv\/mitogen-0.2.10-rc.0\/ansible_mitogen\/plugins\/strategy/' /etc/ansible/ansible.cfg
+  else
+    sed -i '/^\[defaults\]/a strategy_plugins = \/usr\/bin\/dcli-evnv\/mitogen-0.2.10-rc.0\/ansible_mitogen\/plugins\/strategy' /etc/ansible/ansible.cfg
+  fi
+
+  grep -q '^strategy =' /etc/ansible/ansible.cfg
+  if [[ $? -eq 0 ]]; then
+    sed -i 's/^strategy =.*$/strategy = mitogen_linear/' /etc/ansible/ansible.cfg
+  else
+    sed -i '/^\[defaults\]/a strategy = mitogen_linear' /etc/ansible/ansible.cfg
+  fi
 }
 
 ########################

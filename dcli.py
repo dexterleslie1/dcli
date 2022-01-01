@@ -14,6 +14,7 @@ import cli_mariadb
 import cli_rabbitmq
 import cli_shadowsocks
 import cli_docker
+import cli_smartgit
 import logging
 
 
@@ -31,6 +32,7 @@ class Dcli(object):
         self.rabbitmq = cli_rabbitmq.RabbitmqCli()
         self.shadowsocks = cli_shadowsocks.ShadowsocksCli()
         self.docker = cli_docker.DockerCli()
+        self.smartgit = cli_smartgit.SmartgitCli()
 
 
 if __name__ == "__main__":
