@@ -81,8 +81,6 @@ setup_python() {
 # Main
 ########################
 main() {
-  set -x
-
   setup_ansible
   setup_install_git_cli
   setup_python
