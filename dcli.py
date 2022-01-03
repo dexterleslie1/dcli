@@ -15,6 +15,7 @@ import cli_rabbitmq
 import cli_shadowsocks
 import cli_docker
 import cli_smartgit
+import cli_frp
 import logging
 
 
@@ -33,6 +34,7 @@ class Dcli(object):
         self.shadowsocks = cli_shadowsocks.ShadowsocksCli()
         self.docker = cli_docker.DockerCli()
         self.smartgit = cli_smartgit.SmartgitCli()
+        self.frp = cli_frp.FrpCli()
 
 
 if __name__ == "__main__":

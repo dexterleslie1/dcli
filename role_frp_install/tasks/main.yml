@@ -1,0 +1,105 @@
+- name: "下载frp安装包"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/frp/frp_0.38.0_linux_amd64.tar.gz
+    dest: /tmp/frp_0.38.0_linux_amd64.tar.gz
+    checksum: md5:c5f49738f804afa96642f65e7f57e7d8
+
+- name: "解压frp安装包"
+  shell: cd /tmp && tar -xvzf frp_0.38.0_linux_amd64.tar.gz
+- name: "创建/etc/frp配置目录"
+  shell: mkdir /etc/frp
+  ignore_errors: true
+
+# 安装和配置frp服务器
+- name: "停止frps服务"
+  systemd:
+    name: frps
+    state: stopped
+  when: varInstallFrpServer|default(false)
+  ignore_errors: true
+
+- name: "复制frps到/usr/bin目录下"
+  shell: cd /tmp/frp_0.38.0_linux_amd64 && cp frps /usr/bin
+  when: varInstallFrpServer|default(false)
+- name: "复制frps.ini配置文件到/etc/frp配置目录中"
+  copy:
+    src: frps.ini
+    dest: /etc/frp/frps.ini
+    force: no
+  when: varInstallFrpServer|default(false)
+
+- name: "配置frps服务器端口"
+  lineinfile:
+    path: /etc/frp/frps.ini
+    regexp: "^bind_port ="
+    line: "bind_port = {{ varFrpServerPort }}"
+  when: varFrpServerPort!="0" and varInstallFrpServer|default(false)
+- name: "配置frps服务器身份鉴别token"
+  lineinfile:
+    path: /etc/frp/frps.ini
+    regexp: "^privilege_token ="
+    line: "privilege_token = {{ varFrpToken }}"
+  when: varFrpToken|length>0 and varInstallFrpServer|default(false)
+
+- name: "复制frps.service到/etc/systemd/system"
+  shell: cd /tmp/frp_0.38.0_linux_amd64 && cp systemd/frps.service /etc/systemd/system
+  when: varInstallFrpServer|default(false)
+- name: "修改/etc/systemd/system/frps.service添加执行权限"
+  shell: chmod -R a+x /etc/systemd/system/frps.service
+  when: varInstallFrpServer|default(false)
+- name: "启动或者重启frps服务并设置为开机自启动"
+  systemd:
+    name: frps
+    state: restarted
+    enabled: yes
+  when: varInstallFrpServer|default(false)
+
+# 安装和配置frp客户端
+- name: "停止frpc服务"
+  systemd:
+    name: frpc
+    state: stopped
+  when: varInstallFrpClient|default(false)
+  ignore_errors: true
+
+- name: "复制frpc到/usr/bin目录下"
+  shell: cd /tmp/frp_0.38.0_linux_amd64 && cp frpc /usr/bin
+  when: varInstallFrpClient|default(false)
+- name: "复制frpc.ini配置文件到/etc/frp配置目录中"
+  copy:
+    src: frpc.ini
+    dest: /etc/frp/frpc.ini
+    force: no
+  when: varInstallFrpClient|default(false)
+
+- name: "配置frpc服务器ip地址"
+  lineinfile:
+    path: /etc/frp/frpc.ini
+    regexp: "^server_addr ="
+    line: "server_addr = {{ varFrpServerIp }}"
+  when: varFrpServerIp|length>0 and varInstallFrpClient|default(false)
+- name: "配置frpc服务器端口"
+  lineinfile:
+    path: /etc/frp/frpc.ini
+    regexp: "^server_port ="
+    line: "server_port = {{ varFrpServerPort }}"
+  when: varFrpServerPort!="0" and varInstallFrpClient|default(false)
+- name: "配置frp服务器身份鉴别token"
+  lineinfile:
+    path: /etc/frp/frpc.ini
+    regexp: "^privilege_token ="
+    line: "privilege_token = {{ varFrpToken }}"
+  when: varFrpToken|length>0 and varInstallFrpClient|default(false)
+
+- name: "复制frpc.service到/etc/systemd/system"
+  shell: cd /tmp/frp_0.38.0_linux_amd64 && cp systemd/frpc.service /etc/systemd/system
+  when: varInstallFrpClient|default(false)
+- name: "修改/etc/systemd/system/frpc.service添加执行权限"
+  shell: chmod -R a+x /etc/systemd/system/frpc.service
+  when: varInstallFrpClient|default(false)
+- name: "启动或者重启frpc服务并设置为开机自启动"
+  systemd:
+    name: frpc
+    state: restarted
+    enabled: yes
+  when: varInstallFrpClient|default(false)
