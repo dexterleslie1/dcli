@@ -49,8 +49,8 @@ setup_dcli() {
   ( cd /tmp/dcli && git pull )
  fi
 
- # 恢复ssl验证
- git config --global http.sslVerify true
+# # 恢复ssl验证
+# git config --global http.sslVerify true
 
  sudo rm -rf /usr/bin/dcli-env
  sudo cp -r /tmp/dcli /usr/bin/dcli-env
