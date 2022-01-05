@@ -4,13 +4,22 @@
   yum:
    name: epel-release
    state: installed
-- name: 安装xrdp
+  when: ansible_distribution == "CentOS"
+- name: centOS安装xrdp
   yum:
    name: xrdp
    state: installed
+  when: ansible_distribution == "CentOS"
+- name: ubuntu安装xrdp
+  apt:
+    name: xrdp
+    state: present
+  when: ansible_distribution == "Ubuntu"
+# centOS才需要覆盖xrdp.ini文件
 - copy:
    src: ./xrdp.ini
    dest: /etc/xrdp/xrdp.ini
+  when: ansible_distribution == "CentOS"
 - name: 启动xrdp服务
   systemd:
    name: xrdp

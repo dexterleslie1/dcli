@@ -16,6 +16,7 @@ import cli_shadowsocks
 import cli_docker
 import cli_smartgit
 import cli_frp
+import cli_xrdp
 import logging
 
 
@@ -35,6 +36,7 @@ class Dcli(object):
         self.docker = cli_docker.DockerCli()
         self.smartgit = cli_smartgit.SmartgitCli()
         self.frp = cli_frp.FrpCli()
+        self.xrdp = cli_xrdp.XrdpCli()
 
 
 if __name__ == "__main__":
