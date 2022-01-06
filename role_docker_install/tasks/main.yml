@@ -1,30 +1,96 @@
+# centOS安装docker
 - name: "yum install yum-utils -y"
   yum:
     name: yum-utils
     state: installed
+  when: ansible_distribution == "CentOS"
+
 - name: "yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"
   shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  when: ansible_distribution == "CentOS"
 
 - name: "yum remove podman-manpages"
   yum:
     name: podman-manpages
     state: removed
+  when: ansible_distribution == "CentOS"
 - name: "yum remove podman"
   yum:
     name: podman
     state: removed
+  when: ansible_distribution == "CentOS"
 
 - name: "Download docker-ce-20.10.6-3.el8.x86_64.rpm"
   get_url:
-   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-ce-20.10.6-3.el8.x86_64.rpm
-   dest: /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm
-   checksum: md5:653317773036a6d924e708e5c4e008a8
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-ce-20.10.6-3.el8.x86_64.rpm
+    dest: /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm
+    checksum: md5:653317773036a6d924e708e5c4e008a8
+  when: ansible_distribution == "CentOS"
 
 - name: "yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing"
   shell: yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing
+  when: ansible_distribution == "CentOS"
+
+# ubuntu安装docker参考
+# https://docs.docker.com/engine/install/ubuntu/
+- name: "卸载旧版本docker"
+  apt:
+    name:
+      - docker
+      - docker-engine
+      - docker.io
+      - containerd
+      - runc
+    state: absent
+  when: ansible_distribution == "Ubuntu"
+
+- name: "执行apt-get update"
+  apt:
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: "卸载系统已安装的libcurl4"
+  apt:
+    name: libcurl4
+    state: absent
+  when: ansible_distribution == "Ubuntu"
+- name: "安装相关组件允许apt使用HTTPS和仓库通讯"
+  apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: "添加docker官方GPG key"
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --yes --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  when: ansible_distribution == "Ubuntu"
+
+- name: "添加docker官方仓库"
+  shell: echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  when: ansible_distribution == "Ubuntu"
+
+- name: "执行apt-get update"
+  apt:
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: "安装docker相关组件"
+  apt:
+    name:
+      - docker-ce=5:20.10.6~3-0~ubuntu-focal
+      - docker-ce-cli=5:20.10.6~3-0~ubuntu-focal
+      - containerd.io
+    state: present
+  when: ansible_distribution == "Ubuntu"
 
 - name: "mkdir -p /etc/docker"
   shell: mkdir -p /etc/docker
+  ignore_errors: yes
+  when: ansible_distribution == "CentOS"
+
 - name: "copy daemon.json to /etc/docker/daemon.json"
   copy:
     src: daemon.json

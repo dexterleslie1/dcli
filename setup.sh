@@ -20,7 +20,7 @@ setup_install_git_cli() {
      yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm &> /dev/null
     fi
 
-    varCentOS="el*"
+    varCentOS="el"
     varUbuntu="ubuntu"
     if [[ $varUname =~ $varCentOS ]]; then
         yum install -y git
@@ -69,7 +69,7 @@ setup_ansible() {
   varUname=`uname -a`
   # 转换为小写
   varUname=${varUname,,}
-  varCentOS="el*"
+  varCentOS="el"
   varUbuntu="ubuntu"
   if [[ $varUname =~ $varCentOS ]]; then
       yum -y install epel-release
@@ -116,7 +116,7 @@ setup_python() {
   varUname=`uname -a`
   # 转换为小写
   varUname=${varUname,,}
-  varCentOS="el*"
+  varCentOS="el"
   varUbuntu="ubuntu"
   if [[ $varUname =~ $varCentOS ]]; then
       yum -y install epel-release
