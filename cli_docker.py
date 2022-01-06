@@ -9,7 +9,8 @@ class DockerCli(object):
 
     def install(self):
         """
-        Install docker.
+        安装docker，ubuntu系统时，在安装完docker后，需要使用命令手动添加指定用户到docker组，例如：sudo usermod -a -G docker testuser1，
+        否则用户执行docker相关命令都需要添加sudo，注意：把用户添加到docker组后需要logout用户再login才能生效
 
         :return:
         """
