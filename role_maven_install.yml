@@ -1,0 +1,8 @@
+- name: "安装maven"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_os_timezone
+    - role: role_os_firewall
+    - role: role_jdk_install
+    - role: role_maven_install

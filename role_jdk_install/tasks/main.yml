@@ -17,42 +17,36 @@
    disable_gpg_check: yes
   when: ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
 
-# debian10安装和配置jdk
+# debian10、ubuntu安装和配置jdk
 - stat: path=/usr/local/jdk1.8.0_271
   register: var_folder_jdk
-  when: ansible_distribution == "Debian"
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
 - name: "下载jdk-8u271-linux-x64.tar.gz"
   get_url:
    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jdk/jdk-8u271-linux-x64.tar.gz
    dest: /tmp/jdk-8u271-linux-x64.tar.gz
-  when: ansible_distribution == "Debian" and not var_folder_jdk.stat.exists
+   checksum: md5:bd8dc95a810b095996acf5f5b0dd2a69
+  when: (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu") and not var_folder_jdk.stat.exists
 
 - name: "解压/tmp/jdk-8u271-linux-x64.tar.gz到/usr/local目录"
   shell: tar -xvzf /tmp/jdk-8u271-linux-x64.tar.gz -C /usr/local
-  when: ansible_distribution == "Debian" and not var_folder_jdk.stat.exists
+  when: (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu") and not var_folder_jdk.stat.exists
 
-- name: "确保/etc/environment文件存在JAVA_HOME变量"
-  lineinfile:
-   path: /etc/environment
-   regexp: "^JAVA_HOME="
-   line: "JAVA_HOME="
-  when: ansible_distribution == "Debian"
-
-- name: "修改/etc/environment配置jdk环境变量"
-  replace:
-   path: /etc/environment
-   regexp: "^JAVA_HOME="
-   replace: "JAVA_HOME=/usr/local/jdk1.8.0_271"
-  when: ansible_distribution == "Debian"
+- name: "复制文件初始化java环境变量jdk.sh到/etc/profile.d/jdk.sh"
+  copy:
+    src: jdk.sh
+    dest: /etc/profile.d/jdk.sh
+    force: no
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
 - name: "执行update-alternatives --install '/usr/bin/java' 'java' '/usr/local/jdk1.8.0_271/bin/java' 1500"
   shell: update-alternatives --install "/usr/bin/java" "java" "/usr/local/jdk1.8.0_271/bin/java" 1500
-  when: ansible_distribution == "Debian"
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
 - name: "执行update-alternatives --install '/usr/bin/javac' 'javac' '/usr/local/jdk1.8.0_271/bin/javac' 1500"
   shell: update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/jdk1.8.0_271/bin/javac" 1500
-  when: ansible_distribution == "Debian"
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
 - file:
    path: /tmp/jdk-8u144-linux-x64.rpm

@@ -1,10 +1,12 @@
+# coding:utf-8
+
 import cli_common
 import os
 
 
 class DockerCli(object):
     """
-    Cli for managing docker. OS support: centOS8
+    Cli for managing docker. OS support: centOS8、ubuntu
     """
 
     def install(self):
