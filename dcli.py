@@ -18,6 +18,7 @@ import cli_smartgit
 import cli_frp
 import cli_xrdp
 import cli_maven
+import cli_nodejs
 import logging
 
 
@@ -39,6 +40,7 @@ class Dcli(object):
         self.frp = cli_frp.FrpCli()
         self.xrdp = cli_xrdp.XrdpCli()
         self.maven = cli_maven.MavenCli()
+        self.nodejs = cli_nodejs.NodejsCli()
 
 
 if __name__ == "__main__":

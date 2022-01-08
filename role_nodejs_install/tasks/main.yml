@@ -1,0 +1,18 @@
+# 参考
+# https://blog.csdn.net/lisulong1/article/details/80167722
+
+- name: "下载nodejs安装包"
+  get_url:
+   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/nodejs/node-v15.14.0-linux-x64.tar.gz
+   dest: /tmp/node-v15.14.0-linux-x64.tar.gz
+   checksum: md5:66c4a66693a46df811602d37dff6b57b
+
+- name: "解压nodejs安装包到/usr/local目录"
+  shell: tar -xvzf /tmp/node-v15.14.0-linux-x64.tar.gz -C /usr/local
+
+- name: "创建/usr/local/bin/node链接"
+  shell: ln -s /usr/local/node-v15.14.0-linux-x64/bin/node /usr/local/bin/node
+  ignore_errors: yes
+- name: "创建/usr/local/bin/npm链接"
+  shell: ln -s /usr/local/node-v15.14.0-linux-x64/bin/npm /usr/local/bin/npm
+  ignore_errors: yes
