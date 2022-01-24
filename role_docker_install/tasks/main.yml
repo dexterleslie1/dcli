@@ -20,16 +20,27 @@
     state: removed
   when: ansible_distribution == "CentOS"
 
+# centOS8下载和安装docker-ce
 - name: "Download docker-ce-20.10.6-3.el8.x86_64.rpm"
   get_url:
     url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-ce-20.10.6-3.el8.x86_64.rpm
     dest: /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm
     checksum: md5:653317773036a6d924e708e5c4e008a8
-  when: ansible_distribution == "CentOS"
-
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
 - name: "yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing"
   shell: yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
+
+# centOS7下载和安装docker-ce
+- name: "centOS7下载docker-ce rpm安装程序"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-ce-20.10.6-3.el7.x86_64.rpm
+    dest: /tmp/docker-ce-20.10.6-3.el7.x86_64.rpm
+    checksum: md5:4004a06a68002e59797264fce3c9defe
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+- name: "centOS7安装docker-ce"
+  shell: yum install -y /tmp/docker-ce-20.10.6-3.el7.x86_64.rpm
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 
 # ubuntu安装docker参考
 # https://docs.docker.com/engine/install/ubuntu/

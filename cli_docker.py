@@ -6,7 +6,7 @@ import os
 
 class DockerCli(object):
     """
-    Cli for managing docker. OS support: centOS8、ubuntu
+    Cli for managing docker. OS support: centOS7、centOS8、ubuntu
     """
 
     def install(self):
