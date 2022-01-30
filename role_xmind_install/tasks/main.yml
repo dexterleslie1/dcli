@@ -1,0 +1,18 @@
+---
+# ubuntu参考使用snap安装xmind
+# https://snapcraft.io/install/xmind/ubuntu
+# ubuntu安装xmind
+- name: "执行apt-get update"
+  apt:
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: "执行sudo apt install snapd"
+  apt:
+    name: snapd
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: "执行sudo snap install xmind"
+  shell: snap install xmind
+  when: ansible_distribution == "Ubuntu"

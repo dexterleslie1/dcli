@@ -19,6 +19,7 @@ import cli_frp
 import cli_xrdp
 import cli_maven
 import cli_nodejs
+import cli_xmind
 import logging
 
 
@@ -41,6 +42,7 @@ class Dcli(object):
         self.xrdp = cli_xrdp.XrdpCli()
         self.maven = cli_maven.MavenCli()
         self.nodejs = cli_nodejs.NodejsCli()
+        self.xmind = cli_xmind.XmindCli()
 
 
 if __name__ == "__main__":
