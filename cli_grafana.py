@@ -17,12 +17,12 @@ class GrafanaCli(object):
         # Full path of python file locates in
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
-        var_install = raw_input("Install grafana? [y/n]: ")
+        var_install = input("Install grafana? [y/n]: ")
         if var_install.lower() == "y":
-            var_host_prometheus = raw_input("Enter target machine of deploying grafana (example: 192.168.1.20:8080): ")
-            var_host_prometheus_user = raw_input("Enter target machine user (default root): ") or "root"
-            # var_grafana_admin = raw_input("Enter grafana admin user or left it empty without changing: ")
-            # var_grafana_admin_password = raw_input("Enter grafana admin user password or left it empty without changing: ")
+            var_host_prometheus = input("Enter target machine of deploying grafana (example: 192.168.1.20:8080): ")
+            var_host_prometheus_user = input("Enter target machine user (default root): ") or "root"
+            # var_grafana_admin = input("Enter grafana admin user or left it empty without changing: ")
+            # var_grafana_admin_password = input("Enter grafana admin user password or left it empty without changing: ")
 
         # Install grafana
         if var_install.lower() == "y":

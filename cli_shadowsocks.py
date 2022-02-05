@@ -17,12 +17,12 @@ class ShadowsocksCli(object):
         # Full path of python file locates in
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
-        var_install = raw_input("Install Shadowsocks? [y/n]: ")
+        var_install = input("Install Shadowsocks? [y/n]: ")
         if var_install.lower() == "y":
-            var_host_target = raw_input("Enter target deploying machine (example: 192.168.1.20:8080): ")
-            var_host_target_user = raw_input("Enter target machine user (default root): ") or "root"
-            var_server_port = raw_input("Enter server port (default 11080): ") or "11080"
-            var_password = raw_input("Enter password (default 123456): ") or "123456"
+            var_host_target = input("Enter target deploying machine (example: 192.168.1.20:8080): ")
+            var_host_target_user = input("Enter target machine user (default root): ") or "root"
+            var_server_port = input("Enter server port (default 11080): ") or "11080"
+            var_password = input("Enter password (default 123456): ") or "123456"
             var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_shadowsocks_install.yml"
             var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)
             if var_server_port:

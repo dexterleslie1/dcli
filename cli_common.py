@@ -6,7 +6,7 @@ def execute_command(command):
     logging.info("Prepare to execute command '" + command + "'")
     var_result = subprocess.call(command, shell=True)
     if var_result != 0:
-        raise Exception, "Run command '" + command + "' failed"
+        raise Exception("Run command '" + command + "' failed")
 
 
 def concat_command(command, remote_hosts, remote_user):

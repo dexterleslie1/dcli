@@ -18,10 +18,10 @@ class RabbitmqCli(object):
         # Full path of python file locates in
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
-        var_install = raw_input("Install RabbitMQ? [y/n]: ")
+        var_install = input("Install RabbitMQ? [y/n]: ")
         if var_install.lower() == "y":
-            var_host_target_rabbitmq = raw_input("Enter deploying target machine (example: 192.168.1.20:8080): ")
-            var_host_target_user_rabbitmq = raw_input("Enter target machine user (default root): ") or "root"
+            var_host_target_rabbitmq = input("Enter deploying target machine (example: 192.168.1.20:8080): ")
+            var_host_target_user_rabbitmq = input("Enter target machine user (default root): ") or "root"
 
         if var_install.lower() == "y":
             var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_rabbitmq_install.yml"

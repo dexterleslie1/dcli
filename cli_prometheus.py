@@ -17,18 +17,18 @@ class PrometheusCli(object):
         # Full path of python file locates in
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
-        var_install_prometheus = raw_input("Install prometheus? [y/n]: ")
+        var_install_prometheus = input("Install prometheus? [y/n]: ")
         if var_install_prometheus.lower() == "y":
-            var_host_prometheus = raw_input("Enter target machine of deploying prometheus (example: 192.168.1.20:8080): ")
-            var_host_prometheus_user = raw_input("Enter target machine user (default root): ") or "root"
-            var_host_pushgateway_1 = raw_input("* Enter pushgateway (example: 192.168.1.20): ")
+            var_host_prometheus = input("Enter target machine of deploying prometheus (example: 192.168.1.20:8080): ")
+            var_host_prometheus_user = input("Enter target machine user (default root): ") or "root"
+            var_host_pushgateway_1 = input("* Enter pushgateway (example: 192.168.1.20): ")
             if not var_host_pushgateway_1:
-                raise Exception, "Parameter pushgateway cann't be empty"
+                raise Exception("Parameter pushgateway cann't be empty")
 
-        var_install_pushgateway = raw_input("Install pushgateway? [y/n]: ")
+        var_install_pushgateway = input("Install pushgateway? [y/n]: ")
         if var_install_pushgateway.lower() == "y":
-            var_host_pushgateway = raw_input("Enter target machine of deploying pushgateway (example: 192.168.1.20:8080): ")
-            var_host_pushgateway_user = raw_input("Enter target machine user (default root): ") or "root"
+            var_host_pushgateway = input("Enter target machine of deploying pushgateway (example: 192.168.1.20:8080): ")
+            var_host_pushgateway_user = input("Enter target machine user (default root): ") or "root"
 
         # Install prometheus
         if var_install_prometheus.lower() == "y":

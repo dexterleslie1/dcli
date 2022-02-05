@@ -17,18 +17,18 @@ class KamailioCli(object):
         # Full path of python file locates in
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
-        var_install_kamailio = raw_input("Install Kamailio? [y/n]: ")
+        var_install_kamailio = input("Install Kamailio? [y/n]: ")
         if var_install_kamailio.lower() == "y":
-            var_host_target_kamailio = raw_input("Enter deploying target machine (example: 192.168.1.20:8080): ")
-            var_host_target_user_kamailio = raw_input("Enter target machine user (default root): ") or "root"
-        var_install_rtpengine = raw_input("Install Rtpengine? [y/n]: ")
+            var_host_target_kamailio = input("Enter deploying target machine (example: 192.168.1.20:8080): ")
+            var_host_target_user_kamailio = input("Enter target machine user (default root): ") or "root"
+        var_install_rtpengine = input("Install Rtpengine? [y/n]: ")
         if var_install_rtpengine.lower() == "y":
-            var_host_target_rtpengine = raw_input("Enter deploying target machine (example: 192.168.1.20:8080): ")
-            var_host_target_user_rtpengine = raw_input("Enter target machine user (default root): ") or "root"
+            var_host_target_rtpengine = input("Enter deploying target machine (example: 192.168.1.20:8080): ")
+            var_host_target_user_rtpengine = input("Enter target machine user (default root): ") or "root"
 
         if var_install_kamailio.lower() == "y" or var_install_rtpengine.lower() == "y":
-            var_external_kamailio_ip = raw_input("Enter kamailio external ip: ")
-            var_internal_kamailio_ip = raw_input("Enter kamailio internal ip: ")
+            var_external_kamailio_ip = input("Enter kamailio external ip: ")
+            var_internal_kamailio_ip = input("Enter kamailio internal ip: ")
 
         if var_install_kamailio.lower() == "y":
             var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_kamailio_install.yml -e 'ansible_python_interpreter=/usr/bin/python3'"

@@ -22,8 +22,8 @@ class OpenrestyCli(object):
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
         if from_source:
-            var_compile = raw_input("Compile Openresty? [y/n]: ")
-            var_install = raw_input("Install Openresty? [y/n]: ")
+            var_compile = input("Compile Openresty? [y/n]: ")
+            var_install = input("Install Openresty? [y/n]: ")
             if var_compile.lower() == "y":
                 # Compile openresty on compile machine
                 logging.info("########################### Compile openresty ##############################")
@@ -41,4 +41,4 @@ class OpenrestyCli(object):
                 cli_common.execute_command(var_command)
         else:
             # TODO: Install openresty from yum repository
-            raise Exception, "Install openresty from yum repository not implement yet."
+            raise Exception("Install openresty from yum repository not implement yet.")

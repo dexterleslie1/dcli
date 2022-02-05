@@ -17,10 +17,10 @@ class SmartgitCli(object):
         # Full path of python file locates in
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
-        var_install = raw_input("Install smartgit? [y/n]: ")
+        var_install = input("Install smartgit? [y/n]: ")
         if var_install.lower() == "y":
-            var_host_target = raw_input("Enter deploying target machine (example: 192.168.1.20:8080): ")
-            var_host_target_user = raw_input("Enter target machine user (default root): ") or "root"
+            var_host_target = input("Enter deploying target machine (example: 192.168.1.20:8080): ")
+            var_host_target_user = input("Enter target machine user (default root): ") or "root"
 
         if var_install.lower() == "y":
             var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_smartgit_install.yml"

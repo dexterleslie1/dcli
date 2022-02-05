@@ -1,0 +1,7 @@
+- name: "安装和配置jdk"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_os_timezone
+    - role: role_os_firewall
+    - role: role_jdk_install

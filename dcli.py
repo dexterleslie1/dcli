@@ -21,6 +21,7 @@ import cli_maven
 import cli_nodejs
 import cli_xmind
 import cli_pycharm
+import cli_jdk
 import logging
 
 
@@ -45,6 +46,7 @@ class Dcli(object):
         self.nodejs = cli_nodejs.NodejsCli()
         self.xmind = cli_xmind.XmindCli()
         self.pycharm = cli_pycharm.PycharmCli()
+        self.jdk = cli_jdk.JdkCli()
 
 
 if __name__ == "__main__":
