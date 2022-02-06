@@ -22,6 +22,7 @@ import cli_nodejs
 import cli_xmind
 import cli_pycharm
 import cli_jdk
+import cli_vscode
 import logging
 
 
@@ -47,6 +48,7 @@ class Dcli(object):
         self.xmind = cli_xmind.XmindCli()
         self.pycharm = cli_pycharm.PycharmCli()
         self.jdk = cli_jdk.JdkCli()
+        self.vscode = cli_vscode.VscodeCli()
 
 
 if __name__ == "__main__":
