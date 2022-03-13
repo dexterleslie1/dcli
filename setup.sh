@@ -120,11 +120,13 @@ setup_python() {
   varUbuntu="ubuntu"
   if [[ $varUname =~ $varCentOS ]]; then
       yum -y install epel-release
-      yum -y install python2-pip
+      # centOS8安装python3
+      yum -y install python3-pip
   elif [[ $varUname =~ $varUbuntu ]]; then
       sudo apt-get install python-pip -y
   fi
-  pip2 install fire
+  # centOS8使用pip3安装fire
+  pip3 install fire
 }
 
 ########################
