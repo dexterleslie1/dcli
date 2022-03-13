@@ -22,10 +22,15 @@ class DockerCli(object):
 
         var_install = input("Install docker? [y/n]: ")
         if var_install.lower() == "y":
-            var_host_target = input("Enter deploying target machine (example: 192.168.1.20:8080): ")
-            var_host_target_user = input("Enter target machine user (default root): ") or "root"
+            var_install_locally = input("是否本地安装？ [y/n]: ") or "n"
+            if not var_install_locally == "y":
+                var_host_target = input("Enter deploying target machine (example: 192.168.1.20:8080): ")
+                var_host_target_user = input("Enter target machine user (default root): ") or "root"
 
         if var_install.lower() == "y":
-            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_docker_install.yml"
-            var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)
+            if var_install_locally == "y":
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_docker_install.yml --connection=local -i 127.0.0.1,"
+            else:
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_docker_install.yml"
+                var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)
             cli_common.execute_command(var_command)
