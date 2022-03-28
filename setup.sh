@@ -4,6 +4,22 @@
 # Shell for setup dcli
 
 ########################
+# 解决centOS eol问题
+# 参考 https://stackoverflow.com/questions/70926799/centos-through-vm-no-urls-in-mirrorlist
+########################
+setup_resolve_centOS_eol() {
+    varUname=`uname -a`
+    # 转换为小写
+    varUname=${varUname,,}
+
+    # 当centOS8时
+    if [[ $varUname =~ "el8" ]]; then
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+    fi
+}
+
+########################
 # Install git cli
 ########################
 setup_install_git_cli() {
@@ -133,6 +149,7 @@ setup_python() {
 # Main
 ########################
 main() {
+  setup_resolve_centOS_eol
   setup_ansible
   setup_install_git_cli
   setup_python
