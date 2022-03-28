@@ -1,37 +1,45 @@
-- name: "Download jmeter from url https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jmeter/apache-jmeter-5.4.1.tgz"
+- name: "从https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jmeter/apache-jmeter-5.4.1.tgz下载Jmeter"
   get_url:
     url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jmeter/apache-jmeter-5.4.1.tgz
     dest: /tmp/apache-jmeter-5.4.1.tgz
     checksum: md5:ea44a5ff72c25069e6c4b76467292899
-- name: "Check if jmeter already installed"
+
+- name: "判断是否已安装Jmeter"
   stat: path=/usr/local/jmeter
   register: jmeter_folder
+
 - name: "rm -rf /tmp/apache-jmeter-5.4.1"
   file:
     path: /tmp/apache-jmeter-5.4.1
     state: absent
   when: not jmeter_folder.stat.exists
+
 - name: "tar -xvzf apache-jmeter-5.4.1.tgz"
   shell: cd /tmp && tar -xvzf apache-jmeter-5.4.1.tgz
   when: not jmeter_folder.stat.exists
 - name: "mv /tmp/apache-jmeter-5.4.1 /usr/local/jmeter"
   shell: mv /tmp/apache-jmeter-5.4.1 /usr/local/jmeter
   when: not jmeter_folder.stat.exists
-- name: "Change #server.rmi.ssl.disable=false to server.rmi.ssl.disable=true"
+
+- name: "修改#server.rmi.ssl.disable=false为server.rmi.ssl.disable=true"
   lineinfile:
     path: /usr/local/jmeter/bin/jmeter.properties
     regexp: "#server.rmi.ssl.disable="
     line: "server.rmi.ssl.disable=true"
     insertbefore: "# resolve links"
-- name: "Change HEAP -Xmx"
+
+- name: "修改堆内存-Xmx"
   lineinfile:
     path: /usr/local/jmeter/bin/jmeter
     regexp: "HEAP="
     line: "HEAP=\"-Xms1g -Xmx{{ var_heap_mx }}g\""
     insertbefore: "# resolve links"
-- copy:
+
+- name: "配置jmeter-service.service"
+  copy:
    src: jmeter-server.service
    dest: /usr/lib/systemd/system/jmeter-server.service
+
 - name: "systemctl enable jmeter-server && systemctl start jmeter-server"
   systemd:
     name: jmeter-server

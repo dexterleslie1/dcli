@@ -3,12 +3,6 @@
 - name: "Install develop environment"
   hosts: all
   become: yes
-  vars_prompt:
-    - name: "var_heap_mx"
-      prompt: "Enter HEAP mx (unit GB)"
-      private: no
-      default: "1"
-      when: var_include_jmeter|default(false)
   roles:
     - role: role_os_firewall
     - role: role_os_timezone
