@@ -34,7 +34,7 @@ class DevelopEnvCli(object):
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
         if var_install_locally == "y":
-            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_develop_env_install.yml --connection=local -i 127.0.0.1,"
+            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_develop_env_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
         else:
             var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_develop_env_install.yml"
             var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)

@@ -3,19 +3,26 @@
    manager: auto
   when: ansible_distribution == "CentOS"
 
+# 判断是否已安装java
+# 参考 https://stackoverflow.com/questions/30388361/ansible-command-to-check-the-java-version-in-different-servers
+- name: "判断是否已安装java"
+  command: java -version
+  register: var_java_version
+  ignore_errors: true
+
 # centOS安装jdk
 - name: 下载jdk rpm
   get_url:
    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/jdk/jdk-8u144-linux-x64.rpm
    dest: /tmp/jdk-8u144-linux-x64.rpm
-  when: ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
+  when: var_java_version is failed and ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
 
 - name: 安装jdk
   yum:
    name: /tmp/jdk-8u144-linux-x64.rpm
    state: installed
    disable_gpg_check: yes
-  when: ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
+  when: var_java_version is failed and ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
 
 # debian10、ubuntu安装和配置jdk
 - stat: path=/usr/local/jdk1.8.0_271
@@ -38,15 +45,15 @@
     src: jdk.sh
     dest: /etc/profile.d/jdk.sh
     force: no
-  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  when: var_java_version is failed and (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
 
 - name: "执行update-alternatives --install '/usr/bin/java' 'java' '/usr/local/jdk1.8.0_271/bin/java' 1500"
   shell: update-alternatives --install "/usr/bin/java" "java" "/usr/local/jdk1.8.0_271/bin/java" 1500
-  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  when: var_java_version is failed and (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
 
 - name: "执行update-alternatives --install '/usr/bin/javac' 'javac' '/usr/local/jdk1.8.0_271/bin/javac' 1500"
   shell: update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/jdk1.8.0_271/bin/javac" 1500
-  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+  when: var_java_version is failed and (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
 
 - file:
    path: /tmp/jdk-8u144-linux-x64.rpm

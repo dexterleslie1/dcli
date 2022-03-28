@@ -2,6 +2,7 @@
 
 - name: "Install develop environment"
   hosts: all
+  # sudo为root用户
   become: yes
   roles:
     - role: role_os_firewall
