@@ -1,0 +1,5 @@
+- name: "配置centOS8 eol"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_centos_eol

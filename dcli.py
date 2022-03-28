@@ -23,6 +23,7 @@ import cli_xmind
 import cli_pycharm
 import cli_jdk
 import cli_vscode
+import cli_centos_eol
 import logging
 
 
@@ -49,6 +50,7 @@ class Dcli(object):
         self.pycharm = cli_pycharm.PycharmCli()
         self.jdk = cli_jdk.JdkCli()
         self.vscode = cli_vscode.VscodeCli()
+        self.centoseol = cli_centos_eol.CentOSEolCli()
 
 
 if __name__ == "__main__":
