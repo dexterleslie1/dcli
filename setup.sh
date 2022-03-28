@@ -139,9 +139,10 @@ setup_python() {
       # centOS8安装python3
       yum -y install python3-pip
   elif [[ $varUname =~ $varUbuntu ]]; then
-      sudo apt-get install python-pip -y
+      sudo apt-get install python3-pip -y
+      pip3 install setuptools
   fi
-  # centOS8使用pip3安装fire
+
   pip3 install fire
 }
 
