@@ -5,7 +5,7 @@
 
 - stat: path=/usr/local/openresty
   register: var_openresty_folder
-- name: "Copy openresty.tar.gz to target deployment machine"
+- name: "复制本地文件openresty.tar.gz到部署主机"
   synchronize:
    src: /tmp/openresty.tar.gz
    dest: /usr/local/openresty.tar.gz
@@ -17,15 +17,15 @@
    path: /usr/local/openresty.tar.gz
    state: absent
 
-- name: "Copy file openresty.service to /usr/lib/systemd/system/openresty.service"
+- name: "复制本地文件openresty.service到部署主机/usr/lib/systemd/system/openresty.service"
   template:
     src: openresty.service
     dest: /usr/lib/systemd/system/openresty.service
-- name: "Copy file naxsi.rules to /usr/local/openresty/nginx/conf/naxsi.rules"
+- name: "复制本地文件naxsi.rules到部署主机/usr/local/openresty/nginx/conf/naxsi.rules"
   template:
     src: naxsi.rules
     dest: /usr/local/openresty/nginx/conf/naxsi.rules
-- name: "Copy file nginx.conf to /usr/local/openresty/nginx/conf/nginx.conf"
+- name: "复制本地文件nginx.conf到部署主机/usr/local/openresty/nginx/conf/nginx.conf"
   template:
     src: nginx.conf
     dest: /usr/local/openresty/nginx/conf/nginx.conf
