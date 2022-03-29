@@ -44,4 +44,4 @@
   systemd:
     name: jmeter-server
     state: restarted
-    enabled: yes
+    enabled: no
