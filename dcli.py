@@ -24,6 +24,7 @@ import cli_pycharm
 import cli_jdk
 import cli_vscode
 import cli_centos_eol
+import cli_tomcat
 import logging
 
 
@@ -51,6 +52,7 @@ class Dcli(object):
         self.jdk = cli_jdk.JdkCli()
         self.vscode = cli_vscode.VscodeCli()
         self.centoseol = cli_centos_eol.CentOSEolCli()
+        self.tomcat = cli_tomcat.TomcatCli()
 
 
 if __name__ == "__main__":

@@ -1,0 +1,36 @@
+---
+# 安装tomcat
+
+# 下载tomcat
+- name: "从https://bucketxy.oss-cn-hangzhou.aliyuncs.com/tomcat/apache-tomcat-7.0.68.tar.gz下载tomcat"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/tomcat/apache-tomcat-7.0.68.tar.gz
+    dest: /tmp/apache-tomcat-7.0.68.tar.gz
+    checksum: md5:94688679d5f37499d1bd1a65eb9540e7
+
+# 部署tomcat
+- name: "cd /tmp && tar -xvzf apache-tomcat-7.0.68.tar.gz"
+  shell: cd /tmp && tar -xzvf apache-tomcat-7.0.68.tar.gz
+- name: "cd /tmp && mv -n apache-tomcat-7.0.68 /usr/local/"
+  shell: cd /tmp && mv -n apache-tomcat-7.0.68 /usr/local/
+
+# 删除webapps预置项目
+- name: "删除webapps预置项目"
+  file:
+    path: "{{item}}"
+    state: absent
+  with_items:
+    - /usr/local/apache-tomcat-7.0.68/webapps/docs
+    - /usr/local/apache-tomcat-7.0.68/webapps/examples
+    - /usr/local/apache-tomcat-7.0.68/webapps/host-manager
+    - /usr/local/apache-tomcat-7.0.68/webapps/manager
+    - /usr/local/apache-tomcat-7.0.68/webapps/ROOT
+
+# 设置xmx和jmx
+- name: "设置/usr/local/apache-tomcat-7.0.68/bin/catalina.sh xmx和jmx"
+  lineinfile:
+    path: /usr/local/apache-tomcat-7.0.68/bin/catalina.sh
+    regexp: "^CATALINA_OPTS=\"-server"
+    line: "{{ varCatalinaOpts }}"
+    insertbefore: "# OS specific support"
+  when: varCatalinaOpts is defined and varCatalinaOpts|length > 0
