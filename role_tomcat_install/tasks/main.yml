@@ -34,3 +34,15 @@
     line: "{{ varCatalinaOpts }}"
     insertbefore: "# OS specific support"
   when: varCatalinaOpts is defined and varCatalinaOpts|length > 0
+
+# 禁止tomcat access log
+- name: "禁止tomcat access log"
+  replace:
+    path: /usr/local/apache-tomcat-7.0.68/conf/server.xml
+    regexp: "^\\s*<Valve className=\"org.apache.catalina.valves.AccessLogValve\" directory=\"logs\""
+    replace: "        <!-- <Valve className=\"org.apache.catalina.valves.AccessLogValve\" directory=\"logs\""
+- name: "禁止tomcat access log"
+  replace:
+    path: /usr/local/apache-tomcat-7.0.68/conf/server.xml
+    regexp: "pattern=\"%h %l %u %t &quot;%r&quot; %s %b\" />$"
+    replace: "pattern=\"%h %l %u %t &quot;%r&quot; %s %b\" /> -->"
