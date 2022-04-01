@@ -144,6 +144,7 @@ setup_python() {
   fi
 
   pip3 install fire
+  pip3 install enquiries
 }
 
 ########################
