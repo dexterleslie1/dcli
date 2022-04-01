@@ -28,6 +28,13 @@
     line: "server.rmi.ssl.disable=true"
     insertbefore: "# resolve links"
 
+- name: "master模式修改jmeter.properties remote_hosts=配置"
+  lineinfile:
+    path: /usr/local/jmeter/bin/jmeter.properties
+    regexp: "^remote_hosts="
+    line: "remote_hosts={{ varRemoteHosts }}"
+  when: varMasterMode is defined and varMasterMode and varRemoteHosts is defined and varRemoteHosts|length > 0
+
 - name: "修改堆内存-Xmx"
   lineinfile:
     path: /usr/local/jmeter/bin/jmeter
@@ -36,12 +43,17 @@
     insertbefore: "# resolve links"
 
 - name: "配置jmeter-service.service"
-  copy:
-   src: jmeter-server.service
-   dest: /usr/lib/systemd/system/jmeter-server.service
+  template:
+    src: jmeter-server.service
+    dest: /usr/lib/systemd/system/jmeter-server.service
+  when: var_slave_mode is defined and var_slave_mode
 
-- name: "systemctl enable jmeter-server && systemctl start jmeter-server"
+- name: "systemctl daemon-reload"
+  shell: systemctl daemon-reload
+
+- name: "systemctl start jmeter-server"
   systemd:
     name: jmeter-server
     state: restarted
     enabled: no
+  when: var_slave_mode is defined and var_slave_mode

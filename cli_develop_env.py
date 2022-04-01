@@ -1,5 +1,6 @@
 import cli_common
 import os
+import enquiries
 
 
 class DevelopEnvCli(object):
@@ -59,6 +60,24 @@ class DevelopEnvCli(object):
             var_command = var_command + " -e var_include_jmeter=true"
             if not include_jdk:
                 var_command = var_command + " -e var_include_jdk=true"
+
+            varOptions = ["master模式", "slave模式"]
+            varChoice = enquiries.choose("选择Jmeter安装和配置模式：", varOptions)
+
+            if varChoice == "master模式":
+                var_remote_hosts = input("输入jmeter.properties remote_hosts设置（例如：192.168.1.1,192.168.1.2，多个主机之间用逗号分开）：")
+
+                var_command = var_command + " -e varRemoteHosts=" + var_remote_hosts
+                var_command = var_command + " -e varMasterMode=true"
+            else:
+                var_rmi_listen_ip = input("* 输入Jmeter slave模式rmi监听的ip地址：")
+
+                if len(var_rmi_listen_ip.strip()) == 0:
+                    raise Exception("必须输入Jmeter slave模式rmi监听的ip地址！")
+
+                var_command = var_command + " -e varRmiListenIp=" + var_rmi_listen_ip
+                var_command = var_command + " -e var_slave_mode=true"
+
             # 当安装Jmeter时，提示输入Jmeter -Xmx内存值
             var_heap_mx = input("输入Jmeter最大java堆内存，单位GB（默认1GB）：") or "1"
             var_command = var_command + " -e var_heap_mx=" + var_heap_mx
