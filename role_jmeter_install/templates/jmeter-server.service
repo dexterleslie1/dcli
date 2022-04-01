@@ -1,0 +1,22 @@
+# file name:
+# /usr/lib/systemd/system/jmeter-server.service
+
+[Unit]
+Description=JMeter Slave
+
+[Service]
+#Environment="SERVER_PORT=8099"
+#User=testadm
+#WorkingDirectory=/home/testadm/apache-jmeter-5.1.1/slave1
+
+# 使用-Djava.rmi.server.hostname=解决： An error occurred: Cannot start. xxxxx is a loopback address.
+# https://stackoverflow.com/questions/3150448/jmeter-loopback-address-error-when-launching-jmeter-server-on-linux
+ExecStart=/usr/local/jmeter/bin/jmeter-server -Jserver.rmi.ssl.disable=true -Djava.rmi.server.hostname={{ varRmiListenIp }}
+
+SuccessExitStatus=143
+TimeoutStopSec=15
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
