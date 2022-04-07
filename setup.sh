@@ -2,6 +2,8 @@
 
 #
 # Shell for setup dcli
+# 支持操作系统：ubuntu20、centOS7、centOS8
+# NOTE：centOS6从python2.6升级到python2.7之后，pip install fire无法正常工作
 
 ########################
 # 解决centOS eol问题
