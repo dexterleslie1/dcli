@@ -21,6 +21,9 @@ class OpenrestyCli(object):
         :return:
         """
 
+        # openresty是frontend还是backend
+        varFrontend = True
+
         # 获取当前工作目录
         varCurrentWorkingDirectory = os.getcwd()
 
@@ -81,6 +84,15 @@ class OpenrestyCli(object):
                         varCompileHostSshPassword = getpass.getpass("输入SSH密码：")
 
                 if var_install.lower() == "y":
+                    # 询问用户是安装部署frontend openrety还是backend openresty
+                    varOptions = ["frontend", "backend"]
+                    varChoice = enquiries.choose(
+                        "安装部署frontend（用户使用浏览器直接访问的openresty）还是backend（代理后端tomcat的openresty） openresty：", varOptions)
+                    if varChoice == "frontend":
+                        varFrontend = True
+                    else:
+                        varFrontend = False
+
                     var_install_locally = input("是否本地部署openresty？ [y/n]: ") or "n"
                     if not var_install_locally == "y":
                         varDeploymentHostSshIp = input("部署openresty主机（例如： 192.168.1.20:8080）：")
@@ -109,6 +121,19 @@ class OpenrestyCli(object):
                         var_command = cli_common.concat_command(var_command, varDeploymentHostSshIp, varDeploymentHostSshUser, varDeploymentHostSshPassword)
 
                     var_command = var_command + " -e varCurrentWorkingDirectory=\"" + varCurrentWorkingDirectory + "\""
+                    cli_common.execute_command(var_command)
+
+                    # 安装配置fail2ban服务
+                    if var_install_locally == "y":
+                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_fail2ban_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
+                    else:
+                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_fail2ban_install.yml"
+                        var_command = cli_common.concat_command(var_command, varDeploymentHostSshIp, varDeploymentHostSshUser, varDeploymentHostSshPassword)
+
+                    if varFrontend:
+                        var_command = var_command + " -e varFrontend=true"
+                    else:
+                        var_command = var_command + " -e varBackend=true"
                     cli_common.execute_command(var_command)
             else:
                 # TODO: Install openresty from yum repository

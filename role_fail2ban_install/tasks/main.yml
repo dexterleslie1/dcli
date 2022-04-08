@@ -1,0 +1,58 @@
+- name: "安装epel-release仓库"
+  yum:
+   name: epel-release
+   state: installed
+  when: ansible_distribution == "CentOS"
+
+- name: "安装fail2ban"
+  yum:
+   name: fail2ban
+   state: installed
+  when: ansible_distribution == "CentOS"
+
+- name: "设置fail2ban输出日志文件"
+  shell: sed -i 's/^logtarget.*/logtarget = \/var\/log\/fail2ban.log/' /etc/fail2ban/fail2ban.conf
+
+- name: "配置fail2ban logroate"
+  copy:
+    src: fail2ban.logrotate
+    dest: /etc/logrotate.d/fail2ban
+
+- name: "复制my-limit-req-REQ.conf到/etc/fail2ban/filter.d/目录"
+  copy:
+    src: my-limit-req-REQ.conf
+    dest: /etc/fail2ban/filter.d/my-limit-req-REQ.conf
+- name: "复制my-limit-req-REQAcc.conf到/etc/fail2ban/filter.d/目录"
+  copy:
+    src: my-limit-req-REQAcc.conf
+    dest: /etc/fail2ban/filter.d/my-limit-req-REQAcc.conf
+
+# openresty frontend时对应的fail2ban配置
+- name: "复制my-limit-req.local到/etc/fail2ban/jail.d/目录"
+  copy:
+    src: my-limit-req-frontend.local
+    dest: /etc/fail2ban/jail.d/my-limit-req.local
+  when: varFrontend is defined and varFrontend
+
+# openresty backend时对应的fail2ban配置
+- name: "复制my-limit-req-CONN.conf到/etc/fail2ban/filter.d/目录"
+  copy:
+    src: my-limit-req-CONN.conf
+    dest: /etc/fail2ban/filter.d/my-limit-req-CONN.conf
+  when: varBackend is defined and varBackend
+- name: "复制my-iptables.conf到/etc/fail2ban/action.d/目录"
+  copy:
+    src: my-iptables.conf
+    dest: /etc/fail2ban/action.d/my-iptables.conf
+  when: varBackend is defined and varBackend
+- name: "复制my-limit-req.local到/etc/fail2ban/jail.d/目录"
+  copy:
+    src: my-limit-req-backend.local
+    dest: /etc/fail2ban/jail.d/my-limit-req.local
+  when: varBackend is defined and varBackend
+
+- name: "启动fail2ban服务"
+  systemd:
+   name: fail2ban
+   state: restarted
+   enabled: yes

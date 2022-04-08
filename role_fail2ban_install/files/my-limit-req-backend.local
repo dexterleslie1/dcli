@@ -1,0 +1,26 @@
+[my-limit-req-REQ]
+enabled  = true
+logpath  = /usr/local/openresty/nginx/logs/error.log
+action = my-iptables[name="xForwardedForREQ",blocktype="DROP",port="80"]
+         iptables[name="sourceREQ",blocktype="DROP",port="80"]
+maxretry = 1
+findtime = 30
+bantime  = 7200
+
+[my-limit-req-REQAcc]
+enabled  = true
+logpath  = /usr/local/openresty/nginx/logs/error.log
+action = my-iptables[name="xForwardedForREQAcc",blocktype="DROP",port="80"]
+         iptables[name="sourceREQAcc",blocktype="DROP",port="80"]
+maxretry = 1
+findtime = 60
+bantime  = 7200
+
+[my-limit-req-CONN]
+enabled  = true
+logpath  = /usr/local/openresty/nginx/logs/error.log
+action = my-iptables[name="xForwardedForCONN",blocktype="DROP",port="80"]
+         iptables[name="sourceCONN",blocktype="DROP",port="80"]
+maxretry = 1
+findtime = 60
+bantime  = 7200
