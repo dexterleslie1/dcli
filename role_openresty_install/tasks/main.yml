@@ -74,8 +74,14 @@
 
 - name: "复制nginx.conf到/usr/local/openresty/nginx/conf/nginx.conf"
   template:
-    src: nginx.conf
+    src: nginx.frontend.conf
     dest: /usr/local/openresty/nginx/conf/nginx.conf
+  when: varFrontend is defined and varFrontend
+- name: "复制nginx.conf到/usr/local/openresty/nginx/conf/nginx.conf"
+  template:
+    src: nginx.backend.conf
+    dest: /usr/local/openresty/nginx/conf/nginx.conf
+  when: varBackend is defined and varBackend
 
 - name: "systemctl restart openresty"
   systemd:

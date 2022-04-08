@@ -53,7 +53,8 @@ class OpenrestyCli(object):
             varDefaultConfigTemplateFullRelativePath = varExecutionDirection + "/role_openresty_install/templates/" + varDefaultConfigTemplate
             shutil.copyfile(varDefaultConfigTemplateFullRelativePath, varCurrentWorkingDirectory + "/default.conf")
 
-            shutil.copyfile(varExecutionDirection + "/role_openresty_install/templates/naxsi.rules.template", varCurrentWorkingDirectory + "/naxsi.rules")
+            if varChoice != "frontend":
+                shutil.copyfile(varExecutionDirection + "/role_openresty_install/templates/naxsi.rules.template", varCurrentWorkingDirectory + "/naxsi.rules")
             print("提示： 成功在当前工作目录生成default.conf和naxsi.rules模板文件，可以通过编辑default.conf和naxsi.rules自定义openresty配置")
 
         else:
@@ -121,6 +122,12 @@ class OpenrestyCli(object):
                         var_command = cli_common.concat_command(var_command, varDeploymentHostSshIp, varDeploymentHostSshUser, varDeploymentHostSshPassword)
 
                     var_command = var_command + " -e varCurrentWorkingDirectory=\"" + varCurrentWorkingDirectory + "\""
+
+                    if varFrontend:
+                        var_command = var_command + " -e varFrontend=true"
+                    else:
+                        var_command = var_command + " -e varBackend=true"
+
                     cli_common.execute_command(var_command)
 
                     # 安装配置fail2ban服务
