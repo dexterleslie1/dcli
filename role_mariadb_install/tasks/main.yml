@@ -4,7 +4,8 @@
   when: ansible_distribution == "CentOS"
 
 # 安装mariadb
-- get_url:
+- name: "下载MariaDB相关rpm"
+  get_url:
    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/mariadb-10.4.12-1.el8.x86_64/{{ item }}
    dest: /tmp/{{ item }}
   with_items:
@@ -13,12 +14,14 @@
    - MariaDB-server-10.4.12-1.el8.x86_64.rpm
    - galera-4-26.4.3-1.rhel8.0.el8.x86_64.rpm
   when: "'MariaDB-server' not in ansible_facts.packages"
-- yum:
+- name: "使用yum安装MariaDB"
+  yum:
    name: /tmp/MariaDB-client-10.4.12-1.el8.x86_64.rpm,/tmp/MariaDB-common-10.4.12-1.el8.x86_64.rpm,/tmp/MariaDB-server-10.4.12-1.el8.x86_64.rpm,/tmp/galera-4-26.4.3-1.rhel8.0.el8.x86_64.rpm
    state: installed
    disable_gpg_check: yes
   when: "'MariaDB-server' not in ansible_facts.packages"
-- file:
+- name: "删除MariaDB相关rpm"
+  file:
     path: /tmp/{{ item }}
     state: absent
   with_items:
@@ -26,27 +29,34 @@
    - MariaDB-common-10.4.12-1.el8.x86_64.rpm
    - MariaDB-server-10.4.12-1.el8.x86_64.rpm
    - galera-4-26.4.3-1.rhel8.0.el8.x86_64.rpm
-- file:
+- name: "创建/data目录"
+  file:
    path: /data
    state: directory
-- copy:
+
+- name: "复制/var/lib/mysql目录到/data/mysql目录"
+  copy:
    src: /var/lib/mysql
    dest: /data/
    remote_src: yes
    group: mysql
    owner: mysql
    force: no
-- copy:
-   src: ./server.cnf
+- name: "复制server.cnf到/etc/my.cnf.d/server.cnf"
+  copy:
+   src: server.cnf
    dest: /etc/my.cnf.d/server.cnf
-- systemd:
+- name: "systemctl enable mariadb && systemctl start mariadb"
+  systemd:
    name: mariadb
    state: started
    enabled: yes
-- pip:
+- name: "pip install pymysql"
+  pip:
    name: pymysql
    state: present
-- mysql_user:
+- name: "删除MariaDB匿名用户"
+  mysql_user:
    name: ''
    host_all: yes
    state: absent

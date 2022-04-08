@@ -1,8 +1,9 @@
 ---
-- name: Install mariadb server
+- name: "安装MariaDB"
   hosts: all
   become: yes
   roles:
+    - role: role_centos_eol
     - role: role_os_timezone
     - role: role_os_firewall
     - role: role_os_chrony
