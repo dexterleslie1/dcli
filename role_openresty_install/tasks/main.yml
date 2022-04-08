@@ -3,29 +3,76 @@
     state: stopped
   ignore_errors: yes
 
+# 调整sysctl
+- name: "grep -q '^net.ipv4.tcp_syncookies' /etc/sysctl.conf && sed -i 's/^net.ipv4.tcp_syncookies.*/net.ipv4.tcp_syncookies=1/' /etc/sysctl.conf || echo 'net.ipv4.tcp_syncookies=1' >> /etc/sysctl.conf"
+  shell: grep -q '^net.ipv4.tcp_syncookies' /etc/sysctl.conf && sed -i 's/^net.ipv4.tcp_syncookies.*/net.ipv4.tcp_syncookies=1/' /etc/sysctl.conf || echo 'net.ipv4.tcp_syncookies=1' >> /etc/sysctl.conf
+- name: "grep -q '^net.ipv4.tcp_tw_reuse' /etc/sysctl.conf && sed -i 's/^net.ipv4.tcp_tw_reuse.*/net.ipv4.tcp_tw_reuse=1/' /etc/sysctl.conf || echo 'net.ipv4.tcp_tw_reuse=1' >> /etc/sysctl.conf"
+  shell: grep -q '^net.ipv4.tcp_tw_reuse' /etc/sysctl.conf && sed -i 's/^net.ipv4.tcp_tw_reuse.*/net.ipv4.tcp_tw_reuse=1/' /etc/sysctl.conf || echo 'net.ipv4.tcp_tw_reuse=1' >> /etc/sysctl.conf
+- name: "grep -q '^net.ipv4.tcp_tw_recycle' /etc/sysctl.conf && sed -i 's/^net.ipv4.tcp_tw_recycle.*/net.ipv4.tcp_tw_recycle=1/' /etc/sysctl.conf || echo 'net.ipv4.tcp_tw_recycle=1' >> /etc/sysctl.conf"
+  shell: grep -q '^net.ipv4.tcp_tw_recycle' /etc/sysctl.conf && sed -i 's/^net.ipv4.tcp_tw_recycle.*/net.ipv4.tcp_tw_recycle=1/' /etc/sysctl.conf || echo 'net.ipv4.tcp_tw_recycle=1' >> /etc/sysctl.conf
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version != "8"
+- name: "grep -q '^net.ipv4.tcp_fin_timeout' /etc/sysctl.conf && sed -i 's/^net.ipv4.tcp_fin_timeout.*/net.ipv4.tcp_fin_timeout=30/' /etc/sysctl.conf || echo 'net.ipv4.tcp_fin_timeout=30' >> /etc/sysctl.conf"
+  shell: grep -q '^net.ipv4.tcp_fin_timeout' /etc/sysctl.conf && sed -i 's/^net.ipv4.tcp_fin_timeout.*/net.ipv4.tcp_fin_timeout=30/' /etc/sysctl.conf || echo 'net.ipv4.tcp_fin_timeout=30' >> /etc/sysctl.conf
+- name: "sysctl -p"
+  shell: sysctl -p
+  ignore_errors: true
+
 - stat: path=/usr/local/openresty
-  register: var_openresty_folder
-- name: "复制本地文件openresty.tar.gz到部署主机"
-  synchronize:
+  register: varOpenrestyFolder
+- name: "复制openresty.tar.gz到部署主机"
+  copy:
    src: /tmp/openresty.tar.gz
    dest: /usr/local/openresty.tar.gz
-  when: not var_openresty_folder.stat.exists
+  when: not varOpenrestyFolder.stat.exists
 - name: "cd /usr/local && tar zxf openresty.tar.gz"
   shell: cd /usr/local && tar zxf openresty.tar.gz
-  when: not var_openresty_folder.stat.exists
+  when: not varOpenrestyFolder.stat.exists
 - file:
    path: /usr/local/openresty.tar.gz
    state: absent
 
-- name: "复制本地文件openresty.service到部署主机/usr/lib/systemd/system/openresty.service"
+- name: "复制openresty.service到/usr/lib/systemd/system/openresty.service"
   template:
     src: openresty.service
     dest: /usr/lib/systemd/system/openresty.service
-- name: "复制本地文件naxsi.rules到部署主机/usr/local/openresty/nginx/conf/naxsi.rules"
-  template:
-    src: naxsi.rules
-    dest: /usr/local/openresty/nginx/conf/naxsi.rules
-- name: "复制本地文件nginx.conf到部署主机/usr/local/openresty/nginx/conf/nginx.conf"
+
+- stat:
+   path: /usr/local/openresty/nginx/conf/default.conf.bak
+  register: varStatDefaultConfBak
+- stat:
+    path: /usr/local/openresty/nginx/conf/default.conf
+  register: varStatDefaultConf
+- name: "如果default.conf.bak不存在，则备份default.conf到default.conf.bak"
+  copy:
+    src: /usr/local/openresty/nginx/conf/default.conf
+    dest: /usr/local/openresty/nginx/conf/default.conf.bak
+    remote_src: yes
+  when: varStatDefaultConf.stat.exists and not varStatDefaultConfBak.stat.exists
+- name: "复制当前工作目录的default.conf到/usr/local/openresty/nginx/conf目录"
+  copy:
+    src: "{{ varCurrentWorkingDirectory }}/default.conf"
+    dest: /usr/local/openresty/nginx/conf/default.conf
+
+# https://stackoverflow.com/questions/62116534/ansible-copy-files-with-wildcard
+- name: "复制当前工作目录*.rules到/usr/local/openresty/nginx/conf目录"
+  copy:
+    src: "{{ item }}"
+    dest: /usr/local/openresty/nginx/conf/
+  with_fileglob: "{{ varCurrentWorkingDirectory }}/*.rules"
+
+# 配置lua公共库
+- name: "创建目录/usr/local/openresty/nginx/conf/lua"
+  file:
+    path: /usr/local/openresty/nginx/conf/lua
+    state: directory
+- name: "复制my_common.lua到/usr/local/openresty/nginx/conf/lua目录"
+  copy:
+    src: my_common.lua
+    dest: /usr/local/openresty/nginx/conf/lua/my_common.lua
+- name: "chmod 755 /usr/local/openresty/nginx/conf/lua/my_common.lua"
+  shell: chmod 755 /usr/local/openresty/nginx/conf/lua/my_common.lua
+
+- name: "复制nginx.conf到/usr/local/openresty/nginx/conf/nginx.conf"
   template:
     src: nginx.conf
     dest: /usr/local/openresty/nginx/conf/nginx.conf

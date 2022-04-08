@@ -1,0 +1,53 @@
+upstream backend {
+    keepalive 1024;
+    server 127.0.0.1:8080;
+}
+
+server {
+    listen       80;
+    server_name  localhost;
+
+    #charset koi8-r;
+
+    #access_log  logs/host.access.log  main;
+
+    set $naxsi_extensive_log 1;
+    location ~* \.(gif|jpg|jpeg|png|bmp|ico|html|css|js)$ {
+        include /usr/local/openresty/nginx/conf/naxsi_facaded.rules;
+
+        expires 30m;
+        add_header Pragma public;
+        add_header Cache-Control "public";
+        proxy_cache cache_one;
+        proxy_cache_valid 200 30m;
+        proxy_set_header Host $host:$server_port;
+        proxy_set_header x-forwarded-for $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+        proxy_set_header Connection '';
+        proxy_pass http://backend;
+    }
+
+    location / {
+        include /usr/local/openresty/nginx/conf/naxsi_facaded.rules;
+
+        proxy_set_header Host $host:$server_port;
+        proxy_set_header x-forwarded-for $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+        proxy_set_header Connection '';
+        proxy_pass http://backend;
+
+        #content_by_lua_block {
+        #        local common = require("my_common");
+        #        local clientIp = common.getClientIp();
+        #        ngx.header.content_type = "text/plain;charset=utf-8";
+        #        local response = "你好，中国";
+        #        ngx.say(response);
+        #}
+    }
+
+    location /RequestDenied {
+        #access_log logs/access.log access;
+        default_type application/json;
+        return 200 '{"errorCode":50000,"errorMessage":"输入有误，请重新输入"}';
+    }
+}

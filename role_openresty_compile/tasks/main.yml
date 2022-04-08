@@ -45,6 +45,14 @@
 - name: "cp -nf /tmp/naxsi-0.56/naxsi_config/naxsi_core.rules /usr/local/openresty/nginx/conf/naxsi_core.rules"
   shell: cp -nf /tmp/naxsi-0.56/naxsi_config/naxsi_core.rules /usr/local/openresty/nginx/conf/naxsi_core.rules
 
+# 删除默认的 /usr/local/openresty/nginx/conf/default.conf 文件
+# 因为在openresty部署时会先备份 default.conf 文件，如果存在默认 default.conf 文件在首次部署时会被备份为 default.conf.bak 文件
+# 最终会影响真正的 default.conf 文件备份
+- name: "删除默认的 /usr/local/openresty/nginx/conf/default.conf 文件"
+  file:
+    path: /usr/local/openresty/nginx/conf/default.conf
+    state: absent
+
 - name: "cd /usr/local/ && tar -czf openresty.tar.gz openresty/*"
   shell: cd /usr/local/ && tar -czf openresty.tar.gz openresty/*
 

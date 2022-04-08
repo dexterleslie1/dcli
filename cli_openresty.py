@@ -1,6 +1,9 @@
 import cli_common
 import os
 import logging
+import enquiries
+import shutil
+import getpass
 
 
 class OpenrestyCli(object):
@@ -18,47 +21,95 @@ class OpenrestyCli(object):
         :return:
         """
 
-        # Full path of python file locates in
-        var_full_path = os.path.dirname(os.path.realpath(__file__))
+        # 获取当前工作目录
+        varCurrentWorkingDirectory = os.getcwd()
 
-        var_compile_locally = "n"
-        var_install_locally = "n"
-        if from_source:
-            var_compile = input("是否编译openresty？ [y/n]： ")
-            var_install = input("安装openresty？ [y/n]： ")
-            if var_compile.lower() == "y":
-                var_compile_locally = input("是否本地编译openresty？ [y/n]: ") or "n"
-                if not var_compile_locally == "y":
-                    var_host_target = input("编译openresty主机（例如： 192.168.1.20:8080）：")
-                    var_host_target_user = input("编译openresty主机的SSH用户（默认 root）：") or "root"
+        # 询问用户是安装部署openresty还是在当前工作目录生成default.conf和naxsi.rules模板
+        varOptions = ["在当前目录生成default.conf和naxsi.rules模板", "安装部署"]
+        varChoice = enquiries.choose("选择操作：", varOptions)
 
-            if var_install.lower() == "y":
-                var_install_locally = input("是否本地部署openresty？ [y/n]: ") or "n"
-                if not var_install_locally == "y":
-                    var_host_target = input("部署openresty主机（例如： 192.168.1.20:8080）：")
-                    var_host_target_user = input("部署openresty主机的SSH用户（默认 root）：") or "root"
+        if varChoice == "在当前目录生成default.conf和naxsi.rules模板":
+            # 判断当前目录是否已经存在default.conf和naxsi.rules模板
+            # 是则提示用户并且不生成default.conf和naxsi.rules模板
+            # 否则就生成default.conf和naxsi.rules模板
+            if os.path.exists(varCurrentWorkingDirectory + "/default.conf"):
+                raise Exception("当前工作目录已经存在名为default.conf文件，不能在当前目录生成defaut.conf模板文件")
+            if os.path.exists(varCurrentWorkingDirectory + "/naxsi.rules"):
+                raise Exception("当前工作目录已经存在名为naxsi.rules文件，不能在当前目录生成naxsi.rules模板文件")
 
-            if var_compile.lower() == "y":
-                # 在编译主机中编译openresty
-                logging.info("########################### 编译openresty ##############################")
+            # 询问用户是安装部署frontend openrety还是backend openresty
+            varOptions = ["frontend", "backend"]
+            varChoice = enquiries.choose("安装部署frontend（用户使用浏览器直接访问的openresty）还是backend（代理后端tomcat的openresty） openresty：", varOptions)
 
-                if var_compile_locally == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml"
-                    var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)
-                cli_common.execute_command(var_command)
+            varDefaultConfigTemplate = "default.conf.backend.template"
+            if varChoice == "frontend":
+                varDefaultConfigTemplate = "default.conf.frontend.template"
 
-            if var_install.lower() == "y":
-                # 部署openresty
-                logging.info("########################### 部署openresty ##############################")
+            # 复制default.conf和naxsi.rules模板文件到当前工作目录
+            varExecutionDirection = os.path.dirname(os.path.realpath(__file__))
+            varDefaultConfigTemplateFullRelativePath = varExecutionDirection + "/role_openresty_install/templates/" + varDefaultConfigTemplate
+            shutil.copyfile(varDefaultConfigTemplateFullRelativePath, varCurrentWorkingDirectory + "/default.conf")
 
-                if var_install_locally == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml"
-                    var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)
-                cli_common.execute_command(var_command)
+            shutil.copyfile(varExecutionDirection + "/role_openresty_install/templates/naxsi.rules.template", varCurrentWorkingDirectory + "/naxsi.rules")
+            print("提示： 成功在当前工作目录生成default.conf和naxsi.rules模板文件，可以通过编辑default.conf和naxsi.rules自定义openresty配置")
+
         else:
-            # TODO: Install openresty from yum repository
-            raise Exception("Install openresty from yum repository not implement yet.")
+            # 判断当前工作目录是否存在default.conf文件，否则报错提示用户先使用“在当前目录生成default.conf和naxsi.rules模板”生成相关模板
+            if not os.path.exists(varCurrentWorkingDirectory + "/default.conf"):
+                raise Exception("当前工作目录不存在default.conf文件，先使用“在当前目录生成default.conf和naxsi.rules模板”生成相关模板配置")
+
+            # Full path of python file locates in
+            var_full_path = os.path.dirname(os.path.realpath(__file__))
+
+            var_compile_locally = "n"
+            var_install_locally = "n"
+            varCompileHostSshIp = ""
+            varCompileHostSshUser = ""
+            varCompileHostSshPassword = ""
+            varDeploymentHostSshIp = ""
+            varDeploymentHostSshUser = ""
+            varDeploymentHostSshPassword = ""
+
+            if from_source:
+                var_compile = input("是否编译openresty？ [y/n]： ")
+                var_install = input("安装openresty？ [y/n]： ")
+                if var_compile.lower() == "y":
+                    var_compile_locally = input("是否本地编译openresty？ [y/n]: ") or "n"
+                    if not var_compile_locally == "y":
+                        varCompileHostSshIp = input("编译openresty主机（例如： 192.168.1.20:8080）：")
+                        varCompileHostSshUser = input("编译openresty主机的SSH用户（默认 root）：") or "root"
+                        varCompileHostSshPassword = getpass.getpass("输入SSH密码：")
+
+                if var_install.lower() == "y":
+                    var_install_locally = input("是否本地部署openresty？ [y/n]: ") or "n"
+                    if not var_install_locally == "y":
+                        varDeploymentHostSshIp = input("部署openresty主机（例如： 192.168.1.20:8080）：")
+                        varDeploymentHostSshUser = input("部署openresty主机的SSH用户（默认 root）：") or "root"
+                        varDeploymentHostSshPassword = getpass.getpass("输入SSH密码：")
+
+                if var_compile.lower() == "y":
+                    # 在编译主机中编译openresty
+                    logging.info("########################### 编译openresty ##############################")
+
+                    if var_compile_locally == "y":
+                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml --ask-become-pass --connection=local -i 127.0.0.1,"
+                    else:
+                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml"
+                        var_command = cli_common.concat_command(var_command, varCompileHostSshIp, varCompileHostSshUser, varCompileHostSshPassword)
+                    cli_common.execute_command(var_command)
+
+                if var_install.lower() == "y":
+                    # 部署openresty
+                    logging.info("########################### 部署openresty ##############################")
+
+                    if var_install_locally == "y":
+                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
+                    else:
+                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml"
+                        var_command = cli_common.concat_command(var_command, varDeploymentHostSshIp, varDeploymentHostSshUser, varDeploymentHostSshPassword)
+
+                    var_command = var_command + " -e varCurrentWorkingDirectory=\"" + varCurrentWorkingDirectory + "\""
+                    cli_common.execute_command(var_command)
+            else:
+                # TODO: Install openresty from yum repository
+                raise Exception("Install openresty from yum repository not implement yet.")
