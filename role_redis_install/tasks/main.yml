@@ -132,6 +132,12 @@
 - name: "启动集群节点{{ varClusterNode }}"
   shell: cd /data/redis-cluster/{{ varClusterNode }} && redis-server redis.conf
   when: varRedisMode == "cluster" and varAction == "clusterNodeConfig"
+- name: "修改/etc/rc.d/rc.local 添加sudo -i sh -c \"cd /data/redis-cluster/{{ varClusterNode }} && /usr/bin/redis-server redis.conf\""
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    regexp: "^sudo -i sh -c \"cd /data/redis-cluster/{{ varClusterNode }} && /usr/bin/redis-server redis.conf\""
+    line: "sudo -i sh -c \"cd /data/redis-cluster/{{ varClusterNode }} && /usr/bin/redis-server redis.conf\""
+  when: varClusterNode is defined and ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
 
 - name: "重启系统"
   reboot:

@@ -131,6 +131,12 @@ class RedisCli(object):
                     var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
                     var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser,
                                                             varHostRedisPassword)
+
+                if varReboot.lower() == "y":
+                    var_command = var_command + " -e varReboot=true"
+                else:
+                    var_command = var_command + " -e varReboot=false"
+
                 # https://stackoverflow.com/questions/32584112/ansible-spaces-in-command-line-variables
                 var_command = var_command + " -e varRedisMode=cluster -e varAction=clusterCreate -e \"varClusterCreateStr=\'" + varClusterCreateStr + "\'\""
                 cli_common.execute_command(var_command)
