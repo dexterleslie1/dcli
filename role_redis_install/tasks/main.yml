@@ -1,3 +1,19 @@
+- name: "创建集群redis-cli --cluster create {{ varClusterCreateStr }}"
+  shell: echo "yes" | redis-cli --cluster create {{ varClusterCreateStr }}
+  when: varRedisMode is defined and varRedisMode == "cluster" and varAction == "clusterCreate"
+
+# 用于判断/data/redis-cluster目录是否存在
+- stat:
+    path: /data/redis-cluster
+  register: varStatRedisClusterFolder
+  when: varRedisMode == "cluster" and varAction == "clusterCheckRedisClusterFolderExists"
+- name: "判断/data/redis-cluster目录是否存在"
+  assert:
+    that:
+      - not varStatRedisClusterFolder.stat.exists
+    fail_msg: "redis集群目录/data/redis-cluster/已存在，不能在创建redis集群"
+  when: varRedisMode == "cluster" and varAction == "clusterCheckRedisClusterFolderExists"
+
 # 安装redis
 - name: "使用yum安装redis"
   yum:
@@ -83,13 +99,13 @@
   systemd:
    name: redis
    enabled: yes
-  when: varRedisMode == "standalone" and varReboot|bool
+  when: varRedisMode == "standalone" and varReboot is defined and varReboot|bool
 - name: "systemctl enable redis && systemctl start redis"
   systemd:
    name: redis
    state: started
    enabled: yes
-  when: varRedisMode == "standalone" and not varReboot|bool
+  when: varRedisMode == "standalone" and varReboot is defined and not varReboot|bool
 
 # 集群版redis
 - name: "systemctl disable redis && systemctl stop redis"
@@ -97,8 +113,26 @@
    name: redis
    state: stopped
    enabled: no
-  when: varRedisMode == "cluster"
+  when: varRedisMode == "cluster" and varAction == "clusterNodeConfig"
+- name: "创建目录/data/redis-cluster"
+  file:
+    path: /data/redis-cluster
+    state: directory
+  when: varRedisMode == "cluster" and varAction == "clusterNodeConfig"
+- name: "创建集群节点/data/redis-cluster/{{ varClusterNode }}目录"
+  file:
+    path: /data/redis-cluster/{{ varClusterNode }}
+    state: directory
+  when: varRedisMode == "cluster" and varAction == "clusterNodeConfig"
+- name: "复制redis.conf集群节点目录/data/redis-cluster/{{ varClusterNode }}中"
+  template:
+    src: redis.cluster.conf
+    dest: /data/redis-cluster/{{ varClusterNode }}/redis.conf
+  when: varRedisMode == "cluster" and varAction == "clusterNodeConfig"
+- name: "启动集群节点{{ varClusterNode }}"
+  shell: cd /data/redis-cluster/{{ varClusterNode }} && redis-server redis.conf
+  when: varRedisMode == "cluster" and varAction == "clusterNodeConfig"
 
 - name: "重启系统"
   reboot:
-  when: varReboot|bool
+  when: varReboot is defined and varReboot|bool
