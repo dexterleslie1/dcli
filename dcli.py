@@ -25,6 +25,7 @@ import cli_jdk
 import cli_vscode
 import cli_centos_eol
 import cli_tomcat
+import cli_redis
 import logging
 
 
@@ -53,6 +54,7 @@ class Dcli(object):
         self.vscode = cli_vscode.VscodeCli()
         self.centoseol = cli_centos_eol.CentOSEolCli()
         self.tomcat = cli_tomcat.TomcatCli()
+        self.redis = cli_redis.RedisCli()
 
 
 if __name__ == "__main__":

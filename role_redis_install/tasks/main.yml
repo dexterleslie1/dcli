@@ -1,9 +1,104 @@
----
 # 安装redis
-- yum:
+- name: "使用yum安装redis"
+  yum:
    name: redis
    state: installed
-- systemd:
+
+# 调整sysctl
+- name: "grep -q '^vm.overcommit_memory' /etc/sysctl.conf && sed -i 's/^vm.overcommit_memory.*/vm.overcommit_memory=1/' /etc/sysctl.conf || echo 'vm.overcommit_memory=1' >> /etc/sysctl.conf"
+  shell: grep -q '^vm.overcommit_memory' /etc/sysctl.conf && sed -i 's/^vm.overcommit_memory.*/vm.overcommit_memory=1/' /etc/sysctl.conf || echo 'vm.overcommit_memory=1' >> /etc/sysctl.conf
+- name: "grep -q '^net.core.somaxconn' /etc/sysctl.conf && sed -i 's/^net.core.somaxconn.*/net.core.somaxconn=1024/' /etc/sysctl.conf || echo 'net.core.somaxconn=1024' >> /etc/sysctl.conf"
+  shell: grep -q '^net.core.somaxconn' /etc/sysctl.conf && sed -i 's/^net.core.somaxconn.*/net.core.somaxconn=1024/' /etc/sysctl.conf || echo 'net.core.somaxconn=1024' >> /etc/sysctl.conf
+
+# centOS7、centOS8配置rc.local
+- name: "chmod +x /etc/rc.d/rc.local"
+  shell: chmod +x /etc/rc.d/rc.local
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "修改/usr/lib/systemd/system/rc-local.service WantedBy=multi-user.target"
+  lineinfile:
+    path: /usr/lib/systemd/system/rc-local.service
+    regexp: "^WantedBy=multi-user.target"
+    line: "WantedBy=multi-user.target\n"
+    insertafter: '^# systemd-rc-local-generator'
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "修改/usr/lib/systemd/system/rc-local.service [Install]"
+  lineinfile:
+    path: /usr/lib/systemd/system/rc-local.service
+    regexp: "^\\[Install\\]"
+    line: "[Install]"
+    insertafter: '^# systemd-rc-local-generator'
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "修改/usr/lib/systemd/system/rc-local.service After=network.target为After=network-online.target"
+  replace:
+    path: /usr/lib/systemd/system/rc-local.service
+    regexp: "^After=network.target"
+    replace: "After=network-online.target"
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "修改/etc/rc.d/rc.local 添加echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    regexp: "^echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+    line: "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "systemctl daemon-reload"
+  shell: systemctl daemon-reload
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "systemctl enable rc-local.service && systemctl start rc-local.service"
+  systemd:
+   name: rc-local.service
+   state: restarted
+   enabled: yes
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+
+# 单机版redis
+- name: "修改/etc/redis.conf bind 127.0.0.1为bind 0.0.0.0"
+  lineinfile:
+    path: /etc/redis.conf
+    regexp: "^bind 127.0.0.1"
+    line: "bind 0.0.0.0"
+  when: varRedisMode == "standalone"
+- name: "修改/etc/redis.conf port"
+  lineinfile:
+    path: /etc/redis.conf
+    regexp: "^port "
+    line: "port {{ varRedisPort }}"
+  when: varRedisPort is defined and varRedisMode == "standalone"
+- name: "修改/etc/redis.conf requirepass"
+  lineinfile:
+    path: /etc/redis.conf
+    regexp: "^# requirepass"
+    line: "requirepass {{ varRedisPassword }}"
+  when: varRedisPassword is defined and varRedisPassword|length>0 and varRedisMode == "standalone"
+- name: "创建/data/redis目录"
+  file:
+    path: /data/redis
+    state: directory
+- name: "修改/etc/redis.conf 数据目录为/data/redis"
+  lineinfile:
+    path: /etc/redis.conf
+    regexp: "^dir /var/lib/redis"
+    line: "dir /data/redis"
+  when: varRedisMode == "standalone"
+- name: "systemctl enable redis"
+  systemd:
+   name: redis
+   enabled: yes
+  when: varRedisMode == "standalone" and varReboot|bool
+- name: "systemctl enable redis && systemctl start redis"
+  systemd:
    name: redis
    state: started
    enabled: yes
+  when: varRedisMode == "standalone" and not varReboot|bool
+
+# 集群版redis
+- name: "systemctl disable redis && systemctl stop redis"
+  systemd:
+   name: redis
+   state: stopped
+   enabled: no
+  when: varRedisMode == "cluster"
+
+- name: "重启系统"
+  reboot:
+  when: varReboot|bool
