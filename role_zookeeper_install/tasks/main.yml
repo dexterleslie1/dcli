@@ -1,0 +1,20 @@
+- name: "下载zookeeper-3.4.9.tar.gz"
+  get_url:
+    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/zookeeper/zookeeper-3.4.9.tar.gz
+    dest: /tmp/zookeeper-3.4.9.tar.gz
+    checksum: md5:3e8506075212c2d41030d874fcc9dcd2
+
+- name: "cd /tmp && tar -xvzf zookeeper-3.4.9.tar.gz"
+  shell: cd /tmp && tar -xvzf zookeeper-3.4.9.tar.gz
+
+- name: "mv -n /tmp/zookeeper-3.4.9 /usr/local"
+  shell: mv -n /tmp/zookeeper-3.4.9 /usr/local
+
+- name: "复制zoo.cfg到/usr/local/zookeeper-3.4.9/conf/zoo.cfg"
+  template:
+    src: zoo_sample.cfg
+    dest: /usr/local/zookeeper-3.4.9/conf/zoo.cfg
+
+- name: "cd /usr/local/zookeeper-3.4.9/bin && sh zkServer.sh start"
+  shell: cd /usr/local/zookeeper-3.4.9/bin && sh zkServer.sh start
+

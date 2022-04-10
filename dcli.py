@@ -26,6 +26,7 @@ import cli_vscode
 import cli_centos_eol
 import cli_tomcat
 import cli_redis
+import cli_zookeeper
 import logging
 
 
@@ -55,6 +56,7 @@ class Dcli(object):
         self.centoseol = cli_centos_eol.CentOSEolCli()
         self.tomcat = cli_tomcat.TomcatCli()
         self.redis = cli_redis.RedisCli()
+        self.zookeeper = cli_zookeeper.ZookeeperCli()
 
 
 if __name__ == "__main__":
