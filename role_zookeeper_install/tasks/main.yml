@@ -7,14 +7,19 @@
 - name: "cd /tmp && tar -xvzf zookeeper-3.4.9.tar.gz"
   shell: cd /tmp && tar -xvzf zookeeper-3.4.9.tar.gz
 
-- name: "mv -n /tmp/zookeeper-3.4.9 /usr/local"
-  shell: mv -n /tmp/zookeeper-3.4.9 /usr/local
+- name: "创建/data目录"
+  file:
+    path: /data
+    state: directory
 
-- name: "复制zoo.cfg到/usr/local/zookeeper-3.4.9/conf/zoo.cfg"
+- name: "mv -n /tmp/zookeeper-3.4.9 /data"
+  shell: mv -n /tmp/zookeeper-3.4.9 /data
+
+- name: "复制zoo.cfg到/data/zookeeper-3.4.9/conf/zoo.cfg"
   template:
     src: zoo_sample.cfg
-    dest: /usr/local/zookeeper-3.4.9/conf/zoo.cfg
+    dest: /data/zookeeper-3.4.9/conf/zoo.cfg
 
-- name: "cd /usr/local/zookeeper-3.4.9/bin && sh zkServer.sh start"
-  shell: cd /usr/local/zookeeper-3.4.9/bin && sh zkServer.sh start
+- name: "cd /data/zookeeper-3.4.9/bin && sh zkServer.sh start"
+  shell: cd /data/zookeeper-3.4.9/bin && sh zkServer.sh start
 
