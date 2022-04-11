@@ -108,12 +108,12 @@
   when: varRedisMode == "standalone" and varReboot is defined and not varReboot|bool
 
 # 集群版redis
-- name: "systemctl disable redis && systemctl stop redis"
-  systemd:
-   name: redis
-   state: stopped
-   enabled: no
-  when: varRedisMode == "cluster" and varAction == "clusterNodeConfig"
+#- name: "systemctl disable redis && systemctl stop redis"
+#  systemd:
+#   name: redis
+#   state: stopped
+#   enabled: no
+#  when: varRedisMode == "cluster" and varAction == "clusterNodeConfig"
 - name: "创建目录/data/redis-cluster"
   file:
     path: /data/redis-cluster

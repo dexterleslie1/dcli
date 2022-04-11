@@ -27,6 +27,7 @@ import cli_centos_eol
 import cli_tomcat
 import cli_redis
 import cli_zookeeper
+import cli_lhc
 import logging
 
 
@@ -57,6 +58,7 @@ class Dcli(object):
         self.tomcat = cli_tomcat.TomcatCli()
         self.redis = cli_redis.RedisCli()
         self.zookeeper = cli_zookeeper.ZookeeperCli()
+        self.lhc = cli_lhc.LhcCli()
 
 
 if __name__ == "__main__":

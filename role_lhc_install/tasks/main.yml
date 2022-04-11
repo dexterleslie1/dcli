@@ -1,0 +1,22 @@
+- name: "创建目录/root/lhc"
+  file:
+    path: /root/lhc
+    state: directory
+
+- name: "创建目录/root/lhc/logos"
+  file:
+    path: /root/lhc/logos
+    state: directory
+
+- name: "复制文件config.propertie到/root/lhc/目录"
+  copy:
+    src: config.properties
+    dest: /root/lhc/config.properties
+- name: "复制文件configmanagement.propertie到/root/lhc/目录"
+  copy:
+    src: configmanagement.properties
+    dest: /root/lhc/configmanagement.properties
+- name: "复制文件configfacade.propertie到/root/lhc/目录"
+  copy:
+    src: configfacade.properties
+    dest: /root/lhc/configfacade.properties
