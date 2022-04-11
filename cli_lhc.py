@@ -27,6 +27,7 @@ class LhcCli(object):
         varHostSshIp = None
         varHostSshUser = None
         varHostSshPassword = ""
+        varSudoPassword = ""
         # 是否安装zookeeper
         varInstallZookeeper = "n"
         # 是否安装管理节点单机版redis和数据节点集群版redis
@@ -44,6 +45,8 @@ class LhcCli(object):
                 varHostSshIp = input("安装lhc主机（例如： 192.168.1.20:22）：")
                 varHostSshUser = input("安装lhc主机的SSH用户（默认 root）：") or "root"
                 varHostSshPassword = getpass.getpass("输入SSH密码：")
+
+            varSudoPassword = getpass.getpass("输入sudo密码，如果当前为root用户不需要输入：")
 
             varInstallMariadb = input("是否安装数据库MariaDB？ [y/n]：") or "n"
             varInstallZookeeper = input("是否安装Zookeeper？ [y/n]：") or "n"
@@ -68,21 +71,16 @@ class LhcCli(object):
 
         if varInstall.lower() == "y":
             if varInstallMariadb.lower() == "y":
-                if varInstallLocally.lower() == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_mariadb_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_mariadb_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_mariadb_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword, varSudoPassword, varInstallLocally.lower() == "y")
                 cli_common.execute_command(var_command)
 
             if varInstallZookeeper.lower() == "y":
-                if varInstallLocally.lower() == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_zookeeper_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_zookeeper_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_zookeeper_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                       varHostSshPassword, varSudoPassword,
+                                                       varInstallLocally.lower() == "y")
 
                 var_command = var_command + " -e varPort=2181"
 
@@ -90,12 +88,10 @@ class LhcCli(object):
 
             if varInstallRedis.lower() == "y":
                 # 管理节点单机版redis
-                if varInstallLocally.lower() == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                       varHostSshPassword, varSudoPassword,
+                                                       varInstallLocally.lower() == "y")
 
                 var_command = var_command + " -e varRedisMode=standalone"
 
@@ -106,12 +102,10 @@ class LhcCli(object):
                 cli_common.execute_command(var_command)
 
                 # 数据节点集群版redis
-                if varInstallLocally.lower() == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword, varSudoPassword,
+                                                        varInstallLocally.lower() == "y")
 
                 var_command = var_command + " -e varRedisMode=cluster -e varAction=clusterCheckRedisClusterFolderExists"
                 cli_common.execute_command(var_command)
@@ -122,12 +116,10 @@ class LhcCli(object):
                 for varIndex in range(varClusterNodeCount):
                     logging.info("########################### 部署redis集群第" + str(varIndex+1) + "个节点 ##############################")
 
-                    if varInstallLocally.lower() == "y":
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                    else:
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml"
-                        var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                                varHostSshPassword)
+                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml"
+                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                            varHostSshPassword, varSudoPassword,
+                                                            varInstallLocally.lower() == "y")
 
                     varClusterNode = "node" + str(varIndex+1)
 
@@ -145,12 +137,10 @@ class LhcCli(object):
                         varClusterCreateStr = varClusterCreateStr + " "
 
                 # 调用redis-cli --cluster create创建redis集群
-                if varInstallLocally.lower() == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_redis_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword, varSudoPassword,
+                                                        varInstallLocally.lower() == "y")
 
                 var_command = var_command + " -e varReboot=false"
 
@@ -162,12 +152,11 @@ class LhcCli(object):
                 # 安装tomcat-lhc-management
                 varTomcatTargetDirectory = "tomcat-lhc-management"
                 varTomcatListenPort = 9999
-                if varInstallLocally == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword, varSudoPassword,
+                                                        varInstallLocally.lower() == "y")
 
                 var_catalina_opts = "CATALINA_OPTS=\\\"-server"
                 var_catalina_opts = var_catalina_opts + " -Xmx1g"
@@ -185,12 +174,11 @@ class LhcCli(object):
                 # 安装tomcat-lhc-cronb
                 varTomcatTargetDirectory = "tomcat-lhc-cronb"
                 varTomcatListenPort = 8086
-                if varInstallLocally == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword, varSudoPassword,
+                                                        varInstallLocally.lower() == "y")
 
                 var_catalina_opts = "CATALINA_OPTS=\\\"-server"
                 var_catalina_opts = var_catalina_opts + " -Xmx1g"
@@ -208,12 +196,11 @@ class LhcCli(object):
                 # 安装tomcat-lhc-datanode
                 varTomcatTargetDirectory = "tomcat-lhc-datanode"
                 varTomcatListenPort = 8085
-                if varInstallLocally == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword, varSudoPassword,
+                                                        varInstallLocally.lower() == "y")
 
                 var_catalina_opts = "CATALINA_OPTS=\\\"-server"
                 var_catalina_opts = var_catalina_opts + " -Xmx1g"
@@ -231,12 +218,11 @@ class LhcCli(object):
                 # 安装tomcat-lhc-facadea
                 varTomcatTargetDirectory = "tomcat-lhc-facadea"
                 varTomcatListenPort = 8082
-                if varInstallLocally == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword, varSudoPassword,
+                                                        varInstallLocally.lower() == "y")
 
                 var_catalina_opts = "CATALINA_OPTS=\\\"-server"
                 var_catalina_opts = var_catalina_opts + " -Xmx1g"
@@ -254,12 +240,10 @@ class LhcCli(object):
                 # 安装tomcat-lhc-facadez
                 varTomcatTargetDirectory = "tomcat-lhc-facadez"
                 varTomcatListenPort = 8081
-                if varInstallLocally == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                            varHostSshPassword, varSudoPassword,
+                                                            varInstallLocally.lower() == "y")
 
                 var_catalina_opts = "CATALINA_OPTS=\\\"-server"
                 var_catalina_opts = var_catalina_opts + " -Xmx1g"
@@ -277,12 +261,10 @@ class LhcCli(object):
                 # 安装tomcat-lhc-facaded
                 varTomcatTargetDirectory = "tomcat-lhc-facaded"
                 varTomcatListenPort = 8080
-                if varInstallLocally == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                            varHostSshPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_tomcat_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword, varSudoPassword,
+                                                        varInstallLocally.lower() == "y")
 
                 var_catalina_opts = "CATALINA_OPTS=\\\"-server"
                 var_catalina_opts = var_catalina_opts + " -Xmx1g"
@@ -297,12 +279,10 @@ class LhcCli(object):
 
                 cli_common.execute_command(var_command)
 
-            if varInstallLocally.lower() == "y":
-                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_lhc_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-            else:
-                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_lhc_install.yml"
-                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                        varHostSshPassword)
+            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_lhc_install.yml"
+            var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                    varHostSshPassword, varSudoPassword,
+                                                    varInstallLocally.lower() == "y")
 
             var_command = var_command + " -e \"varCurrentWorkingDirectory=\'" + varCurrentWorkingDirectory + "\'\""
 
