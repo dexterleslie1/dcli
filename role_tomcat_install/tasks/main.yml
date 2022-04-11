@@ -1,5 +1,13 @@
----
-# 安装tomcat
+- stat:
+    path: "/data/{{ varTomcatTargetDirectory }}"
+  register: varStatTomcatTargetDirectory
+  when: varTomcatTargetDirectory is defined
+- name: "判断tomcat部署目录是否已存在"
+  assert:
+    that:
+      - not varStatTomcatTargetDirectory.stat.exists
+    fail_msg: "tomcat部署目录/data/{{ varTomcatTargetDirectory }}已经存在，不能再创建此目录"
+  when: varTomcatTargetDirectory is defined
 
 # 下载tomcat
 - name: "从https://bucketxy.oss-cn-hangzhou.aliyuncs.com/tomcat/apache-tomcat-7.0.68.tar.gz下载tomcat"
@@ -11,8 +19,8 @@
 # 部署tomcat
 - name: "cd /tmp && tar -xvzf apache-tomcat-7.0.68.tar.gz"
   shell: cd /tmp && tar -xzvf apache-tomcat-7.0.68.tar.gz
-- name: "cd /tmp && mv -n apache-tomcat-7.0.68 /usr/local/"
-  shell: cd /tmp && mv -n apache-tomcat-7.0.68 /usr/local/
+- name: "cd /tmp && mv -n apache-tomcat-7.0.68 /data/{{ varTomcatTargetDirectory }}"
+  shell: cd /tmp && mv -n apache-tomcat-7.0.68 /data/{{ varTomcatTargetDirectory }}
 
 # 删除webapps预置项目
 - name: "删除webapps预置项目"
@@ -20,16 +28,35 @@
     path: "{{item}}"
     state: absent
   with_items:
-    - /usr/local/apache-tomcat-7.0.68/webapps/docs
-    - /usr/local/apache-tomcat-7.0.68/webapps/examples
-    - /usr/local/apache-tomcat-7.0.68/webapps/host-manager
-    - /usr/local/apache-tomcat-7.0.68/webapps/manager
-    - /usr/local/apache-tomcat-7.0.68/webapps/ROOT
+    - /data/{{ varTomcatTargetDirectory }}/webapps/docs
+    - /data/{{ varTomcatTargetDirectory }}/webapps/examples
+    - /data/{{ varTomcatTargetDirectory }}/webapps/host-manager
+    - /data/{{ varTomcatTargetDirectory }}/webapps/manager
+    - /data/{{ varTomcatTargetDirectory }}/webapps/ROOT
+
+# 设置端口
+- name: "设置tomcat shutdown端口"
+  lineinfile:
+    path: /data/{{ varTomcatTargetDirectory }}/conf/server.xml
+    regexp: "<Server port=\"8005\" shutdown=\"SHUTDOWN\">"
+    line: "<Server port=\"{{ varTomcatShutdownPort }}\" shutdown=\"SHUTDOWN\">"
+  when: varTomcatShutdownPort is defined and varTomcatShutdownPort|int > 0
+- name: "设置tomcat监听端口"
+  lineinfile:
+    path: /data/{{ varTomcatTargetDirectory }}/conf/server.xml
+    regexp: "<Connector port=\"8080\" protocol=\"HTTP/1.1\""
+    line: "<Connector port=\"{{ varTomcatListenPort }}\" protocol=\"HTTP/1.1\""
+  when: varTomcatListenPort is defined and varTomcatListenPort|int > 0
+- name: "注释<Connector port=\"8009\" protocol=\"AJP/1.3\" redirectPort=\"8443\" />"
+  lineinfile:
+    path: /data/{{ varTomcatTargetDirectory }}/conf/server.xml
+    regexp: "<Connector port=\"8009\" protocol=\"AJP/1.3\" redirectPort=\"8443\" />"
+    line: "<!-- <Connector port=\"8009\" protocol=\"AJP/1.3\" redirectPort=\"8443\" /> -->"
 
 # 设置xmx和jmx
-- name: "设置/usr/local/apache-tomcat-7.0.68/bin/catalina.sh xmx和jmx"
+- name: "设置/data/{{ varTomcatTargetDirectory }}/bin/catalina.sh xmx和jmx"
   lineinfile:
-    path: /usr/local/apache-tomcat-7.0.68/bin/catalina.sh
+    path: /data/{{ varTomcatTargetDirectory }}/bin/catalina.sh
     regexp: "^CATALINA_OPTS=\"-server"
     line: "{{ varCatalinaOpts }}"
     insertbefore: "# OS specific support"
@@ -38,11 +65,18 @@
 # 禁止tomcat access log
 - name: "禁止tomcat access log"
   replace:
-    path: /usr/local/apache-tomcat-7.0.68/conf/server.xml
+    path: /data/{{ varTomcatTargetDirectory }}/conf/server.xml
     regexp: "^\\s*<Valve className=\"org.apache.catalina.valves.AccessLogValve\" directory=\"logs\""
     replace: "        <!-- <Valve className=\"org.apache.catalina.valves.AccessLogValve\" directory=\"logs\""
 - name: "禁止tomcat access log"
   replace:
-    path: /usr/local/apache-tomcat-7.0.68/conf/server.xml
+    path: /data/{{ varTomcatTargetDirectory }}/conf/server.xml
     regexp: "pattern=\"%h %l %u %t &quot;%r&quot; %s %b\" />$"
     replace: "pattern=\"%h %l %u %t &quot;%r&quot; %s %b\" /> -->"
+
+# 设置tomcat rc.local
+- name: "设置tomcat rc.local"
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    regexp: "^sudo -i sh -c \"cd /data/{{ varTomcatTargetDirectory }}/bin && sh startup.sh\""
+    line: "sudo -i sh -c \"cd /data/{{ varTomcatTargetDirectory }}/bin && sh startup.sh\""

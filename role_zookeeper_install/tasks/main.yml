@@ -23,3 +23,10 @@
 - name: "cd /data/zookeeper-3.4.9/bin && sh zkServer.sh start"
   shell: cd /data/zookeeper-3.4.9/bin && sh zkServer.sh start
 
+# 设置zookeeper rc.local
+- name: "设置zookeeper rc.local"
+  lineinfile:
+    path: /etc/rc.d/rc.local
+    regexp: "^sudo -i sh -c \"cd /data/zookeeper-3.4.9/bin && sh zkServer.sh start\""
+    line: "sudo -i sh -c \"cd /data/zookeeper-3.4.9/bin && sh zkServer.sh start\""
+

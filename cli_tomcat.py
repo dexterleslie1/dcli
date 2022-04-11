@@ -1,5 +1,6 @@
 import cli_common
 import os
+import getpass
 
 
 class TomcatCli(object):
@@ -22,18 +23,31 @@ class TomcatCli(object):
 
         var_host_target = None
         var_host_target_user = None
+        varHostSshPassword = ""
 
         var_xmx = None
         var_xmx_setting = "n"
         var_jmx_enable = "n"
         var_jmx_host = None
         var_jmx_port = None
+        varTomcatTargetDirectory = "tomcat"
+        varTomcatListenPort = 8080
+        varTomcatShutdownPort = 8005
 
         if var_install.lower() == "y":
             var_install_locally = input("是否本地安装tomcat？ [y/n]: ") or "n"
             if not var_install_locally == "y":
-                var_host_target = input("安装tomcat主机（例如： 192.168.1.20:8080）：")
+                var_host_target = input("安装tomcat主机（例如： 192.168.1.20:22）：")
                 var_host_target_user = input("安装tomcat主机的SSH用户（默认 root）：") or "root"
+                varHostSshPassword = getpass.getpass("输入SSH密码：")
+
+            # 部署的tomcat目录名称
+            varTomcatTargetDirectory = input("设置tomcat部署目录（默认tomcat）：") or "tomcat"
+
+            # 设置tomcat监听端口
+            varTomcatListenPort = input("设置tomcat监听端口（默认8080）：") or 8080
+            varTomcatListenPort = int(varTomcatListenPort)
+            varTomcatShutdownPort = 8005 + (varTomcatListenPort - 8080)
 
             # 设置tomcat xmx内存
             var_xmx_setting = input("是否设置tomcat xmx？[y/n]：") or "n"
@@ -51,7 +65,7 @@ class TomcatCli(object):
                 var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_tomcat_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
             else:
                 var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_tomcat_install.yml"
-                var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)
+                var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user, varHostSshPassword)
 
             if var_xmx_setting.lower() == "y" or var_jmx_enable.lower() == "y":
                 var_catalina_opts = "CATALINA_OPTS=\\\"-server"
@@ -64,5 +78,9 @@ class TomcatCli(object):
 
                 var_catalina_opts = var_catalina_opts + "\\\""
                 var_command = var_command + " -e varCatalinaOpts=\"" + var_catalina_opts + "\""
+
+            var_command = var_command + " -e varTomcatTargetDirectory=" + varTomcatTargetDirectory
+            var_command = var_command + " -e varTomcatListenPort=" + str(varTomcatListenPort)
+            var_command = var_command + " -e varTomcatShutdownPort=" + str(varTomcatShutdownPort)
 
             cli_common.execute_command(var_command)
