@@ -19,6 +19,8 @@ class LhcCli(object):
         # Full path of python file locates in
         varFullPath = os.path.dirname(os.path.realpath(__file__))
 
+        varCurrentWorkingDirectory = os.getcwd()
+
         varInstall = input("是否安装lhc？ [y/n]： ")
         varInstallLocally = "n"
 
@@ -51,7 +53,6 @@ class LhcCli(object):
             varInstallTomcat = input("是否安装tomcat？ [y/n]：") or "n"
             if varInstallTomcat.lower() == "y":
                 # 判断本地是否有lhcclientmanagement.war、lhcclient.war、lhccronb.war、lhcfacadea.war、lhcfacadez.war、lhcfacaded.war
-                varCurrentWorkingDirectory = os.getcwd()
                 if not os.path.exists(varCurrentWorkingDirectory + "/lhcclientmanagement.war"):
                     raise Exception("当前工作目录不存在lhcclientmanagement.war文件，不能安装tomcat")
                 if not os.path.exists(varCurrentWorkingDirectory + "/lhcclient.war"):
@@ -66,14 +67,6 @@ class LhcCli(object):
                     raise Exception("当前工作目录不存在lhcfacaded.war文件，不能安装tomcat")
 
         if varInstall.lower() == "y":
-            if varInstallLocally.lower() == "y":
-                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_lhc_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-            else:
-                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_lhc_install.yml"
-                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
-                                                        varHostSshPassword)
-            cli_common.execute_command(var_command)
-
             if varInstallMariadb.lower() == "y":
                 if varInstallLocally.lower() == "y":
                     var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_mariadb_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
@@ -303,5 +296,16 @@ class LhcCli(object):
                 var_command = var_command + " -e varTomcatShutdownPort=" + str(varTomcatShutdownPort)
 
                 cli_common.execute_command(var_command)
+
+            if varInstallLocally.lower() == "y":
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_lhc_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
+            else:
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_lhc_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                        varHostSshPassword)
+
+            var_command = var_command + " -e \"varCurrentWorkingDirectory=\'" + varCurrentWorkingDirectory + "\'\""
+
+            cli_common.execute_command(var_command)
 
             print("提醒： lhc所有相关组件已经安装完毕，请导入名为lhcmanagement（管理节点数据库）和lhc（数据节点数据库）数据库后重启操作系统既可访问所有服务")

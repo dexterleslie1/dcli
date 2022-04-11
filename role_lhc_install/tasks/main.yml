@@ -20,3 +20,56 @@
   copy:
     src: configfacade.properties
     dest: /root/lhc/configfacade.properties
+
+- name: "复制lhcclientmanagement.war到/data/tomcat-lhc-management/webapps/目录"
+  copy:
+    src: "{{ varCurrentWorkingDirectory }}/lhcclientmanagement.war"
+    dest: "/data/tomcat-lhc-management/webapps/lhcclientmanagement.war"
+- name: "复制lhcclient.war到/data/tomcat-lhc-datanode/webapps/目录"
+  copy:
+    src: "{{ varCurrentWorkingDirectory }}/lhcclient.war"
+    dest: "/data/tomcat-lhc-datanode/webapps/lhcclient.war"
+- name: "复制lhccronb.war到/data/tomcat-lhc-cronb/webapps/目录"
+  copy:
+    src: "{{ varCurrentWorkingDirectory }}/lhccronb.war"
+    dest: "/data/tomcat-lhc-cronb/webapps/lhccronb.war"
+- name: "复制lhcfacadea.war到/data/tomcat-lhc-facadea/webapps/目录"
+  copy:
+    src: "{{ varCurrentWorkingDirectory }}/lhcfacadea.war"
+    dest: "/data/tomcat-lhc-facadea/webapps/lhcfacadea.war"
+- name: "复制lhcfacadez.war到/data/tomcat-lhc-facadez/webapps/目录"
+  copy:
+    src: "{{ varCurrentWorkingDirectory }}/lhcfacadez.war"
+    dest: "/data/tomcat-lhc-facadez/webapps/lhcfacadez.war"
+- name: "复制lhcfacaded.war到/data/tomcat-lhc-facaded/webapps/目录"
+  copy:
+    src: "{{ varCurrentWorkingDirectory }}/lhcfacaded.war"
+    dest: "/data/tomcat-lhc-facaded/webapps/lhcfacaded.war"
+
+- name: "配置lhcfacadea <Context path=\"\" docBase=\"lhcfacadea\" debug=\"0\" reloadable=\"false\"/>"
+  lineinfile:
+    path: "/data/tomcat-lhc-facadea/conf/server.xml"
+    line: "<Context path=\"\" docBase=\"lhcfacadea\" debug=\"0\" reloadable=\"false\"/>"
+    regexp: "<Context path=\"\" docBase=\"lhcfacadea\" debug=\"0\" reloadable=\"false\"/>"
+    insertbefore: "</Host>"
+- name: "配置lhcfacadez <Context path=\"\" docBase=\"lhcfacadez\" debug=\"0\" reloadable=\"false\"/>"
+  lineinfile:
+    path: "/data/tomcat-lhc-facadez/conf/server.xml"
+    line: "<Context path=\"\" docBase=\"lhcfacadez\" debug=\"0\" reloadable=\"false\"/>"
+    regexp: "<Context path=\"\" docBase=\"lhcfacadez\" debug=\"0\" reloadable=\"false\"/>"
+    insertbefore: "</Host>"
+- name: "配置lhcfacaded <Context path=\"\" docBase=\"lhcfacaded\" debug=\"0\" reloadable=\"false\"/>"
+  lineinfile:
+    path: "/data/tomcat-lhc-facaded/conf/server.xml"
+    line: "<Context path=\"\" docBase=\"lhcfacaded\" debug=\"0\" reloadable=\"false\"/>"
+    regexp: "<Context path=\"\" docBase=\"lhcfacaded\" debug=\"0\" reloadable=\"false\"/>"
+    insertbefore: "</Host>"
+
+- name: "授权root用户连接127.0.0.1"
+  mysql_user:
+    name: root
+    host: 127.0.0.1
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    state: present
+    password: "123456"
+    priv: "*.*:ALL"
