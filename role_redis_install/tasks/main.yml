@@ -88,6 +88,8 @@
 - name: "创建/data/redis目录"
   file:
     path: /data/redis
+    group: redis
+    owner: redis
     state: directory
 - name: "修改/etc/redis.conf 数据目录为/data/redis"
   lineinfile:
