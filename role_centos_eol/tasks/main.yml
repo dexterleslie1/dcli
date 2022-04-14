@@ -1,10 +1,13 @@
----
-# 修复centOS8 eol问题
-# 参考 https://stackoverflow.com/questions/70926799/centos-through-vm-no-urls-in-mirrorlist
-- name: "执行sed -i 's/^mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*"
-  shell: sed -i 's/^mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
+## 修复centOS8 eol问题
+## 参考 https://stackoverflow.com/questions/70926799/centos-through-vm-no-urls-in-mirrorlist
+#- name: "执行sed -i 's/^mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*"
+#  shell: sed -i 's/^mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+#  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
+#
+#- name: "执行sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*"
+#  shell: sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+#  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
 
-- name: "执行sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*"
-  shell: sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
+# 参考 https://www.centos.org/download/
+- name: "dnf --disablerepo '*' --enablerepo extras swap centos-linux-repos centos-stream-repos -y"
+  shell: dnf --disablerepo '*' --enablerepo extras swap centos-linux-repos centos-stream-repos -y
