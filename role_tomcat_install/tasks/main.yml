@@ -16,6 +16,11 @@
     dest: /tmp/apache-tomcat-7.0.68.tar.gz
     checksum: md5:94688679d5f37499d1bd1a65eb9540e7
 
+- name: "创建/data目录"
+  file:
+    path: /data
+    state: directory
+
 # 部署tomcat
 - name: "cd /tmp && tar -xvzf apache-tomcat-7.0.68.tar.gz"
   shell: cd /tmp && tar -xzvf apache-tomcat-7.0.68.tar.gz
