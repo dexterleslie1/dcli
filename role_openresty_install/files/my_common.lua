@@ -64,7 +64,7 @@ function _M.ccDetectionReqAccLimit(clientIp, requestUrl, dictMyLimitReq)
     -- 允许最大请求总次数
     local valueSituation2RequestCountMaximumAllow = 50;
     -- 允许最大违规总次数
-    local valueSituation2CommittedCountMaximumAllow = 12;
+    local valueSituation2CommittedCountMaximumAllow = 9;
     -- 违规总次数
     local keySituation2CommittedCount = "situation2CommittedCount#";
 
