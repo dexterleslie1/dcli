@@ -51,6 +51,15 @@
     dest: /etc/fail2ban/jail.d/my-limit-req.local
   when: varBackend is defined and varBackend
 
+- name: "创建/usr/local/openresty/nginx/logs/目录"
+  file:
+    path: /usr/local/openresty/nginx/logs/
+    state: directory
+- name: "创建/usr/local/openresty/nginx/logs/error.log文件"
+  file:
+    path: /usr/local/openresty/nginx/logs/error.log
+    state: touch
+
 - name: "启动fail2ban服务"
   systemd:
    name: fail2ban
