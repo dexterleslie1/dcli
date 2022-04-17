@@ -73,6 +73,8 @@ class OpenrestyCli(object):
             varDeploymentHostSshIp = ""
             varDeploymentHostSshUser = ""
             varDeploymentHostSshPassword = ""
+            varSudoPasswordCompile = ""
+            varSudoPasswordDeployment = ""
 
             if from_source:
                 var_compile = input("是否编译openresty？ [y/n]： ")
@@ -83,6 +85,8 @@ class OpenrestyCli(object):
                         varCompileHostSshIp = input("编译openresty主机（例如： 192.168.1.20:8080）：")
                         varCompileHostSshUser = input("编译openresty主机的SSH用户（默认 root）：") or "root"
                         varCompileHostSshPassword = getpass.getpass("输入SSH密码：")
+
+                    varSudoPasswordCompile = getpass.getpass("输入编译openresty主机的sudo密码，如果当前为root用户不需要输入：")
 
                 if var_install.lower() == "y":
                     # 询问用户是安装部署frontend openrety还是backend openresty
@@ -100,26 +104,24 @@ class OpenrestyCli(object):
                         varDeploymentHostSshUser = input("部署openresty主机的SSH用户（默认 root）：") or "root"
                         varDeploymentHostSshPassword = getpass.getpass("输入SSH密码：")
 
+                    varSudoPasswordDeployment = getpass.getpass("输入部署openresty主机的sudo密码，如果当前为root用户不需要输入：")
+
                 if var_compile.lower() == "y":
                     # 在编译主机中编译openresty
                     logging.info("########################### 编译openresty ##############################")
 
-                    if var_compile_locally == "y":
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                    else:
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml"
-                        var_command = cli_common.concat_command(var_command, varCompileHostSshIp, varCompileHostSshUser, varCompileHostSshPassword)
+                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_compile.yml"
+                    var_command = cli_common.concat_command(var_command, varCompileHostSshIp, varCompileHostSshUser, varCompileHostSshPassword
+                                                            , varSudoPasswordCompile, var_compile_locally.lower() == "y")
                     cli_common.execute_command(var_command)
 
                 if var_install.lower() == "y":
                     # 部署openresty
                     logging.info("########################### 部署openresty ##############################")
 
-                    if var_install_locally == "y":
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                    else:
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml"
-                        var_command = cli_common.concat_command(var_command, varDeploymentHostSshIp, varDeploymentHostSshUser, varDeploymentHostSshPassword)
+                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_openresty_install.yml"
+                    var_command = cli_common.concat_command(var_command, varDeploymentHostSshIp, varDeploymentHostSshUser, varDeploymentHostSshPassword
+                                                            , varSudoPasswordDeployment, var_install_locally.lower() == "y")
 
                     var_command = var_command + " -e varCurrentWorkingDirectory=\"" + varCurrentWorkingDirectory + "\""
 
@@ -131,11 +133,9 @@ class OpenrestyCli(object):
                     cli_common.execute_command(var_command)
 
                     # 安装配置fail2ban服务
-                    if var_install_locally == "y":
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_fail2ban_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                    else:
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_fail2ban_install.yml"
-                        var_command = cli_common.concat_command(var_command, varDeploymentHostSshIp, varDeploymentHostSshUser, varDeploymentHostSshPassword)
+                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_fail2ban_install.yml"
+                    var_command = cli_common.concat_command(var_command, varDeploymentHostSshIp, varDeploymentHostSshUser, varDeploymentHostSshPassword
+                                                            , varSudoPasswordDeployment, var_install_locally.lower() == "y")
 
                     if varFrontend:
                         var_command = var_command + " -e varFrontend=true"
