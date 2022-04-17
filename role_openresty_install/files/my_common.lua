@@ -57,6 +57,8 @@ end
 
 -- 拦截5秒内超过50个请求情况
 function _M.ccDetectionReqAccLimit(clientIp, requestUrl, dictMyLimitReq)
+    -- 默认观察周期5秒
+    local valueDefaultObservationPeriodInSeconds = 5;
     -- 默认REQAcc committed观察周期60秒
     local valueDefaultREQAccCommittedObservationPeriodInSeconds = 120;
     -- 请求总次数
