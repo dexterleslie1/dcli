@@ -83,7 +83,8 @@
     dest: /usr/local/openresty/nginx/conf/nginx.conf
   when: varBackend is defined and varBackend
 
-- name: "systemctl restart openresty"
+- name: "systemctl restart openresty && systemctl enable openresty"
   systemd:
     name: openresty
     state: restarted
+    enabled: yes
