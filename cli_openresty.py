@@ -142,6 +142,8 @@ class OpenrestyCli(object):
                     else:
                         var_command = var_command + " -e varBackend=true"
                     cli_common.execute_command(var_command)
+
+                    print("提示： 已经成功安装配置openresty和fail2ban，需要手动重启操作系统使内核性能优化参数生效。")
             else:
                 # TODO: Install openresty from yum repository
                 raise Exception("Install openresty from yum repository not implement yet.")
