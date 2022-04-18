@@ -1,0 +1,12 @@
+---
+
+- name: "安装和配置Jmeter"
+  hosts: all
+  # sudo为root用户
+  become: yes
+  roles:
+    - role: role_centos_eol
+    - role: role_os_firewall
+    - role: role_os_timezone
+    - role: role_jdk_install
+    - role: role_jmeter_install
