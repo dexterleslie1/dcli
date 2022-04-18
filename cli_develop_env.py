@@ -1,6 +1,7 @@
 import cli_common
 import os
 import enquiries
+import getpass
 
 
 class DevelopEnvCli(object):
@@ -26,19 +27,25 @@ class DevelopEnvCli(object):
         :return:
         """
 
+        var_host_target = ""
+        var_host_target_user = ""
+        varHostSshPassword = ""
+        varSudoPassword = ""
+
         var_install_locally = input("是否本地安装？ [y/n]: ") or "n"
         if not var_install_locally == "y":
             var_host_target = input("目标主机（例如： 192.168.1.20:8080）：")
             var_host_target_user = input("目标主机SSH用户（默认 root）：") or "root"
+            varHostSshPassword = getpass.getpass("输入SSH密码：")
+
+        varSudoPassword = getpass.getpass("输入主机的sudo密码，如果当前为root用户不需要输入：")
 
         # Full path of python file locates in
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
-        if var_install_locally == "y":
-            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_develop_env_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-        else:
-            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_develop_env_install.yml"
-            var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)
+        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_develop_env_install.yml"
+        var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user
+                                                    , varHostSshPassword, varSudoPassword, var_install_locally.lower() == "y")
 
         if include_jdk:
             var_command = var_command + " -e var_include_jdk=true"
@@ -79,7 +86,8 @@ class DevelopEnvCli(object):
                 var_command = var_command + " -e var_slave_mode=true"
 
             # 当安装Jmeter时，提示输入Jmeter -Xmx内存值
-            var_heap_mx = input("输入Jmeter最大java堆内存，单位GB（默认1GB）：") or "1"
-            var_command = var_command + " -e var_heap_mx=" + var_heap_mx
+            var_heap_mx = input("输入Jmeter最大java堆内存，单位GB（默认1GB）：") or 1
+            var_heap_mx = int(var_heap_mx)
+            var_command = var_command + " -e var_heap_mx=" + str(var_heap_mx)
 
         cli_common.execute_command(var_command)
