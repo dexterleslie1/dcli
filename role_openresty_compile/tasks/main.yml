@@ -4,14 +4,14 @@
     name: make,readline-devel,pcre-devel,openssl-devel,gcc,perl
     state: installed
 
-- name: "从https://bucket-public-common.oss-cn-hangzhou.aliyuncs.com/nginx/openresty-1.15.8.1.tar.gz下载openresty源代码"
+- name: "从http://bucketxy.cn-gd.ufileos.com/nginx/openresty-1.15.8.1.tar.gz下载openresty源代码"
   get_url:
-    url: https://bucket-public-common.oss-cn-hangzhou.aliyuncs.com/nginx/openresty-1.15.8.1.tar.gz
+    url: http://bucketxy.cn-gd.ufileos.com/nginx/openresty-1.15.8.1.tar.gz
     dest: /tmp/openresty-1.15.8.1.tar.gz
     checksum: md5:d614e17360e3a805ff94edbf7037221c
-- name: "从https://bucket-public-common.oss-cn-hangzhou.aliyuncs.com/nginx/naxsi-0.56.tar.gz下载naxsi源代码"
+- name: "从http://bucketxy.cn-gd.ufileos.com/nginx/naxsi-0.56.tar.gz下载naxsi源代码"
   get_url:
-    url: https://bucket-public-common.oss-cn-hangzhou.aliyuncs.com/nginx/naxsi-0.56.tar.gz
+    url: http://bucketxy.cn-gd.ufileos.com/nginx/naxsi-0.56.tar.gz
     dest: /tmp/naxsi-0.56.tar.gz
     checksum: md5:01a28913b57dfce2ab8435b56d292f82
 
