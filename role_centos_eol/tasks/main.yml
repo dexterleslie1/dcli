@@ -11,3 +11,4 @@
 # 参考 https://www.centos.org/download/
 - name: "dnf --disablerepo '*' --enablerepo extras swap centos-linux-repos centos-stream-repos -y"
   shell: dnf --disablerepo '*' --enablerepo extras swap centos-linux-repos centos-stream-repos -y
+  ignore_errors: true
