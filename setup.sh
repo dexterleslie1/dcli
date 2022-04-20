@@ -16,9 +16,13 @@ setup_resolve_centOS_eol() {
 
     # 当centOS8时
     if [[ $varUname =~ "el8" ]]; then
-        # sed -i 's/^mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-        # sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
         dnf --disablerepo '*' --enablerepo extras swap centos-linux-repos centos-stream-repos -y
+        # 发现亚马逊centOS8不能成功执行上面命令
+        if [ ! $? -eq 0 ]
+        then
+          sed -i 's/^mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+          sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        fi
     fi
 }
 
