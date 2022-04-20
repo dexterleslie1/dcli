@@ -2,19 +2,24 @@ local _M = { _VERSION = '1.0.0' }
 
 -- 获取客户端真实ip地址
 function _M.getClientIp()
-        local headers=ngx.req.get_headers()
+        local varHeaders = ngx.req.get_headers()
         local clientIp;
-        local xForwardedFor = headers["X_Forwarded_For"];
-        if not xForwardedFor then
-                xForwardedFor = "";
+        local varXForwardedFor = varHeaders["x-forwarded-for"];
+        if (varXForwardedFor == nil or varXForwardedFor == "") then
+                varXForwardedFor = "";
+
+                -- 没有x-forwarded-for表示客户端直接访问openresty
+                -- 此时需要设置ngx.var.remote_addr为x-forwarded-for的值
+                ngx.req.set_header("x-forwarded-for", ngx.var.remote_addr);
         end
-        -- ngx.log(ngx.WARN, "X-Forwarded-For=" .. xForwardedFor);
-        if xForwardedFor then
+        -- ngx.log(ngx.WARN, "x-forwarded-for=" .. varXForwardedFor);
+        if varXForwardedFor then
                 local count = 0;
-                for k, v in string.gmatch(xForwardedFor, "[^,]+") do
+                for k, v in string.gmatch(varXForwardedFor, "[^,]+") do
                         if count==0 then
                                 clientIp = k;
-                                -- ngx.log(ngx.WARN, "X-Forwarded-For=" .. xForwardedFor .. "提取到客户端ip地址:" .. clientIp);
+                                -- ngx.log(ngx.WARN, "x-forwarded-for=" .. varXForwardedFor .. "提取到客户端ip地址:" .. clientIp);
+                                break;
                         end
                         count = count+1;
                 end

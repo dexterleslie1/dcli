@@ -21,7 +21,6 @@ server {
         proxy_cache cache_one;
         proxy_cache_valid 200 30m;
         proxy_set_header Host $host:$server_port;
-        proxy_set_header x-forwarded-for $proxy_add_x_forwarded_for;
         proxy_http_version 1.1;
         proxy_set_header Connection '';
         proxy_pass http://backend;
@@ -31,7 +30,6 @@ server {
         include /usr/local/openresty/nginx/conf/naxsi_facaded.rules;
 
         proxy_set_header Host $host:$server_port;
-        proxy_set_header x-forwarded-for $proxy_add_x_forwarded_for;
         proxy_http_version 1.1;
         proxy_set_header Connection '';
         proxy_pass http://backend;
