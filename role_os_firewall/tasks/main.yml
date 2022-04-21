@@ -1,6 +1,12 @@
+# https://stackoverflow.com/questions/30328506/check-if-service-exists-with-ansible
+- name: "判断firewalld服务是否存在"
+  stat:
+    path: /usr/lib/systemd/system/firewalld.service
+  register: varFirewalldService
+
 - name: "systemctl stop firewalld && systemctl disable firewalld"
   systemd:
     name: firewalld
     state: stopped
     enabled: no
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" and varFirewalldService.stat.exists
