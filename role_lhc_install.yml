@@ -4,4 +4,5 @@
   roles:
     - role: role_os_timezone
     - role: role_os_firewall
+    - role: role_os_selinux
     - role: role_lhc_install

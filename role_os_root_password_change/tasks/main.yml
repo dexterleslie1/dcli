@@ -1,0 +1,5 @@
+# https://www.ansiblepilot.com/articles/change-user-password-ansible-module-user/
+- name: "修改超级管理员密码"
+  user:
+    name: "root"
+    password: "{{ varNewRootPassword | password_hash('sha512') }}"

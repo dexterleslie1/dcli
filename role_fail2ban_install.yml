@@ -6,4 +6,5 @@
     - role: role_centos_eol
     - role: role_os_timezone
     - role: role_os_firewall
+    - role: role_os_selinux
     - role: role_fail2ban_install

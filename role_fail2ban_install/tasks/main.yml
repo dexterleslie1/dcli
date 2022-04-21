@@ -60,6 +60,13 @@
     path: /usr/local/openresty/nginx/logs/error.log
     state: touch
 
+
+- name: "复制sshd.local到/etc/fail2ban/jail.d目录"
+  copy:
+    src: sshd.local
+    dest: /etc/fail2ban/jail.d/sshd.local
+  when: varEnableSshd is defined and varEnableSshd
+
 - name: "启动fail2ban服务"
   systemd:
    name: fail2ban

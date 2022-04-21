@@ -15,5 +15,6 @@
   roles:
     - role: role_os_timezone
     - role: role_os_firewall
+    - role: role_os_selinux
     - role: role_freeswitch_install
       var_socks5: "{{ socks5 | default('') }}"

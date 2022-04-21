@@ -4,5 +4,6 @@
   roles:
     - role: role_os_timezone
     - role: role_os_firewall
+    - role: role_os_selinux
     - role: role_jdk_install
     - role: role_tomcat_install

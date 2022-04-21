@@ -1,3 +1,2 @@
----
-- name: Set time zone to Asia/Shanghai
+- name: "修改系统时区为上海"
   shell: timedatectl set-timezone Asia/Shanghai

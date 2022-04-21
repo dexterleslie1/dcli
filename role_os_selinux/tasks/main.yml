@@ -1,0 +1,10 @@
+- name: "Disable selinux temporarily by using setenforce 0"
+  shell: setenforce 0 || true
+  when: ansible_distribution == "CentOS"
+
+- name: "Modify /etc/selinux/config file disable selinux"
+  replace:
+    path: /etc/sysconfig/selinux
+    regexp: SELINUX=enforcing
+    replace: SELINUX=disabled
+  when: ansible_distribution == "CentOS"

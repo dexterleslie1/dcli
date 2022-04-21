@@ -1,0 +1,10 @@
+---
+
+- name: "配置firewall"
+  hosts: all
+  # sudo为root用户
+  become: yes
+  roles:
+    - role: role_centos_eol
+    - role: role_os_timezone
+    - role: role_os_firewall

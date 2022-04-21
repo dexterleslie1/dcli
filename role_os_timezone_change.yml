@@ -1,0 +1,9 @@
+---
+
+- name: "修改时区为上海"
+  hosts: all
+  # sudo为root用户
+  become: yes
+  roles:
+    - role: role_centos_eol
+    - role: role_os_timezone

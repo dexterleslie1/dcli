@@ -1,0 +1,8 @@
+---
+
+- name: "配置chrony"
+  hosts: all
+  # sudo为root用户
+  become: yes
+  roles:
+    - role: role_os_chrony

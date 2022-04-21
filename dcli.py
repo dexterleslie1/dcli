@@ -30,6 +30,7 @@ import cli_zookeeper
 import cli_lhc
 import cli_fail2ban
 import cli_jmeter
+import cli_os
 import logging
 
 
@@ -63,6 +64,7 @@ class Dcli(object):
         self.lhc = cli_lhc.LhcCli()
         self.fail2ban = cli_fail2ban.Fail2banCli()
         self.jmeter = cli_jmeter.JmeterCli()
+        self.os = cli_os.OsCli()
 
 
 if __name__ == "__main__":
