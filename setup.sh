@@ -59,6 +59,16 @@ setup_install_git_cli() {
 # Setup dcli
 ########################
 setup_dcli() {
+  varUname=`uname -a`
+  # 转换为小写
+  varUname=${varUname,,}
+
+  # 当centOS8时
+  if [[ $varUname =~ "el8" ]]; then
+      # 安装tar命令
+      yum install tar -y
+  fi
+
  # Remove *.pyc
  sudo rm -rf /usr/bin/dcli-env/*.pyc
 
