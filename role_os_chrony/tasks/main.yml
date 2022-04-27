@@ -7,7 +7,3 @@
     name: chronyd
     state: restarted
     enabled: yes
-- name: "yum install -y ntpstat"
-  yum:
-    name: ntpstat
-    state: installed
