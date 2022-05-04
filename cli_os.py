@@ -27,6 +27,7 @@ class OsCli(object):
 
         varDisableFirewall = "n"
         varDisableSelinux = "n"
+        varDisableSwap = "n"
         varChangeRootPassword = "n"
         varNewRootPassword = ""
         varChangeSshPort = "n"
@@ -50,6 +51,7 @@ class OsCli(object):
 
         varDisableFirewall = input("是否关闭系统防火墙？ [y/n]： ") or "n"
         varDisableSelinux = input("是否关闭系统selinux？ [y/n]： ") or "n"
+        varDisableSwap = input("是否关闭系统swap？ [y/n]： ") or "n"
         varChangeRootPassword = input("是否修改root密码？ [y/n]： ") or "n"
         if varChangeRootPassword.lower() == "y":
             varTempRootPassword = getpass.getpass("输入root新密码：")
@@ -75,6 +77,12 @@ class OsCli(object):
 
         if varDisableSelinux.lower() == "y":
             var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_selinux_install.yml"
+            var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword
+                                                    , varSudoPassword, varConfigLocally.lower() == "y")
+            cli_common.execute_command(var_command)
+
+        if varDisableSwap.lower() == "y":
+            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_os_swap_config.yml"
             var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword
                                                     , varSudoPassword, varConfigLocally.lower() == "y")
             cli_common.execute_command(var_command)

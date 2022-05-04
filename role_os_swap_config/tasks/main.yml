@@ -1,0 +1,8 @@
+- name: "临时关闭swap"
+  shell: swapoff -a
+
+- name: "永久关闭swap"
+  lineinfile:
+    path: /etc/fstab
+    regexp: ".+swap.+"
+    state: absent
