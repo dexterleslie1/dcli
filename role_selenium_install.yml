@@ -1,0 +1,5 @@
+- name: "配置selenium"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_selenium_install
