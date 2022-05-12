@@ -25,8 +25,9 @@ class RedisCli(object):
         varHostRedisPassword = ""
         varRedisPassword = ""
         varRedisPort = ""
-        varRedisMode = "";
+        varRedisMode = ""
         varInstallLocally = "n"
+        varSudoPassword = ""
         varReboot  = "n"
 
         # redis集群节点数
@@ -65,13 +66,15 @@ class RedisCli(object):
                 varHostRedisUser = input("输入目标主机SSH用户（默认 root）：") or "root"
                 varHostRedisPassword = getpass.getpass("输入SSH密码：")
 
+            varSudoPassword = getpass.getpass("输入主机的sudo密码，如果当前为root用户不需要输入：")
+
         if varInstall.lower() == "y":
             if varRedisMode == "单机版":
-                if varInstallLocally.lower() == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser, varHostRedisPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser, varHostRedisPassword,
+                                                        varSudoPassword, varInstallLocally.lower() == "y")
+
+                cli_common.execute_command(var_command)
 
                 var_command = var_command + " -e varRedisMode=standalone"
 
@@ -89,12 +92,10 @@ class RedisCli(object):
                 cli_common.execute_command(var_command)
             else:
                 # redis集群判断/data/redis-cluster目录是否已经存在
-                if varInstallLocally.lower() == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser,
-                                                            varHostRedisPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser,
+                                                        varHostRedisPassword,
+                                                        varSudoPassword, varInstallLocally.lower() == "y")
                 var_command = var_command + " -e varRedisMode=cluster -e varAction=clusterCheckRedisClusterFolderExists"
                 cli_common.execute_command(var_command)
 
@@ -102,12 +103,10 @@ class RedisCli(object):
                 for varIndex in range(varClusterNodeCount):
                     logging.info("########################### 部署redis集群第" + str(varIndex+1) + "个节点 ##############################")
 
-                    if varInstallLocally.lower() == "y":
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                    else:
-                        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
-                        var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser,
-                                                                varHostRedisPassword)
+                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
+                    var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser,
+                                                            varHostRedisPassword,
+                                                            varSudoPassword, varInstallLocally.lower() == "y")
 
                     varClusterNode = "node" + str(varIndex+1)
 
@@ -125,12 +124,10 @@ class RedisCli(object):
                         varClusterCreateStr = varClusterCreateStr + " "
 
                 # 调用redis-cli --cluster create创建redis集群
-                if varInstallLocally.lower() == "y":
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml --ask-become-pass --connection=local -i 127.0.0.1,"
-                else:
-                    var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
-                    var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser,
-                                                            varHostRedisPassword)
+                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_redis_install.yml"
+                var_command = cli_common.concat_command(var_command, varHostRedisIp, varHostRedisUser,
+                                                        varHostRedisPassword,
+                                                        varSudoPassword, varInstallLocally.lower() == "y")
 
                 if varReboot.lower() == "y":
                     var_command = var_command + " -e varReboot=true"
