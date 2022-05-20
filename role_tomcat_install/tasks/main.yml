@@ -79,6 +79,13 @@
     regexp: "pattern=\"%h %l %u %t &quot;%r&quot; %s %b\" />$"
     replace: "pattern=\"%h %l %u %t &quot;%r&quot; %s %b\" /> -->"
 
+- name: "conf/server.xml插入<!-- <Context path=\"\" docBase=\"teest\" debug=\"0\" reloadable=\"false\"/> -->"
+  lineinfile:
+    path: /data/{{ varTomcatTargetDirectory }}/conf/server.xml
+    regexp: "^\\s*<!-- <Context path=\"\" docBase=\"teest\" debug=\"0\" reloadable=\"false\"/> -->"
+    line: "        <!-- <Context path=\"\" docBase=\"teest\" debug=\"0\" reloadable=\"false\"/> -->"
+    insertbefore: "\\s*</Host>"
+
 # 设置tomcat rc.local
 - name: "设置tomcat rc.local"
   lineinfile:
