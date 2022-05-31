@@ -1,0 +1,6 @@
+---
+- name: "mariadb slave配置"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_mariadb_slave_config

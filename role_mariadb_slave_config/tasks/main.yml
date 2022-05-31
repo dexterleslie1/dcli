@@ -1,0 +1,5 @@
+- name: "复制{{varSrcTemplate}}到当前工作目录"
+  template:
+    src: "{{varSrcTemplate}}"
+    dest: "{{varDestTemplate}}"
+  when: varCopyTemplate is defined and varCopyTemplate|bool

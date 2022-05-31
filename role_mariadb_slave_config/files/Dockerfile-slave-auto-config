@@ -1,0 +1,11 @@
+from mariadb:10.4.19
+
+run apt-get update
+
+run apt-get install -y curl
+
+env DOCKERIZE_VERSION v0.6.1
+run curl --silent --output dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz https://bucketxy.oss-cn-hangzhou.aliyuncs.com/dockerize-linux-amd64-v0.6.1.tar.gz
+run tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+
+copy docker-slave-auto-config.sh docker-slave-auto-config.sh
