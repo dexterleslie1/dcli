@@ -10,8 +10,9 @@ rm -f /tmp/*.sql
 varContainerName=$varSlaveContainerName
 
 mysql -uroot -P3306 -h$varContainerName -e "create database $varMasterDatabaseName" && \
+echo "成功创建数据库$varMasterDatabaseName，正在使用全量备份还原数据库，可能需要等待一段时间。。。" && \
 mysql -uroot -P3306 -h$varContainerName $varMasterDatabaseName < /tmp/fullybackup-restore.sql && \
-echo "成功创建并还原$varMasterDatabaseName数据库"
+echo "成功还原数据库$varMasterDatabaseName"
 
 # 解析全量备份并获取master_log_file和master_log_pos
 varMasterLogFile=`grep -r "CHANGE MASTER TO" /tmp/fullybackup-restore.sql | awk -F '[ = , ;]' '{print $5}'`
