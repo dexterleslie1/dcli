@@ -102,11 +102,17 @@ setup_ansible() {
   varUname=`uname -a`
   # 转换为小写
   varUname=${varUname,,}
-  varCentOS="el"
+  varCentOS8="el8"
+  varCentOS7="el7"
   varUbuntu="ubuntu"
-  if [[ $varUname =~ $varCentOS ]]; then
+  if [[ $varUname =~ $varCentOS8 ]]; then
       yum -y install epel-release
-      yum -y install ansible
+      # NOTE: 官方yum ansible不能用
+      # yum -y install ansible
+      yum -y install https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ansible/ansible-2.9.27-1.el8.noarch.rpm
+  elif [[ $varUname =~ $varCentOS7 ]]; then
+      yum -y install epel-release
+      yum -y install https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ansible/ansible-2.9.27-1.el7.noarch.rpm
   elif [[ $varUname =~ $varUbuntu ]]; then
       # sudo apt-get install software-properties-common
       sudo apt-add-repository ppa:ansible/ansible -y
