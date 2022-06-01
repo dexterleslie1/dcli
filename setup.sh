@@ -109,7 +109,7 @@ setup_ansible() {
       yum -y install epel-release
       # NOTE: 官方yum ansible不能用
       # yum -y install ansible
-      yum -y install https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ansible/ansible-2.9.27-1.el8.noarch.rpm
+      yum -y install https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ansible/ansible-2.9.27-1.el8.noarch.rpm https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ansible/sshpass-1.09-4.el8.x86_64.rpm
   elif [[ $varUname =~ $varCentOS7 ]]; then
       yum -y install epel-release
       yum -y install https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ansible/ansible-2.9.27-1.el7.noarch.rpm

@@ -9,6 +9,16 @@ def execute_command(command):
         raise Exception("Run command '" + command + "' failed")
 
 
+def execute_command_by_subprocess_run(command, isLogging=False):
+    if isLogging:
+        logging.info("Prepare to execute command '" + command + "'")
+    varResult = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    # varStdErr = varResult.stderr
+    # if varStdErr is not None and len(varStdErr.strip()) != 0:
+    #     raise Exception("执行命令 '" + command + "' 失败，原因如下：\n" + varStdErr )
+    return varResult
+
+
 def concat_command(command, remote_hosts, remote_user, remotePassword = None, sudoPassword = None, installLocally = False):
     if remotePassword is None:
         if remote_hosts:

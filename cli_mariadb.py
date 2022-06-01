@@ -176,7 +176,63 @@ class MariadbCli(object):
 
     def slave_status(self):
         """
-
+        查看数据库同步容器状态
         """
 
-        # todo 自动遍历当前工作目录
+        varResult = cli_common.execute_command_by_subprocess_run("docker ps -a")
+        varRowList = varResult.stdout.splitlines()
+        if len(varRowList) <= 1:
+            return
+
+        varRowList = varRowList[1:]
+        for item in varRowList:
+            varStatusRunning = "Exited" not in item
+            varColumnList = item.split()
+            varContainerName = varColumnList[len(varColumnList) - 1]
+            if varContainerName.startswith("slave-") and not varContainerName.endswith("-auto-config"):
+                if not varStatusRunning:
+                    print("错误！" + varContainerName + " 数据库同步容器已经Exited停止状态，使用 docker logs " + varContainerName + " 命令查看容器日志分析其中原因")
+                else:
+                    varCommand = "docker exec " + varContainerName + " mysql -uroot -e \"show slave status\G\""
+                    varResult = cli_common.execute_command_by_subprocess_run(varCommand)
+                    varRowList1 = varResult.stdout.splitlines()
+                    varSlaveIORunning = False
+                    varSlaveSQLRunning = False
+                    varLastErrno = False
+                    varLastIOErrno = False
+                    varLastSQLErrno = False
+                    for item1 in varRowList1:
+                        item1 = item1.strip()
+                        if item1.startswith("Slave_IO_Running:"):
+                            varSlaveIORunning = not item1.endswith("Yes")
+                        elif item1.startswith("Slave_SQL_Running:"):
+                            varSlaveSQLRunning = not item1.endswith("Yes")
+                        elif item1.startswith("Last_Errno:"):
+                            varLastErrno = int(item1.split(":")[1].strip()) != 0
+                        elif item1.startswith("Last_IO_Errno:"):
+                            varLastIOErrno = int(item1.split(":")[1].strip()) != 0
+                        elif item1.startswith("Last_SQL_Errno:"):
+                            varLastSQLErrno = int(item1.split(":")[1].strip()) != 0
+
+                    if varSlaveIORunning or varSlaveSQLRunning or varLastErrno or varLastIOErrno or varLastSQLErrno:
+                        print("错误！" + varContainerName + " 数据库同步容器错误状态，使用 docker exec " + varContainerName + " mysql -uroot -e \"show slave status\G\" 查看具体错误原因")
+                    else:
+                        print("正常。" + varContainerName + " 数据库同步容器正常状态")
+
+    def slave_cleanup(self):
+        """
+        释放slave-xxxx-auto-config容器
+        """
+
+        # 读取所有退出状态容器
+        varResult = cli_common.execute_command_by_subprocess_run("docker ps -f \"status=exited\"")
+        varRowList = varResult.stdout.splitlines()
+        if len(varRowList) <= 1:
+            return
+
+        varRowList = varRowList[1:]
+        for item in varRowList:
+            varColumnList = item.split()
+            varContainerName = varColumnList[len(varColumnList)-1]
+            if varContainerName.startswith("slave-") and varContainerName.endswith("-auto-config"):
+                cli_common.execute_command_by_subprocess_run("docker-compose rm --stop --force -v " + varContainerName)

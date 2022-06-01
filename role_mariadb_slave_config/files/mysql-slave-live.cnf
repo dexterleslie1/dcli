@@ -17,4 +17,7 @@ replicate-ignore-db="mysql"
 replicate-ignore-db="performance_schema"
 replicate-ignore-db="test"
 
+#skip-slave-start
+#slave_skip_errors=1451
+
 server_id=95001
