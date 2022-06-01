@@ -18,6 +18,8 @@ echo "成功还原数据库$varMasterDatabaseName"
 varMasterLogFile=`grep -r "CHANGE MASTER TO" /tmp/fullybackup-restore.sql | awk -F '[ = , ;]' '{print $5}'`
 varMasterLogPos=`grep -r "CHANGE MASTER TO" /tmp/fullybackup-restore.sql | awk -F '[ = , ;]' '{print $8}'`
 
+rm -f /tmp/fullybackup-restore.sql
+
 if [[ "$varReplicationDelayInSeconds" == "" ]]; then
   mysql -uroot -P3306 -h$varContainerName -e "change master to master_host='$varMasterIp',master_port=$varMasterPort,master_user='$varMasterReplicationUser',master_password='$varMasterReplicationUserPassword',master_log_file=$varMasterLogFile,master_log_pos=$varMasterLogPos" && echo "成功执行change master命令"
 else
@@ -25,5 +27,3 @@ else
 fi
 
 mysql -uroot -P3306 -h$varContainerName -e "start slave" && echo "成功启动slave复制进程"
-
-rm -f /tmp/fullybackup-restore.sql
