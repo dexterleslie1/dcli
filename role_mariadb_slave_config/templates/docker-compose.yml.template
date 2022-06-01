@@ -35,6 +35,7 @@ services:
       - varMasterReplicationUser=${varMasterReplicationUser}
       - varMasterReplicationUserPassword=${varMasterReplicationUserPassword}
       - varSlaveContainerName=slave-{{varProjectName}}-live
+      - TZ=Asia/Shanghai
     volumes:
       - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
     command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-live:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"
@@ -50,6 +51,7 @@ services:
       - varMasterReplicationUserPassword=${varMasterReplicationUserPassword}
       - varSlaveContainerName=slave-{{varProjectName}}-2d-delay
       - varReplicationDelayInSeconds=172800
+      - TZ=Asia/Shanghai
     volumes:
       - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
     command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-2d-delay:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"

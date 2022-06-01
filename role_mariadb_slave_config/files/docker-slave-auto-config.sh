@@ -15,8 +15,8 @@ mysql -uroot -P3306 -h$varContainerName $varMasterDatabaseName < /tmp/fullybacku
 echo "成功还原数据库$varMasterDatabaseName"
 
 # 解析全量备份并获取master_log_file和master_log_pos
-varMasterLogFile=`grep -r "CHANGE MASTER TO" /tmp/fullybackup-restore.sql | awk -F '[ = , ;]' '{print $5}'`
-varMasterLogPos=`grep -r "CHANGE MASTER TO" /tmp/fullybackup-restore.sql | awk -F '[ = , ;]' '{print $8}'`
+varMasterLogFile=`head -500 /tmp/fullybackup-restore.sql | grep "CHANGE MASTER TO" | awk -F '[ = , ;]' '{print $5}'`
+varMasterLogPos=`head -500 /tmp/fullybackup-restore.sql | grep "CHANGE MASTER TO" | awk -F '[ = , ;]' '{print $8}'`
 
 rm -f /tmp/fullybackup-restore.sql
 
