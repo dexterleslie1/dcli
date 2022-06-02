@@ -242,8 +242,7 @@ class MariadbCli(object):
         for item in varRowList:
             varColumnList = item.split()
             varContainerName = varColumnList[len(varColumnList)-1]
-            if varContainerName.startswith("slave-") and \
-                    (varContainerName.endswith("-auto-config") or varContainerName.endswith("-restore")):
+            if varContainerName.startswith("slave-") and varContainerName.endswith("-auto-config"):
                 cli_common.execute_command_by_subprocess_run("docker rm --force -v " + varContainerName)
                 print("成功清除容器 " + varContainerName + " 相关资源")
 
