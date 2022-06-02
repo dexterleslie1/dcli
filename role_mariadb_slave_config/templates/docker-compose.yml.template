@@ -6,7 +6,8 @@ services:
     container_name: slave-{{varProjectName}}-live
     image: mariadb:10.4.19
     environment:
-      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true
+      #- MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true
+      - MYSQL_ROOT_PASSWORD=123456
       - TZ=Asia/Shanghai
     restart: always
     volumes:
@@ -19,7 +20,8 @@ services:
     container_name: slave-{{varProjectName}}-2d-delay
     image: mariadb:10.4.19
     environment:
-      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true
+      #- MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true
+      - MYSQL_ROOT_PASSWORD=123456
       - TZ=Asia/Shanghai
     restart: always
     volumes:
