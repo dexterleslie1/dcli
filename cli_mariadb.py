@@ -286,4 +286,4 @@ class MariadbCli(object):
         cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
 
         print("成功从容器 slave-" + varProjectName + "-delay 复制数据到容器 slave-" + varProjectName + "-delay-restore 中，" +
-              "使用 docker exec -it slave-" + varProjectName + "-delay-restore /bin/bash 进入并还原数据")
+              "使用 docker exec -it slave-" + varProjectName + "-delay-restore /bin/bash 进入并还原数据，具体数据还原步骤参照当前工作目录的README.md文件")
