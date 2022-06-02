@@ -16,8 +16,8 @@ services:
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake
 
   # 2天延迟备份
-  slave-{{varProjectName}}-2d-delay:
-    container_name: slave-{{varProjectName}}-2d-delay
+  slave-{{varProjectName}}-delay:
+    container_name: slave-{{varProjectName}}-delay
     image: mariadb:10.4.19
     environment:
       #- MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true
@@ -26,7 +26,7 @@ services:
     restart: always
     volumes:
       - ./mysql-slave-delay.cnf:/etc/mysql/conf.d/my.cnf
-      - vol-slave-{{varProjectName}}-2d-delay:/var/lib/mysql
+      - vol-slave-{{varProjectName}}-delay:/var/lib/mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake
 
   slave-{{varProjectName}}-live-auto-config:
@@ -44,8 +44,8 @@ services:
       - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
     command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-live:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"
 
-  slave-{{varProjectName}}-2d-delay-auto-config:
-    container_name: slave-{{varProjectName}}-2d-delay-auto-config
+  slave-{{varProjectName}}-delay-auto-config:
+    container_name: slave-{{varProjectName}}-delay-auto-config
     image: docker.118899.net:10001/yyd-public/slave-auto-config
     environment:
       - varMasterDatabaseName=${varMasterDatabaseName}
@@ -53,15 +53,15 @@ services:
       - varMasterPort=${varMasterPort}
       - varMasterReplicationUser=${varMasterReplicationUser}
       - varMasterReplicationUserPassword=${varMasterReplicationUserPassword}
-      - varSlaveContainerName=slave-{{varProjectName}}-2d-delay
-      - varReplicationDelayInSeconds=172800
+      - varSlaveContainerName=slave-{{varProjectName}}-delay
+      - varReplicationDelayInSeconds=432000
       - TZ=Asia/Shanghai
     volumes:
       - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
-    command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-2d-delay:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"
+    command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-delay:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"
 
 volumes:
   vol-slave-{{varProjectName}}-live:
     name: vol-slave-{{varProjectName}}-live
-  vol-slave-{{varProjectName}}-2d-delay:
-    name: vol-slave-{{varProjectName}}-2d-delay
+  vol-slave-{{varProjectName}}-delay:
+    name: vol-slave-{{varProjectName}}-delay

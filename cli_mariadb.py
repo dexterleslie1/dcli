@@ -138,6 +138,8 @@ class MariadbCli(object):
                         varCurrentWorkingDirectory + "/mysql-slave-live.cnf")
         shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-delay.cnf",
                         varCurrentWorkingDirectory + "/mysql-slave-delay.cnf")
+        shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-delay-restore.cnf",
+                        varCurrentWorkingDirectory + "/mysql-slave-delay-restore.cnf")
         # 复制README.md文件到当前工作目录
         shutil.copyfile(varDefaultConfigFileFullRelativePath + "/README.md",
                         varCurrentWorkingDirectory + "/README.md")
@@ -157,8 +159,12 @@ class MariadbCli(object):
         if varStart.lower() != "y":
             return
 
-        # 判断当前目录是否存在全量数据库备份
         varCurrentWorkingDirectory = os.getcwd()
+        if not os.path.exists(varCurrentWorkingDirectory + "/.env")\
+                or not os.path.exists(varCurrentWorkingDirectory + "/docker-compose.yml"):
+            raise Exception("当前所在目录不是数据库备份工作目录，切换到相应的工作目录再重试此命令")
+
+        # 判断当前目录是否存在全量数据库备份
         if not os.path.exists(varCurrentWorkingDirectory + "/fullybackup-restore.tar.gz"):
             raise Exception("当前工作目录不存在名为fullybackup-restore.tar.gz全量数据库备份，无法启动数据库复制")
 
@@ -236,6 +242,49 @@ class MariadbCli(object):
         for item in varRowList:
             varColumnList = item.split()
             varContainerName = varColumnList[len(varColumnList)-1]
-            if varContainerName.startswith("slave-") and varContainerName.endswith("-auto-config"):
+            if varContainerName.startswith("slave-") and \
+                    (varContainerName.endswith("-auto-config") or varContainerName.endswith("-restore")):
                 cli_common.execute_command_by_subprocess_run("docker rm --force -v " + varContainerName)
                 print("成功清除容器 " + varContainerName + " 相关资源")
+
+    def slave_restore_prepare(self):
+        """
+        用于准备数据库恢复容器，原理： 复制delay容器数据到delay restore新容器，之后人工介入还原数据
+        """
+
+        varConfirm = input("是否确定准备数据库还原步骤吗？ [y/n]: ") or "n"
+        if varConfirm.lower() != "y":
+            return
+
+        varCurrentWorkingDirectory = os.getcwd()
+        if not os.path.exists(varCurrentWorkingDirectory + "/.env") \
+                or not os.path.exists(varCurrentWorkingDirectory + "/docker-compose.yml"):
+            raise Exception("当前所在目录不是数据库备份工作目录，切换到相应的工作目录再重试此命令")
+
+        # 获取项目名称
+        varResult = cli_common.execute_command_by_subprocess_run("grep \"varProjectName\" " + varCurrentWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
+        varProjectName = varResult.stdout.strip()
+
+        # 停止delay复制同步
+        varCommand = "docker exec -it slave-" + varProjectName + "-delay mysql -uroot -p123456 -e \"stop slave\""
+        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+
+        # 删除之前的slave-xxx-delay-restore容器
+        varCommand = "docker rm --force -v slave-" + varProjectName + "-delay-restore || true"
+        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+
+        varVolumeNameRestore = "vol-slave-" + varProjectName + "-delay-restore"
+
+        # 删除之前的restore volume
+        varCommand = "docker volume rm " + varVolumeNameRestore + " || true"
+        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+
+        # 使用临时容器复制delay容器数据
+        varCommand = "docker run --rm -it --volumes-from slave-" + varProjectName + "-delay:ro -v " + varVolumeNameRestore + ":/mount-point-datum centos /bin/sh -c \"rm -rf /mount-point-datum/* && cp -rp /var/lib/mysql/* /mount-point-datum/\""
+        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+
+        varCommand = "docker run -d --name slave-" + varProjectName + "-delay-restore -v " + varVolumeNameRestore + ":/var/lib/mysql -v " + varCurrentWorkingDirectory + "/mysql-slave-delay-restore.cnf:/etc/mysql/conf.d/my.cnf mariadb:10.4.19"
+        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+
+        print("成功从容器 slave-" + varProjectName + "-delay 复制数据到容器 slave-" + varProjectName + "-delay-restore 中，" +
+              "使用 docker exec -it slave-" + varProjectName + "-delay-restore /bin/bash 进入并还原数据")

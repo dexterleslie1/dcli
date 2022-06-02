@@ -12,5 +12,7 @@ dcli mariadb slave_status
 
 # 清除无用的容器
 dcli mariadb slave_cleanup
-# 
+
+# 准备数据恢复容器
+dcli mariadb slave_restore_prepare
 ```
