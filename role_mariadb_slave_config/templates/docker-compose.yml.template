@@ -11,6 +11,7 @@ services:
     restart: always
     volumes:
       - ./mysql-slave-live.cnf:/etc/mysql/conf.d/my.cnf
+      - vol-slave-{{varProjectName}}-live:/var/lib/mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake
 
   # 2天延迟备份
@@ -23,6 +24,7 @@ services:
     restart: always
     volumes:
       - ./mysql-slave-delay.cnf:/etc/mysql/conf.d/my.cnf
+      - vol-slave-{{varProjectName}}-2d-delay:/var/lib/mysql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake
 
   slave-{{varProjectName}}-live-auto-config:
@@ -55,3 +57,9 @@ services:
     volumes:
       - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
     command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-2d-delay:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"
+
+volumes:
+  vol-slave-{{varProjectName}}-live:
+    name: vol-slave-{{varProjectName}}-live
+  vol-slave-{{varProjectName}}-2d-delay:
+    name: vol-slave-{{varProjectName}}-2d-delay

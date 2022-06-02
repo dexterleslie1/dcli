@@ -90,7 +90,7 @@ class MariadbCli(object):
             raise Exception("没有指定Master端口")
 
         # 询问master复制用户
-        varMasterReplicationUser = input("Master复制用户：")
+        varMasterReplicationUser = input("Master复制用户（默认值root）：") or "root"
         if varMasterReplicationUser.strip() == "":
             raise Exception("没有指定Master复制用户")
 
@@ -165,7 +165,7 @@ class MariadbCli(object):
         # 全新启动需要销毁之前的容器
         varFreshStart = input("是否全新重新启动（注意：全新重新启动会删除之前的实时同步数据后重新开始同步）？ [y/n]: ") or "n"
         if varFreshStart.lower() == "y":
-            varCommand = "docker-compose down"
+            varCommand = "docker-compose down -v"
             cli_common.execute_command(varCommand)
 
         varCommand = "docker-compose up -d"
@@ -182,6 +182,7 @@ class MariadbCli(object):
         varResult = cli_common.execute_command_by_subprocess_run("docker ps -a")
         varRowList = varResult.stdout.splitlines()
         if len(varRowList) <= 1:
+            print("没有相关数据数据库同步容器")
             return
 
         varRowList = varRowList[1:]
@@ -228,6 +229,7 @@ class MariadbCli(object):
         varResult = cli_common.execute_command_by_subprocess_run("docker ps -f \"status=exited\"")
         varRowList = varResult.stdout.splitlines()
         if len(varRowList) <= 1:
+            print("没有可清除的容器")
             return
 
         varRowList = varRowList[1:]
