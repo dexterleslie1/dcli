@@ -283,7 +283,7 @@ class MariadbCli(object):
         varCommand = "docker run --rm -it --volumes-from slave-" + varProjectName + "-delay:ro -v " + varVolumeNameRestore + ":/mount-point-datum centos /bin/sh -c \"rm -rf /mount-point-datum/* && cp -rp /var/lib/mysql/* /mount-point-datum/\""
         cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
 
-        varCommand = "docker run -d --name slave-" + varProjectName + "-delay-restore -v " + varVolumeNameRestore + ":/var/lib/mysql -v " + varCurrentWorkingDirectory + "/mysql-slave-delay-restore.cnf:/etc/mysql/conf.d/my.cnf mariadb:10.4.19"
+        varCommand = "docker run -d --name slave-" + varProjectName + "-delay-restore -e TZ=Asia/Shanghai -v " + varVolumeNameRestore + ":/var/lib/mysql -v " + varCurrentWorkingDirectory + "/mysql-slave-delay-restore.cnf:/etc/mysql/conf.d/my.cnf mariadb:10.4.19"
         cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
 
         print("成功从容器 slave-" + varProjectName + "-delay 复制数据到容器 slave-" + varProjectName + "-delay-restore 中，" +
