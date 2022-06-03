@@ -196,7 +196,7 @@ class MariadbCli(object):
             varStatusRunning = "Exited" not in item
             varColumnList = item.split()
             varContainerName = varColumnList[len(varColumnList) - 1]
-            if varContainerName.startswith("slave-") and not varContainerName.endswith("-auto-config"):
+            if varContainerName.startswith("slave-") and not varContainerName.endswith("-auto-config") and not varContainerName.endswith("-restore"):
                 if not varStatusRunning:
                     print("错误！" + varContainerName + " 数据库同步容器已经Exited停止状态，使用 docker logs " + varContainerName + " 命令查看容器日志分析其中原因")
                 else:
@@ -208,6 +208,7 @@ class MariadbCli(object):
                     varLastErrno = False
                     varLastIOErrno = False
                     varLastSQLErrno = False
+                    varSecondsBehindMaster = False
                     for item1 in varRowList1:
                         item1 = item1.strip()
                         if item1.startswith("Slave_IO_Running:"):
@@ -220,8 +221,10 @@ class MariadbCli(object):
                             varLastIOErrno = int(item1.split(":")[1].strip()) != 0
                         elif item1.startswith("Last_SQL_Errno:"):
                             varLastSQLErrno = int(item1.split(":")[1].strip()) != 0
+                        elif varContainerName.endswith("-live") and item1.startswith("Seconds_Behind_Master:"):
+                            varSecondsBehindMaster = int(item1.split(":")[1].strip()) != 0
 
-                    if varSlaveIORunning or varSlaveSQLRunning or varLastErrno or varLastIOErrno or varLastSQLErrno:
+                    if varSlaveIORunning or varSlaveSQLRunning or varLastErrno or varLastIOErrno or varLastSQLErrno or varSecondsBehindMaster:
                         print("错误！" + varContainerName + " 数据库同步容器错误状态，使用 docker exec " + varContainerName + " mysql -uroot -p123456 -e \"show slave status\G\" 查看具体错误原因")
                     else:
                         print("正常。" + varContainerName + " 数据库同步容器正常状态")

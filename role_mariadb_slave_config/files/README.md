@@ -24,4 +24,7 @@ mysqlbinlog mysqld-bin-relay-log.000020 --stop-position=5589 | mysql -uroot -p d
 
 # 导出还原数据后下载restore-export.gz文件
 dcli mariadb slave_export
+
+# 还原生产环境数据库
+gzip -dkc restore-export.gz | mysql -uroot -p databasename
 ```
