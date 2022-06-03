@@ -246,44 +246,77 @@ class MariadbCli(object):
                 cli_common.execute_command_by_subprocess_run("docker rm --force -v " + varContainerName)
                 print("成功清除容器 " + varContainerName + " 相关资源")
 
-    def slave_restore_prepare(self):
+    def slave_restore_pre(self):
         """
         用于准备数据库恢复容器，原理： 复制delay容器数据到delay restore新容器，之后人工介入还原数据
         """
 
-        varConfirm = input("是否确定准备数据库还原步骤吗？ [y/n]: ") or "n"
-        if varConfirm.lower() != "y":
-            return
-
         varCurrentWorkingDirectory = os.getcwd()
+
         if not os.path.exists(varCurrentWorkingDirectory + "/.env") \
                 or not os.path.exists(varCurrentWorkingDirectory + "/docker-compose.yml"):
             raise Exception("当前所在目录不是数据库备份工作目录，切换到相应的工作目录再重试此命令")
 
         # 获取项目名称
-        varResult = cli_common.execute_command_by_subprocess_run("grep \"varProjectName\" " + varCurrentWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
+        varResult = cli_common.execute_command_by_subprocess_run(
+            "grep \"varProjectName\" " + varCurrentWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
         varProjectName = varResult.stdout.strip()
+
+        varConfirm = input("是否确定准备项目" + varProjectName + "数据库还原容器吗？ [y/n]: ") or "n"
+        if varConfirm.lower() != "y":
+            return
 
         # 停止delay复制同步
         varCommand = "docker exec -it slave-" + varProjectName + "-delay mysql -uroot -p123456 -e \"stop slave\""
-        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+        cli_common.execute_command_by_subprocess_run(varCommand)
+        print("成功停止 slave-" + varProjectName + "-delay 复制同步线程")
 
         # 删除之前的slave-xxx-delay-restore容器
         varCommand = "docker rm --force -v slave-" + varProjectName + "-delay-restore || true"
-        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+        cli_common.execute_command_by_subprocess_run(varCommand)
+        print("成功删除 slave-" + varProjectName + "-delay-restore 容器")
 
         varVolumeNameRestore = "vol-slave-" + varProjectName + "-delay-restore"
 
         # 删除之前的restore volume
         varCommand = "docker volume rm " + varVolumeNameRestore + " || true"
-        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+        cli_common.execute_command_by_subprocess_run(varCommand)
+        print("成功删除 " + varVolumeNameRestore + " 容器数据卷")
 
         # 使用临时容器复制delay容器数据
+        print("准备复制 slave-" + varProjectName + "-delay 容器数据到命名数据卷 " + varVolumeNameRestore + " ，这个过程可能需要等待一段时间。。。")
         varCommand = "docker run --rm -it --volumes-from slave-" + varProjectName + "-delay:ro -v " + varVolumeNameRestore + ":/mount-point-datum centos /bin/sh -c \"rm -rf /mount-point-datum/* && cp -rp /var/lib/mysql/* /mount-point-datum/\""
-        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+        cli_common.execute_command_by_subprocess_run(varCommand)
+        print("成功复制 slave-" + varProjectName + "-delay 容器数据到命名数据卷 " + varVolumeNameRestore)
 
         varCommand = "docker run -d --name slave-" + varProjectName + "-delay-restore -e TZ=Asia/Shanghai -v " + varVolumeNameRestore + ":/var/lib/mysql -v " + varCurrentWorkingDirectory + "/mysql-slave-delay-restore.cnf:/etc/mysql/conf.d/my.cnf mariadb:10.4.19"
-        cli_common.execute_command_by_subprocess_run(varCommand, isLogging=True)
+        cli_common.execute_command_by_subprocess_run(varCommand)
+        print("成功创建数据还原容器 slave-" + varProjectName + "-delay-restore")
 
         print("成功从容器 slave-" + varProjectName + "-delay 复制数据到容器 slave-" + varProjectName + "-delay-restore 中，" +
               "使用 docker exec -it slave-" + varProjectName + "-delay-restore /bin/bash 进入并还原数据，具体数据还原步骤参照当前工作目录的README.md文件")
+
+    def slave_export(self):
+        """
+        容器数据还原后使用这个命令导出数据用于数据还原
+        """
+
+        varCurrentWorkingDirectory = os.getcwd()
+
+        if not os.path.exists(varCurrentWorkingDirectory + "/.env") \
+                or not os.path.exists(varCurrentWorkingDirectory + "/docker-compose.yml"):
+            raise Exception("当前所在目录不是数据库备份工作目录，切换到相应的工作目录再重试此命令")
+
+        # 获取项目名称
+        varResult = cli_common.execute_command_by_subprocess_run(
+            "grep \"varProjectName\" " + varCurrentWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
+        varProjectName = varResult.stdout.strip()
+
+        varConfirm = input("是否确定导出项目" + varProjectName + "还原后的数据吗？ [y/n]: ") or "n"
+        if varConfirm.lower() != "y":
+            return
+
+        print("准备导出还原后的数据，可能需要等待一段时间。。。")
+        varCommand = "docker exec -it slave-hm2015-delay-restore mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false testdb | gzip -c > restore-export.gz"
+        cli_common.execute_command_by_subprocess_run(varCommand)
+        print("成功导出还原后的数据到当前工作目录的数据文件 restore-export.gz，使用命令 gzip -dkc restore-export.gz > restore-export.sql 解压数据到restore-export.sql文件")
