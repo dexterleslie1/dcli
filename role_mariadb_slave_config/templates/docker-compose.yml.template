@@ -54,7 +54,8 @@ services:
       - varMasterReplicationUser=${varMasterReplicationUser}
       - varMasterReplicationUserPassword=${varMasterReplicationUserPassword}
       - varSlaveContainerName=slave-{{varProjectName}}-delay
-      - varReplicationDelayInSeconds=432000
+      # 4.5天
+      - varReplicationDelayInSeconds=388800
       - TZ=Asia/Shanghai
     volumes:
       - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
