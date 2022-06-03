@@ -312,11 +312,15 @@ class MariadbCli(object):
             "grep \"varProjectName\" " + varCurrentWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
         varProjectName = varResult.stdout.strip()
 
+        varResult = cli_common.execute_command_by_subprocess_run(
+            "grep \"varMasterDatabaseName\" " + varCurrentWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
+        varMasterDatabaseName = varResult.stdout.strip()
+
         varConfirm = input("是否确定导出项目" + varProjectName + "还原后的数据吗？ [y/n]: ") or "n"
         if varConfirm.lower() != "y":
             return
 
         print("准备导出还原后的数据，可能需要等待一段时间。。。")
-        varCommand = "docker exec -it slave-hm2015-delay-restore mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false testdb | gzip -c > restore-export.gz"
+        varCommand = "docker exec -it slave-hm2015-delay-restore mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false " + varMasterDatabaseName + " | gzip -c > restore-export.gz"
         cli_common.execute_command_by_subprocess_run(varCommand)
         print("成功导出还原后的数据到当前工作目录的数据文件 restore-export.gz，使用命令 gzip -dkc restore-export.gz > restore-export.sql 解压数据到restore-export.sql文件")
