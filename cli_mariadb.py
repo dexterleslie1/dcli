@@ -321,6 +321,6 @@ class MariadbCli(object):
             return
 
         print("准备导出还原后的数据，可能需要等待一段时间。。。")
-        varCommand = "docker exec -it slave-hm2015-delay-restore mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false " + varMasterDatabaseName + " | gzip -c > restore-export.gz"
+        varCommand = "docker exec -it slave-" + varProjectName + "-delay-restore mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false " + varMasterDatabaseName + " | gzip -c > restore-export.gz"
         cli_common.execute_command_by_subprocess_run(varCommand)
         print("成功导出还原后的数据到当前工作目录的数据文件 restore-export.gz，使用命令 gzip -dkc restore-export.gz > restore-export.sql 解压数据到restore-export.sql文件")
