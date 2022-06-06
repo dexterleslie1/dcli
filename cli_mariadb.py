@@ -2,6 +2,7 @@ import cli_common
 import os
 import getpass
 import shutil
+import datetime
 
 
 class MariadbCli(object):
@@ -43,21 +44,29 @@ class MariadbCli(object):
 
     def slave_config(self):
         """
-        在当前工作目录生成slave的相关配置文件，具体操作步骤参考当前工作目录的README.md文件
+        在项目工作目录/data/slave-xxxx生成同步的相关配置文件，具体操作步骤参考项目工作目录的README.md文件
 
         :return:
         """
 
-        varConfig = input("是否确定在当前目录生成slave相关配置？ [y/n]: ") or "n"
+        varConfig = input("是否确定生成同步相关配置？ [y/n]: ") or "n"
         if varConfig.lower() != "y":
             return
 
-        # 判断当前工作目录是否为空
-        varCurrentWorkingDirectory = os.getcwd()
-        if os.path.exists(varCurrentWorkingDirectory + "/.env"):
-            raise Exception("当前工作目录不为空目录，不能创建slave相关配置文件")
+        # 询问项目名称，例如：hm2015、hm2016等
+        varProjectName = input("当前项目名称，例如：hm2015、hm2016等： ") or ""
+        varProjectName = varProjectName.strip()
+        if varProjectName == "":
+            raise Exception("没有指定前项目名称")
 
-        varProjectName = ""
+        # 判断项目工作目录是否为空
+        varProjectWorkingDirectory = "/data/slave-" + varProjectName
+        if os.path.exists(varProjectWorkingDirectory + "/.env"):
+            raise Exception("项目" + varProjectName + "的工作目录" + varProjectWorkingDirectory + "不为空目录，不能生成同步相关配置文件")
+
+        if not os.path.exists(varProjectWorkingDirectory):
+            cli_common.execute_command_by_subprocess_run("mkdir -p " + varProjectWorkingDirectory)
+
         varMasterDatabaseName = ""
         varMasterIp = ""
         varMasterPort = 3306
@@ -67,11 +76,6 @@ class MariadbCli(object):
 
         # 询问是否重新编译slave-auto-config docker镜像
         varRecompileSlaveAutoConfigDockerImage = input("是否重新编译slave-auto-config镜像？ [y/n]: ") or "n"
-
-        # 询问项目名称，例如：hm2015、hm2016等
-        varProjectName = input("当前项目名称，例如：hm2015、hm2016等： ")
-        if varProjectName.strip() == "":
-            raise Exception("没有指定前项目名称")
 
         # 询问master数据库名称
         varMasterDatabaseName = input("Master数据库名称： ")
@@ -112,7 +116,7 @@ class MariadbCli(object):
         var_command = var_command + " -e varMasterReplicationUser=" + varMasterReplicationUser
         var_command = var_command + " -e varMasterReplicationUserPassword=" + varMasterReplicationUserPassword
         var_command = var_command + " -e varSrcTemplate=.env.template"
-        var_command = var_command + " -e varDestTemplate=\"" + varCurrentWorkingDirectory + "/.env\""
+        var_command = var_command + " -e varDestTemplate=\"" + varProjectWorkingDirectory + "/.env\""
         var_command = var_command + " -e varCopyTemplate=True"
         cli_common.execute_command(var_command)
 
@@ -123,50 +127,55 @@ class MariadbCli(object):
         var_command = cli_common.concat_command(var_command, "", "", "", varSudoPassword, True)
         var_command = var_command + " -e varProjectName=" + varProjectName
         var_command = var_command + " -e varSrcTemplate=docker-compose.yml.template"
-        var_command = var_command + " -e varDestTemplate=\"" + varCurrentWorkingDirectory + "/docker-compose.yml\""
+        var_command = var_command + " -e varDestTemplate=\"" + varProjectWorkingDirectory + "/docker-compose.yml\""
         var_command = var_command + " -e varCopyTemplate=True"
         cli_common.execute_command(var_command)
 
         # 复制docker-slave-auto-config.sh
         shutil.copyfile(varDefaultConfigFileFullRelativePath + "/docker-slave-auto-config.sh",
-                        varCurrentWorkingDirectory + "/docker-slave-auto-config.sh")
+                        varProjectWorkingDirectory + "/docker-slave-auto-config.sh")
         # 复制Dockerfile-slave-auto-config
         shutil.copyfile(varDefaultConfigFileFullRelativePath + "/Dockerfile-slave-auto-config",
-                        varCurrentWorkingDirectory + "/Dockerfile")
+                        varProjectWorkingDirectory + "/Dockerfile")
         # 复制mysql-slave.cnf
         shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-live.cnf",
-                        varCurrentWorkingDirectory + "/mysql-slave-live.cnf")
-        shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-delay.cnf",
-                        varCurrentWorkingDirectory + "/mysql-slave-delay.cnf")
-        shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-delay-restore.cnf",
-                        varCurrentWorkingDirectory + "/mysql-slave-delay-restore.cnf")
+                        varProjectWorkingDirectory + "/mysql-slave-live.cnf")
+        shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-restore.cnf",
+                        varProjectWorkingDirectory + "/mysql-slave-restore.cnf")
         # 复制README.md文件到当前工作目录
         shutil.copyfile(varDefaultConfigFileFullRelativePath + "/README.md",
-                        varCurrentWorkingDirectory + "/README.md")
+                        varProjectWorkingDirectory + "/README.md")
 
         if varRecompileSlaveAutoConfigDockerImage.lower() == "y":
-            var_command = "docker build --tag docker.118899.net:10001/yyd-public/slave-auto-config --file Dockerfile " + varCurrentWorkingDirectory
+            var_command = "docker build --tag docker.118899.net:10001/yyd-public/slave-auto-config --file Dockerfile " + varProjectWorkingDirectory
             cli_common.execute_command(var_command)
+
+        print("项目" + varProjectName + "相关同步配置已经在项目工作目录/data/slave-" + varProjectName + "中生成，切换到项目工作目录后再进行其他操作")
 
     def slave_start(self):
         """
-        启动数据库复制
+        启动数据库同步
 
         :return:
         """
 
-        varStart = input("是否确定启动/重新启动数据库复制吗？ [y/n]: ") or "n"
-        if varStart.lower() != "y":
-            return
-
         varCurrentWorkingDirectory = os.getcwd()
-        if not os.path.exists(varCurrentWorkingDirectory + "/.env")\
+        if not os.path.exists(varCurrentWorkingDirectory + "/.env") \
                 or not os.path.exists(varCurrentWorkingDirectory + "/docker-compose.yml"):
             raise Exception("当前所在目录不是数据库备份工作目录，切换到相应的工作目录再重试此命令")
 
+        # 获取项目名称
+        varResult = cli_common.execute_command_by_subprocess_run(
+            "grep \"varProjectName\" " + varCurrentWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
+        varProjectName = varResult.stdout.strip()
+
+        varStart = input("是否确定启动或者全新启动项目" + varProjectName + "数据库同步吗？ [y/n]: ") or "n"
+        if varStart.lower() != "y":
+            return
+
         # 判断当前目录是否存在全量数据库备份
         if not os.path.exists(varCurrentWorkingDirectory + "/fullybackup-restore.tar.gz"):
-            raise Exception("当前工作目录不存在名为fullybackup-restore.tar.gz全量数据库备份，无法启动数据库复制")
+            raise Exception("当前工作目录不存在名为fullybackup-restore.tar.gz全量数据库备份，无法启动数据库同步")
 
         # 全新启动需要销毁之前的容器
         varFreshStart = input("是否全新重新启动（注意：全新重新启动会删除之前的实时同步数据后重新开始同步）？ [y/n]: ") or "n"
@@ -238,7 +247,7 @@ class MariadbCli(object):
         varResult = cli_common.execute_command_by_subprocess_run("docker ps -f \"status=exited\"")
         varRowList = varResult.stdout.splitlines()
         if len(varRowList) <= 1:
-            print("没有可清除的容器")
+            print("没有可清除的数据库同步配置容器")
             return
 
         varRowList = varRowList[1:]
@@ -247,18 +256,18 @@ class MariadbCli(object):
             varContainerName = varColumnList[len(varColumnList)-1]
             if varContainerName.startswith("slave-") and varContainerName.endswith("-auto-config"):
                 cli_common.execute_command_by_subprocess_run("docker rm --force -v " + varContainerName)
-                print("成功清除容器 " + varContainerName + " 相关资源")
+                print("成功清除数据库同步配置容器 " + varContainerName + " 相关资源")
 
     def slave_restore_pre(self):
         """
-        用于准备数据库恢复容器，原理： 复制delay容器数据到delay restore新容器，之后人工介入还原数据
+        用于准备数据库恢复容器，原理： 复制live容器数据到restore新容器，之后人工介入还原数据
         """
 
         varCurrentWorkingDirectory = os.getcwd()
 
         if not os.path.exists(varCurrentWorkingDirectory + "/.env") \
                 or not os.path.exists(varCurrentWorkingDirectory + "/docker-compose.yml"):
-            raise Exception("当前所在目录不是数据库备份工作目录，切换到相应的工作目录再重试此命令")
+            raise Exception("当前所在目录不是数据库同步工作目录，切换到相应的工作目录再重试此命令")
 
         # 获取项目名称
         varResult = cli_common.execute_command_by_subprocess_run(
@@ -269,17 +278,17 @@ class MariadbCli(object):
         if varConfirm.lower() != "y":
             return
 
-        # 停止delay复制同步
-        varCommand = "docker exec -it slave-" + varProjectName + "-delay mysql -uroot -p123456 -e \"stop slave\""
+        # 停止复制同步
+        varCommand = "docker exec -it slave-" + varProjectName + "-live mysql -uroot -p123456 -e \"stop slave\""
         cli_common.execute_command_by_subprocess_run(varCommand)
-        print("成功停止 slave-" + varProjectName + "-delay 复制同步线程")
+        print("成功停止 slave-" + varProjectName + "-live 复制同步线程")
 
-        # 删除之前的slave-xxx-delay-restore容器
-        varCommand = "docker rm --force -v slave-" + varProjectName + "-delay-restore || true"
+        # 删除之前的slave-xxx-restore容器
+        varCommand = "docker rm --force -v slave-" + varProjectName + "-restore || true"
         cli_common.execute_command_by_subprocess_run(varCommand)
-        print("成功删除 slave-" + varProjectName + "-delay-restore 容器")
+        print("成功删除 slave-" + varProjectName + "-restore 容器")
 
-        varVolumeNameRestore = "vol-slave-" + varProjectName + "-delay-restore"
+        varVolumeNameRestore = "vol-slave-" + varProjectName + "-restore"
 
         # 删除之前的restore volume
         varCommand = "docker volume rm " + varVolumeNameRestore + " || true"
@@ -287,17 +296,17 @@ class MariadbCli(object):
         print("成功删除 " + varVolumeNameRestore + " 容器数据卷")
 
         # 使用临时容器复制delay容器数据
-        print("准备复制 slave-" + varProjectName + "-delay 容器数据到命名数据卷 " + varVolumeNameRestore + " ，这个过程可能需要等待一段时间。。。")
-        varCommand = "docker run --rm -it --volumes-from slave-" + varProjectName + "-delay:ro -v " + varVolumeNameRestore + ":/mount-point-datum centos /bin/sh -c \"rm -rf /mount-point-datum/* && cp -rp /var/lib/mysql/* /mount-point-datum/\""
+        print("准备复制 slave-" + varProjectName + "-live 容器数据到命名数据卷 " + varVolumeNameRestore + " ，这个过程可能需要等待一段时间。。。")
+        varCommand = "docker run --rm -it --volumes-from slave-" + varProjectName + "-live:ro -v " + varVolumeNameRestore + ":/mount-point-datum centos /bin/sh -c \"rm -rf /mount-point-datum/* && cp -rp /var/lib/mysql/* /mount-point-datum/\""
         cli_common.execute_command_by_subprocess_run(varCommand)
-        print("成功复制 slave-" + varProjectName + "-delay 容器数据到命名数据卷 " + varVolumeNameRestore)
+        print("成功复制 slave-" + varProjectName + "-live 容器数据到命名数据卷 " + varVolumeNameRestore)
 
-        varCommand = "docker run -d --name slave-" + varProjectName + "-delay-restore -e TZ=Asia/Shanghai -v " + varVolumeNameRestore + ":/var/lib/mysql -v " + varCurrentWorkingDirectory + "/mysql-slave-delay-restore.cnf:/etc/mysql/conf.d/my.cnf mariadb:10.4.19"
+        varCommand = "docker run -d --name slave-" + varProjectName + "-restore -e TZ=Asia/Shanghai -v " + varVolumeNameRestore + ":/var/lib/mysql -v " + varCurrentWorkingDirectory + "/mysql-slave-restore.cnf:/etc/mysql/conf.d/my.cnf mariadb:10.4.19"
         cli_common.execute_command_by_subprocess_run(varCommand)
-        print("成功创建数据还原容器 slave-" + varProjectName + "-delay-restore")
+        print("成功创建数据还原容器 slave-" + varProjectName + "-restore")
 
-        print("成功从容器 slave-" + varProjectName + "-delay 复制数据到容器 slave-" + varProjectName + "-delay-restore 中，" +
-              "使用 docker exec -it slave-" + varProjectName + "-delay-restore /bin/bash 进入并还原数据，具体数据还原步骤参照当前工作目录的README.md文件")
+        print("成功从容器 slave-" + varProjectName + "-live 复制数据到容器 slave-" + varProjectName + "-restore 中，" +
+              "使用 docker exec -it slave-" + varProjectName + "-restore /bin/bash 进入并还原数据，具体数据还原步骤参照当前工作目录的README.md文件")
 
     def slave_export(self):
         """
@@ -324,6 +333,87 @@ class MariadbCli(object):
             return
 
         print("准备导出还原后的数据，可能需要等待一段时间。。。")
-        varCommand = "docker exec -it slave-" + varProjectName + "-delay-restore mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false " + varMasterDatabaseName + " | gzip -c > restore-export.gz"
+        varCommand = "docker exec -it slave-" + varProjectName + "-restore mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false " + varMasterDatabaseName + " | gzip -c > restore-export.gz"
         cli_common.execute_command_by_subprocess_run(varCommand)
         print("成功导出还原后的数据到当前工作目录的数据文件 restore-export.gz，使用命令 gzip -dkc restore-export.gz > restore-export.sql 解压数据到restore-export.sql文件")
+
+    def slave_fullbackup(self, varProjectName = None):
+        """
+        基于slave-xxx-live容器全量数据备份
+
+        :param varProjectName 指定需要备份的容器，不提供则备份所有slave-xxx-live容器
+        :return:
+        """
+
+        if varProjectName is not None:
+            varProjectName = varProjectName.strip()
+
+        if varProjectName is not None and varProjectName != "":
+            self.__slave_fullbackup_internal(varProjectName)
+
+        else:
+            varResult = cli_common.execute_command_by_subprocess_run("docker ps")
+            varRowList = varResult.stdout.splitlines()
+            if len(varRowList) <= 1:
+                print("没有需要全量备份相关容器")
+                return
+
+            varRowList = varRowList[1:]
+            for item in varRowList:
+                varColumnList = item.split()
+                varContainerName = varColumnList[len(varColumnList) - 1]
+                if varContainerName.startswith("slave-") and varContainerName.endswith("-live"):
+                    varProjectName = varContainerName.split("-")[1]
+                    self.__slave_fullbackup_internal(varProjectName)
+
+
+    def __slave_fullbackup_internal(self, varProjectName = None):
+        """
+
+        """
+
+        if varProjectName is None:
+            raise Exception("没有指定varProjectName参数")
+
+        varProjectName = varProjectName.strip()
+        if varProjectName == "":
+            raise Exception("没有指定varProjectName参数")
+
+        varProjectWorkingDirectory = "/data/slave-" + varProjectName
+
+        if not os.path.exists(varProjectWorkingDirectory + "/.env") \
+                or not os.path.exists(varProjectWorkingDirectory + "/docker-compose.yml"):
+            raise Exception("项目" + varProjectName + "工作目录" + varProjectWorkingDirectory + "不存在")
+
+        # 获取项目名称
+        varResult = cli_common.execute_command_by_subprocess_run(
+            "grep \"varProjectName\" " + varProjectWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
+        varProjectName = varResult.stdout.strip()
+
+        varResult = cli_common.execute_command_by_subprocess_run(
+            "grep \"varMasterDatabaseName\" " + varProjectWorkingDirectory + "/.env | awk -F '=' '{print $2}'")
+        varDatabaseName = varResult.stdout.strip()
+
+        print("准备全量备份数据库同步容器 slave-" + varProjectName + "-live，可能需要等待一段时间。。。")
+        varFilename = "fullbackup-" + datetime.datetime.now().strftime("%Y-%m-%d") + ".gz"
+        varFullbackupFile = "/data/slave-" + varProjectName + "/" + varFilename
+        varCommand = "docker exec -it slave-" + varProjectName + "-live mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false --master-data " + varDatabaseName + " | gzip -c > " + varFullbackupFile
+        cli_common.execute_command_by_subprocess_run(varCommand)
+        print("成功全量备份数据库同步容器数据到文件" + varFullbackupFile)
+
+    def slave_config_cron(self):
+        """
+        配置数据库同步全量备份cron
+        """
+
+        varConfirm = input("是否确定配置数据库同步全量备份cron吗？ [y/n]: ") or "n"
+        if varConfirm.lower() != "y":
+            return
+
+        varSudoPassword = getpass.getpass("输入当前主机的sudo密码，如果当前为root用户不需要输入：")
+
+        varFullPath = os.path.dirname(os.path.realpath(__file__))
+        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_mariadb_slave_config.yml"
+        var_command = cli_common.concat_command(var_command, "", "", "", varSudoPassword, True)
+        var_command = var_command + " -e varConfigSlaveFullbackupCron=True"
+        cli_common.execute_command(var_command)

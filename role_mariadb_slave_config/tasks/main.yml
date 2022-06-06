@@ -3,3 +3,11 @@
     src: "{{varSrcTemplate}}"
     dest: "{{varDestTemplate}}"
   when: varCopyTemplate is defined and varCopyTemplate|bool
+
+- name: "创建数据库全量备份任务cron"
+  cron:
+    name: "slave-fullbackup"
+    job: "dcli mariadb slave_fullbackup >> /var/log/slave_fullbackup.log"
+    minute: "0"
+    hour: "6"
+  when: varConfigSlaveFullbackupCron is defined and varConfigSlaveFullbackupCron|bool

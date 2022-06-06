@@ -16,18 +16,18 @@ services:
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake
 
   # 2天延迟备份
-  slave-{{varProjectName}}-delay:
-    container_name: slave-{{varProjectName}}-delay
-    image: mariadb:10.4.19
-    environment:
-      #- MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true
-      - MYSQL_ROOT_PASSWORD=123456
-      - TZ=Asia/Shanghai
-    restart: always
-    volumes:
-      - ./mysql-slave-delay.cnf:/etc/mysql/conf.d/my.cnf
-      - vol-slave-{{varProjectName}}-delay:/var/lib/mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake
+  # slave-{{varProjectName}}-delay:
+  #  container_name: slave-{{varProjectName}}-delay
+  #  image: mariadb:10.4.19
+  #  environment:
+  #    #- MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true
+  #    - MYSQL_ROOT_PASSWORD=123456
+  #    - TZ=Asia/Shanghai
+  #  restart: always
+  #  volumes:
+  #    - ./mysql-slave-delay.cnf:/etc/mysql/conf.d/my.cnf
+  #    - vol-slave-{{varProjectName}}-delay:/var/lib/mysql
+  #  command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake
 
   slave-{{varProjectName}}-live-auto-config:
     container_name: slave-{{varProjectName}}-live-auto-config
@@ -44,25 +44,25 @@ services:
       - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
     command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-live:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"
 
-  slave-{{varProjectName}}-delay-auto-config:
-    container_name: slave-{{varProjectName}}-delay-auto-config
-    image: docker.118899.net:10001/yyd-public/slave-auto-config
-    environment:
-      - varMasterDatabaseName=${varMasterDatabaseName}
-      - varMasterIp=${varMasterIp}
-      - varMasterPort=${varMasterPort}
-      - varMasterReplicationUser=${varMasterReplicationUser}
-      - varMasterReplicationUserPassword=${varMasterReplicationUserPassword}
-      - varSlaveContainerName=slave-{{varProjectName}}-delay
-      # 4.5天
-      - varReplicationDelayInSeconds=388800
-      - TZ=Asia/Shanghai
-    volumes:
-      - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
-    command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-delay:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"
+  # slave-{{varProjectName}}-delay-auto-config:
+  #  container_name: slave-{{varProjectName}}-delay-auto-config
+  #  image: docker.118899.net:10001/yyd-public/slave-auto-config
+  #  environment:
+  #    - varMasterDatabaseName=${varMasterDatabaseName}
+  #    - varMasterIp=${varMasterIp}
+  #    - varMasterPort=${varMasterPort}
+  #    - varMasterReplicationUser=${varMasterReplicationUser}
+  #    - varMasterReplicationUserPassword=${varMasterReplicationUserPassword}
+  #    - varSlaveContainerName=slave-{{varProjectName}}-delay
+  #    # 4.5天
+  #    - varReplicationDelayInSeconds=388800
+  #    - TZ=Asia/Shanghai
+  #  volumes:
+  #    - ./fullybackup-restore.tar.gz:/tmp/fullybackup-restore.tar.gz
+  #  command: sh -c "dockerize -wait tcp://slave-{{varProjectName}}-delay:3306 -timeout 120s -wait-retry-interval 5s && bash docker-slave-auto-config.sh"
 
 volumes:
   vol-slave-{{varProjectName}}-live:
     name: vol-slave-{{varProjectName}}-live
-  vol-slave-{{varProjectName}}-delay:
-    name: vol-slave-{{varProjectName}}-delay
+  # vol-slave-{{varProjectName}}-delay:
+  #  name: vol-slave-{{varProjectName}}-delay
