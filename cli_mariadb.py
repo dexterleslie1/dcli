@@ -147,7 +147,7 @@ class MariadbCli(object):
                         varProjectWorkingDirectory + "/README.md")
 
         if varRecompileSlaveAutoConfigDockerImage.lower() == "y":
-            var_command = "docker build --tag docker.118899.net:10001/yyd-public/slave-auto-config --file Dockerfile " + varProjectWorkingDirectory
+            var_command = "docker build --tag docker.118899.net:10001/yyd-public/slave-auto-config --file " + varProjectWorkingDirectory + "/Dockerfile " + varProjectWorkingDirectory
             cli_common.execute_command(var_command)
 
         print("项目" + varProjectName + "相关同步配置已经在项目工作目录/data/slave-" + varProjectName + "中生成，切换到项目工作目录后再进行其他操作")

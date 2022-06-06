@@ -15,9 +15,9 @@ rm -f /tmp/*.sql
 (cd /tmp && tar -xvzf fullybackup-restore.tar.gz)
 (cd /tmp && mv *.sql fullybackup-restore.sql || mv .*.sql fullybackup-restore.sql)
 
-mysql -uroot -p123456 -P3306 -h$varContainerName -e "create database $varMasterDatabaseName" && \
+mysql -uroot -p123456 -P3306 -h$varContainerName -e "set session sql_log_bin=0;create database $varMasterDatabaseName" && \
 echo "成功创建数据库$varMasterDatabaseName，正在使用全量备份还原数据库，可能需要等待一段时间。。。" && \
-mysql -uroot -p123456 -P3306 -h$varContainerName $varMasterDatabaseName < /tmp/fullybackup-restore.sql && \
+(echo "set session sql_log_bin=0;"; cat /tmp/fullybackup-restore.sql) | mysql -uroot -p123456 -P3306 -h$varContainerName $varMasterDatabaseName && \
 echo "成功还原数据库$varMasterDatabaseName"
 
 # 解析全量备份并获取master_log_file和master_log_pos
