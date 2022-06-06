@@ -396,7 +396,11 @@ class MariadbCli(object):
 
         print("准备全量备份数据库同步容器 slave-" + varProjectName + "-live，可能需要等待一段时间。。。")
         varFilename = "fullbackup-" + datetime.datetime.now().strftime("%Y-%m-%d") + ".gz"
-        varFullbackupFile = "/data/slave-" + varProjectName + "/" + varFilename
+        varFullbackupDirectory = "/data/slave-" + varProjectName + "/fullbackup"
+        if not os.path.exists(varFullbackupDirectory):
+            cli_common.execute_command_by_subprocess_run("mkdir -p " + varFullbackupDirectory)
+
+        varFullbackupFile =  varFullbackupDirectory + "/" + varFilename
         varCommand = "docker exec -it slave-" + varProjectName + "-live mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false --master-data " + varDatabaseName + " | gzip -c > " + varFullbackupFile
         cli_common.execute_command_by_subprocess_run(varCommand)
         print("成功全量备份数据库同步容器数据到文件" + varFullbackupFile)
