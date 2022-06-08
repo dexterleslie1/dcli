@@ -9,5 +9,5 @@
     name: "slave-fullbackup"
     job: "dcli mariadb slave_fullbackup >> /var/log/slave_fullbackup.log"
     minute: "0"
-    hour: "8"
+    hour: "7"
   when: varConfigSlaveFullbackupCron is defined and varConfigSlaveFullbackupCron|bool
