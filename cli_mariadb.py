@@ -250,11 +250,22 @@ class MariadbCli(object):
                 # 查看当天全量备份状态
                 varDateStr = datetime.datetime.now().strftime("%Y-%m-%d")
                 varProjectName = varContainerName.split("-")[1]
-                varFilename = "fullbackup-" + datetime.datetime.now().strftime("%Y-%m-%d") + ".gz"
+                varFilename = "fullbackup-" + varDateStr + ".gz"
                 varFullbackupDirectory = "/data/slave-" + varProjectName + "/fullbackup"
                 varFullbackupFile = varFullbackupDirectory + "/" + varFilename
                 if not os.path.exists(varFullbackupFile):
-                    print("错误！项目" + varProjectName + "当天全量备份不正常，切换到目录" + varFullbackupDirectory + "详细分析")
+                    # 判断是否第一天初始化数据库同步
+                    varDatetimeNow = datetime.datetime.now()
+                    for item in range(1, 31):
+                        varDatetime = varDatetimeNow - datetime.timedelta(days=item)
+                        varDateStrTemp = varDatetime.strftime("%Y-%m-%d")
+                        varFilenameTemp = "fullbackup-" + varDateStrTemp + ".gz"
+                        varFullbackupFileTemp = varFullbackupDirectory + "/" + varFilenameTemp
+                        varFirstDay = True
+                        if os.path.exists(varFullbackupFileTemp):
+                            varFirstDay = False
+                        if not varFirstDay:
+                            print("错误！项目" + varProjectName + "当天全量备份" + varFilename + "不存在，切换到目录" + varFullbackupDirectory + "详细分析")
                 else:
                     print("正常。项目" + varProjectName + "当天全量备份正常")
 
