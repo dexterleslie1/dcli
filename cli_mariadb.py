@@ -406,6 +406,17 @@ class MariadbCli(object):
         cli_common.execute_command_by_subprocess_run(varCommand)
         print(varDatetimeStr + " 成功全量备份数据库同步容器数据到文件" + varFullbackupFile)
 
+        # 删除过期的全量数据备份
+        varDatetime30daysAgo = datetime.datetime.now() - datetime.timedelta(days=30)
+        for path, subdirs, files in os.walk(varFullbackupDirectory):
+            for name in files:
+                varDateTimeStr = name.replace("fullbackup-", "")
+                varDateTimeStr = varDateTimeStr.replace(".gz", "")
+                varDatetimeObject = datetime.datetime.strptime(varDateTimeStr, "%Y-%m-%d")
+                if varDatetime30daysAgo >= varDatetimeObject:
+                    varFullPathFile = os.path.join(path, name)
+                    os.remove(varFullPathFile)
+
     def slave_config_cron(self):
         """
         配置数据库同步全量备份cron
