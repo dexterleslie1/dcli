@@ -231,7 +231,9 @@ class MariadbCli(object):
                         elif item1.startswith("Last_SQL_Errno:"):
                             varLastSQLErrno = int(item1.split(":")[1].strip()) != 0
                         elif varContainerName.endswith("-live") and item1.startswith("Seconds_Behind_Master:"):
-                            varSecondsBehindMaster = int(item1.split(":")[1].strip()) != 0
+                            varSecondsBehindMasterStr = item1.split(":")[1].strip()
+                            if varSecondsBehindMasterStr != "NULL":
+                                varSecondsBehindMaster = int(varSecondsBehindMasterStr) != 0
 
                     if varSlaveIORunning or varSlaveSQLRunning or varLastErrno or varLastIOErrno or varLastSQLErrno or varSecondsBehindMaster:
                         print("错误！" + varContainerName + " 数据库同步容器错误状态，使用 docker exec " + varContainerName + " mysql -uroot -p123456 -e \"show slave status\G\" 查看具体错误原因")
