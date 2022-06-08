@@ -402,7 +402,7 @@ class MariadbCli(object):
             cli_common.execute_command_by_subprocess_run("mkdir -p " + varFullbackupDirectory)
 
         varFullbackupFile =  varFullbackupDirectory + "/" + varFilename
-        varCommand = "docker exec -it slave-" + varProjectName + "-live mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false --master-data " + varDatabaseName + " | gzip -c > " + varFullbackupFile
+        varCommand = "docker exec -i slave-" + varProjectName + "-live mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false --master-data " + varDatabaseName + " | gzip -c > " + varFullbackupFile
         cli_common.execute_command_by_subprocess_run(varCommand)
         print(varDatetimeStr + " 成功全量备份数据库同步容器数据到文件" + varFullbackupFile)
 
