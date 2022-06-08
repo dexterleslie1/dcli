@@ -301,7 +301,7 @@ class MariadbCli(object):
         cli_common.execute_command_by_subprocess_run(varCommand)
         print("成功复制 slave-" + varProjectName + "-live 容器数据到命名数据卷 " + varVolumeNameRestore)
 
-        varCommand = "docker run -d --name slave-" + varProjectName + "-restore -e TZ=Asia/Shanghai -v " + varVolumeNameRestore + ":/var/lib/mysql -v " + varCurrentWorkingDirectory + "/mysql-slave-restore.cnf:/etc/mysql/conf.d/my.cnf mariadb:10.4.19"
+        varCommand = "docker run -d --name slave-" + varProjectName + "-restore -e TZ=Asia/Shanghai -v " + varVolumeNameRestore + ":/var/lib/mysql -v " + varCurrentWorkingDirectory + "/mysql-slave-restore.cnf:/etc/mysql/conf.d/my.cnf mariadb:10.4.19 --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --skip-character-set-client-handshake"
         cli_common.execute_command_by_subprocess_run(varCommand)
         print("成功创建数据还原容器 slave-" + varProjectName + "-restore")
 
