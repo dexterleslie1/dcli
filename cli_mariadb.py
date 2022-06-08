@@ -194,6 +194,13 @@ class MariadbCli(object):
         查看数据库同步容器状态
         """
 
+        # 07:15前不能执行次命令，因为slave全量备份在每天07:00开始执行
+        varStr = datetime.datetime.now().strftime("%H:%M:%S")
+        varDatetimeNow = datetime.datetime.strptime(varStr, "%H:%M:%S")
+        varDatetime7 = datetime.datetime.strptime("07:15:00", "%H:%M:%S")
+        if varDatetimeNow <= varDatetime7:
+            raise Exception("07:15前不能执行次命令，因为slave全量备份在每天07:15开始执行，你必须在07:15后执行此命令")
+
         varResult = cli_common.execute_command_by_subprocess_run("docker ps -a")
         varRowList = varResult.stdout.splitlines()
         if len(varRowList) <= 1:
@@ -239,6 +246,18 @@ class MariadbCli(object):
                         print("错误！" + varContainerName + " 数据库同步容器错误状态，使用 docker exec " + varContainerName + " mysql -uroot -p123456 -e \"show slave status\G\" 查看具体错误原因")
                     else:
                         print("正常。" + varContainerName + " 数据库同步容器正常状态")
+
+                # 查看当天全量备份状态
+                varDateStr = datetime.datetime.now().strftime("%Y-%m-%d")
+                varProjectName = varContainerName.split("-")[1]
+                varFilename = "fullbackup-" + datetime.datetime.now().strftime("%Y-%m-%d") + ".gz"
+                varFullbackupDirectory = "/data/slave-" + varProjectName + "/fullbackup"
+                varFullbackupFile = varFullbackupDirectory + "/" + varFilename
+                if not os.path.exists(varFullbackupFile):
+                    print("错误！项目" + varProjectName + "当天全量备份不正常，切换到目录" + varFullbackupDirectory + "详细分析")
+                else:
+                    print("正常。项目" + varProjectName + "当天全量备份正常")
+
 
     def slave_cleanup(self):
         """
