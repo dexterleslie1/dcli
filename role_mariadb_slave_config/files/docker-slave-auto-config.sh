@@ -21,8 +21,8 @@ echo "成功创建数据库$varMasterDatabaseName，正在使用全量备份还�
 echo "成功还原数据库$varMasterDatabaseName"
 
 # 解析全量备份并获取master_log_file和master_log_pos
-varMasterLogFile=`head -500 /tmp/fullybackup-restore.sql | grep "CHANGE MASTER TO" | awk -F '[ = , ;]' '{print $5}'`
-varMasterLogPos=`head -500 /tmp/fullybackup-restore.sql | grep "CHANGE MASTER TO" | awk -F '[ = , ;]' '{print $8}'`
+varMasterLogFile=`head -500 /tmp/fullybackup-restore.sql | grep "CHANGE MASTER TO" | awk -F '[ = , ;]' '{print $6}'`
+varMasterLogPos=`head -500 /tmp/fullybackup-restore.sql | grep "CHANGE MASTER TO" | awk -F '[ = , ;]' '{print $9}'`
 
 rm -f /tmp/fullybackup-restore.sql
 
