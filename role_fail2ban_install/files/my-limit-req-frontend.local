@@ -1,14 +1,6 @@
-[my-limit-req-REQ]
+[my-limit-req]
 enabled  = true
 action   = iptables[blocktype="DROP",port="1:65535"]
-logpath  = /usr/local/openresty/nginx/logs/error.log
-maxretry = 1
-findtime = 30
-bantime  = 7200
-
-[my-limit-req-REQAcc]
-enabled  = true
-action = iptables[blocktype="DROP",port="1:65535"]
 logpath  = /usr/local/openresty/nginx/logs/error.log
 maxretry = 1
 findtime = 60

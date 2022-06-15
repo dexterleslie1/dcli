@@ -18,14 +18,23 @@
     src: fail2ban.logrotate
     dest: /etc/logrotate.d/fail2ban
 
-- name: "复制my-limit-req-REQ.conf到/etc/fail2ban/filter.d/目录"
+- name: "删除遗留的/etc/fail2ban/filter.d/my-limit-req-REQ.conf"
+  file:
+    name: /etc/fail2ban/filter.d/my-limit-req-REQ.conf
+    state: absent
+- name: "删除遗留的/etc/fail2ban/filter.d/my-limit-req-REQAcc.conf"
+  file:
+    name: /etc/fail2ban/filter.d/my-limit-req-REQAcc.conf
+    state: absent
+
+- name: "复制my-limit-req.conf到/etc/fail2ban/filter.d/目录"
   copy:
-    src: my-limit-req-REQ.conf
-    dest: /etc/fail2ban/filter.d/my-limit-req-REQ.conf
-- name: "复制my-limit-req-REQAcc.conf到/etc/fail2ban/filter.d/目录"
-  copy:
-    src: my-limit-req-REQAcc.conf
-    dest: /etc/fail2ban/filter.d/my-limit-req-REQAcc.conf
+    src: my-limit-req.conf
+    dest: /etc/fail2ban/filter.d/my-limit-req.conf
+#- name: "复制my-limit-req-REQAcc.conf到/etc/fail2ban/filter.d/目录"
+#  copy:
+#    src: my-limit-req-REQAcc.conf
+#    dest: /etc/fail2ban/filter.d/my-limit-req-REQAcc.conf
 
 # openresty frontend时对应的fail2ban配置
 - name: "复制my-limit-req.local到/etc/fail2ban/jail.d/目录"
