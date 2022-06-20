@@ -149,7 +149,7 @@ class MariadbCli(object):
         var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_mariadb_slave_config.yml"
         var_command = cli_common.concat_command(var_command, "", "", "", varSudoPassword, True)
         var_command = var_command + " -e varMasterDatabaseName=" + varMasterDatabaseName
-        var_command = var_command + " -e varSlaveServerId=" + varSlaveServerId
+        var_command = var_command + " -e varSlaveServerId=" + str(varSlaveServerId)
         var_command = var_command + " -e varSrcTemplate=mysql-slave-live.cnf"
         var_command = var_command + " -e varDestTemplate=\"" + varProjectWorkingDirectory + "/mysql-slave-live.cnf\""
         var_command = var_command + " -e varCopyTemplate=True"
