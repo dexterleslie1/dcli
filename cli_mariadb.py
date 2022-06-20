@@ -93,6 +93,12 @@ class MariadbCli(object):
         if varMasterPort <= 0:
             raise Exception("没有指定Master端口")
 
+        # 询问slave server id
+        varSlaveServerId = input("Slave server id（默认值95001）：") or 95001
+        varSlaveServerId = int(varSlaveServerId)
+        if varSlaveServerId <= 0:
+            raise Exception("没有指定Slave server id")
+
         # 询问master复制用户
         varMasterReplicationUser = input("Master复制用户（默认值root）：") or "root"
         if varMasterReplicationUser.strip() == "":
@@ -138,8 +144,17 @@ class MariadbCli(object):
         shutil.copyfile(varDefaultConfigFileFullRelativePath + "/Dockerfile-slave-auto-config",
                         varProjectWorkingDirectory + "/Dockerfile")
         # 复制mysql-slave.cnf
-        shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-live.cnf",
-                        varProjectWorkingDirectory + "/mysql-slave-live.cnf")
+        # shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-live.cnf",
+        #                 varProjectWorkingDirectory + "/mysql-slave-live.cnf")
+        var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_mariadb_slave_config.yml"
+        var_command = cli_common.concat_command(var_command, "", "", "", varSudoPassword, True)
+        var_command = var_command + " -e varMasterDatabaseName=" + varMasterDatabaseName
+        var_command = var_command + " -e varSlaveServerId=" + varSlaveServerId
+        var_command = var_command + " -e varSrcTemplate=mysql-slave-live.cnf"
+        var_command = var_command + " -e varDestTemplate=\"" + varProjectWorkingDirectory + "/mysql-slave-live.cnf\""
+        var_command = var_command + " -e varCopyTemplate=True"
+        cli_common.execute_command(var_command)
+
         shutil.copyfile(varDefaultConfigFileFullRelativePath + "/mysql-slave-restore.cnf",
                         varProjectWorkingDirectory + "/mysql-slave-restore.cnf")
         # 复制README.md文件到当前工作目录

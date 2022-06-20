@@ -20,10 +20,11 @@ replicate-ignore-db="information_schema"
 replicate-ignore-db="mysql"
 replicate-ignore-db="performance_schema"
 replicate-ignore-db="test"
+replicate-do-db="{{varMasterDatabaseName}}"
 # 启用slave记录redo日志
 log-slave-updates
 
 #skip-slave-start
 #slave_skip_errors=1451
 
-server_id=95001
+server_id={{varSlaveServerId}}

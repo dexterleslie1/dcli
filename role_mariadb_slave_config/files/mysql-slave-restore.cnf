@@ -11,5 +11,3 @@ innodb_log_buffer_size=256m
 innodb_file_per_table=1
 
 skip-slave-start
-
-server_id=95003
