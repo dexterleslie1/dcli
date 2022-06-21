@@ -281,6 +281,7 @@ class MariadbCli(object):
                             varFirstDay = False
                         if not varFirstDay:
                             print("错误！项目" + varProjectName + "当天全量备份" + varFilename + "不存在，切换到目录" + varFullbackupDirectory + "详细分析")
+                            break
                 else:
                     print("正常。项目" + varProjectName + "当天全量备份正常")
 
