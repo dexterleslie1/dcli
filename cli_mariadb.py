@@ -264,7 +264,9 @@ class MariadbCli(object):
 
                 # 查看当天全量备份状态
                 varDateStr = datetime.datetime.now().strftime("%Y-%m-%d")
-                varProjectName = varContainerName.split("-")[1]
+                # varProjectName = varContainerName.split("-")[1]
+                varProjectName = varContainerName.replace("slave-", "")
+                varProjectName = varProjectName.replace("-live", "")
                 varFilename = "fullbackup-" + varDateStr + ".gz"
                 varFullbackupDirectory = "/data/slave-" + varProjectName + "/fullbackup"
                 varFullbackupFile = varFullbackupDirectory + "/" + varFilename
@@ -411,7 +413,9 @@ class MariadbCli(object):
                 varColumnList = item.split()
                 varContainerName = varColumnList[len(varColumnList) - 1]
                 if varContainerName.startswith("slave-") and varContainerName.endswith("-live"):
-                    varProjectName = varContainerName.split("-")[1]
+                    # varProjectName = varContainerName.split("-")[1]
+                    varProjectName = varContainerName.replace("slave-", "")
+                    varProjectName = varProjectName.replace("-live", "")
                     self.__slave_fullbackup_internal(varProjectName)
 
 
