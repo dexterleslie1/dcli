@@ -57,7 +57,7 @@ function _M.ccDetectionReqLimit(clientIp, requestUrl, dictMyLimitReq)
         ngx.log(ngx.WARN, "Client " .. clientIp .. " committed REQ " .. requestCount ..  " times maximum allow " .. valueSituation1MaximumAllow  .. " within " .. valueDefaultObservationPeriodInSeconds .. " seconds, request url=" .. requestUrl);
 
         -- 重置requestCount防止高频fail2ban日志尾巴问题
-        dictMyLimitReq:set(keySituation1RequestCount, 0);
+        dictMyLimitReq:set(keySituation1RequestCount .. clientIp, 0);
     end
 
     dictMyLimitReq:incr(keySituation1RequestCount .. clientIp, 1);
