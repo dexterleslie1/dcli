@@ -36,14 +36,14 @@ function _M.getRequestUrl()
         return fullUrl;
 end
 
--- 拦截5秒内超过110个请求情况
+-- 拦截5秒内超过120个请求情况
 function _M.ccDetectionReqLimit(clientIp, requestUrl, dictMyLimitReq)
     -- 默认观察周期5秒
     local valueDefaultObservationPeriodInSeconds = 5;
     -- 请求总次数
     local keySituation1RequestCount = "situation1RequestCount#";
     -- 允许最大请求总次数
-    local valueSituation1MaximumAllow = 110;
+    local valueSituation1MaximumAllow = 120;
 
     -- 设置相关key对应初始化value
     local requestCount = dictMyLimitReq:get(keySituation1RequestCount .. clientIp);
