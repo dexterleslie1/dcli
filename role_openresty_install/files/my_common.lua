@@ -18,7 +18,7 @@ function _M.getClientIp()
                 for k, v in string.gmatch(varXForwardedFor, "[^,]+") do
                         if count==0 then
                                 clientIp = k;
-                                -- ngx.log(ngx.WARN, "x-forwarded-for=" .. varXForwardedFor .. "提取到客户端ip地址:" .. clientIp);
+                                -- ngx.log(ngx.CRIT, "x-forwarded-for=" .. varXForwardedFor .. "提取到客户端ip地址:" .. clientIp);
                                 break;
                         end
                         count = count+1;
@@ -54,7 +54,7 @@ function _M.ccDetectionReqLimit(clientIp, requestUrl, dictMyLimitReq)
     -- 判断5秒内是否超过120次
     local requestCount = dictMyLimitReq:get(keySituation1RequestCount .. clientIp);
     if requestCount >= valueSituation1MaximumAllow then
-        ngx.log(ngx.WARN, "Client " .. clientIp .. " committed REQ " .. requestCount ..  " times maximum allow " .. valueSituation1MaximumAllow  .. " within " .. valueDefaultObservationPeriodInSeconds .. " seconds, request url=" .. requestUrl);
+        ngx.log(ngx.CRIT, "Client " .. clientIp .. " committed REQ " .. requestCount ..  " times maximum allow " .. valueSituation1MaximumAllow  .. " within " .. valueDefaultObservationPeriodInSeconds .. " seconds, request url=" .. requestUrl);
 
         -- 重置requestCount防止高频fail2ban日志尾巴问题
         dictMyLimitReq:set(keySituation1RequestCount .. clientIp, 0);
@@ -91,14 +91,15 @@ function _M.ccDetectionReqAccLimit(clientIp, requestUrl, dictMyLimitReq)
     -- 判断5秒内是否超过50次
     local requestCount = dictMyLimitReq:get(keySituation2RequestCount .. clientIp);
     if requestCount >= valueSituation2RequestCountMaximumAllow then
-        ngx.log(ngx.WARN, "客户端 " .. clientIp .. " REQAcc犯规+1，reqCnt=" .. requestCount .. ";maximumAllow=" .. valueSituation2RequestCountMaximumAllow);
+        ngx.log(ngx.ERR, "客户端 " .. clientIp .. " REQAcc犯规+1，reqCnt=" .. requestCount .. ";maximumAllow=" .. valueSituation2RequestCountMaximumAllow);
 
         dictMyLimitReq:incr(keySituation2CommittedCount .. clientIp, 1);
         dictMyLimitReq:set(keySituation2RequestCount .. clientIp, 0, valueDefaultObservationPeriodInSeconds);
 
         local committedCount = dictMyLimitReq:get(keySituation2CommittedCount .. clientIp);
         if committedCount >= valueSituation2CommittedCountMaximumAllow then
-            ngx.log(ngx.WARN, "Client " .. clientIp .. " committed REQAcc " .. committedCount ..  " times maximum allow " .. valueSituation2CommittedCountMaximumAllow  .. " within " .. valueDefaultREQAccCommittedObservationPeriodInSeconds .. " seconds, request url=" .. requestUrl);
+            ngx.log(ngx.CRIT, "Client " .. clientIp .. " committed REQAcc " .. committedCount ..  " times maximum allow " .. valueSituation2CommittedCountMaximumAllow  .. " within " .. valueDefaultREQAccCommittedObservationPeriodInSeconds .. " seconds, request url=" .. requestUrl);
+            dictMyLimitReq:set(keySituation2CommittedCount .. clientIp, 0, valueDefaultREQAccCommittedObservationPeriodInSeconds);
         end
     end
 
