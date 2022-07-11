@@ -83,6 +83,30 @@
     dest: /usr/local/openresty/nginx/conf/nginx.conf
   when: varBackend is defined and varBackend
 
+# 配置geoip2
+- name: "/usr/local/openresty/bin/opm get anjia0532/lua-resty-maxminddb"
+  shell: /usr/local/openresty/bin/opm get anjia0532/lua-resty-maxminddb
+- name: "下载libmaxminddb-1.6.0.tar.gz"
+  get_url:
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nginx/libmaxminddb-1.6.0.tar.gz
+    dest: /tmp/libmaxminddb-1.6.0.tar.gz
+    checksum: md5:34beeef1cd60e0269516d0576868cf28
+- name: "解压libmaxminddb-1.6.0.tar.gz"
+  shell: tar -xvzf /tmp/libmaxminddb-1.6.0.tar.gz -C /tmp
+- name: "cd /tmp/libmaxminddb-1.6.0 && ./configure && make && make check && make install"
+  shell: cd /tmp/libmaxminddb-1.6.0 && ./configure && make && make check && make install
+- name: "/etc/ld.so.conf.d/local.conf添加/usr/local/lib"
+  lineinfile:
+    path: /etc/ld.so.conf.d/local.conf
+    regexp: "/usr/local/lib"
+    line: "/usr/local/lib"
+- name: "ldconfig"
+  shell: ldconfig
+- name: "下载GeoLite2-City.mmdb"
+  get_url:
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nginx/GeoLite2-City.mmdb
+    dest: /usr/local/openresty/
+
 - name: "systemctl restart openresty && systemctl enable openresty"
   systemd:
     name: openresty

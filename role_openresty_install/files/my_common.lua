@@ -1,3 +1,11 @@
+local cjson=require 'cjson'
+local geo=require 'resty.maxminddb'
+
+-- 初始化geo
+if not geo.initted() then
+    geo.init("/usr/local/openresty/GeoLite2-City.mmdb")
+end
+
 local _M = { _VERSION = '1.0.0' }
 
 -- 获取客户端真实ip地址
@@ -36,14 +44,14 @@ function _M.getRequestUrl()
         return fullUrl;
 end
 
--- 拦截5秒内超过120个请求情况
+-- 拦截5秒内超过100个请求情况
 function _M.ccDetectionReqLimit(clientIp, requestUrl, dictMyLimitReq)
     -- 默认观察周期5秒
     local valueDefaultObservationPeriodInSeconds = 5;
     -- 请求总次数
     local keySituation1RequestCount = "situation1RequestCount#";
     -- 允许最大请求总次数
-    local valueSituation1MaximumAllow = 120;
+    local valueSituation1MaximumAllow = 100;
 
     -- 设置相关key对应初始化value
     local requestCount = dictMyLimitReq:get(keySituation1RequestCount .. clientIp);
@@ -67,14 +75,14 @@ end
 function _M.ccDetectionReqAccLimit(clientIp, requestUrl, dictMyLimitReq)
     -- 默认观察周期5秒
     local valueDefaultObservationPeriodInSeconds = 5;
-    -- 默认REQAcc committed观察周期120秒
-    local valueDefaultREQAccCommittedObservationPeriodInSeconds = 120;
+    -- 默认REQAcc committed观察周期60秒
+    local valueDefaultREQAccCommittedObservationPeriodInSeconds = 60;
     -- 请求总次数
     local keySituation2RequestCount = "situation2RequestCount#";
     -- 允许最大请求总次数
     local valueSituation2RequestCountMaximumAllow = 50;
     -- 允许最大违规总次数
-    local valueSituation2CommittedCountMaximumAllow = 9;
+    local valueSituation2CommittedCountMaximumAllow = 4;
     -- 违规总次数
     local keySituation2CommittedCount = "situation2CommittedCount#";
 
@@ -104,6 +112,98 @@ function _M.ccDetectionReqAccLimit(clientIp, requestUrl, dictMyLimitReq)
     end
 
     dictMyLimitReq:incr(keySituation2RequestCount .. clientIp, 1);
+end
+
+function _M.ccGeoIpLimitation(clientIp, dictMyLimitReq,
+                switchGlobal, switchHongkong, switchTaiwan, switchBeijing, switchFujian,
+                switchJiangxi, switchHunan, switchZhejiang, switchChongqing)
+	if not (switchGlobal == 1 and switchHongkong == 1 and
+		switchTaiwan == 1 and switchBeijing == 1 and
+		switchFujian == 1 and switchJiangxi == 1 and
+		switchHunan == 1 and switchZhejiang == 1 and
+		switchChongqing == 1)
+	then
+		local ban = 0;
+		local res,err = geo.lookup(clientIp);
+		-- ngx.log(ngx.CRIT, cjson.encode(res));
+		if res then
+			local province = nil;
+			local country = nil;
+			if not (res["subdivisions"] == nil) then
+				province = res["subdivisions"][1]["iso_code"];
+			end
+			if not (res["country"] == nil) then
+				country = res["country"]["iso_code"];
+			end
+
+			if country == "CN" and not (province == nil) and province == "GD" then
+				ban = 0;
+			else
+				if not (country == "CN" or country == "HK" or country == "TW") and switchGlobal == 0 then
+					-- 全球关闭
+					ban = 1;
+				elseif country == "HK" then
+					-- 香港
+					if switchHongkong == 0 then
+						ban = 1;
+					end
+				elseif country == "TW" then
+					-- 台湾
+					if switchTaiwan == 0 then
+						ban = 1;
+					end
+				elseif country == "CN" and not (province == nil) and province == "BJ" then
+					-- 北京
+					if switchBeijing == 0 then
+						ban = 1;
+					end
+				elseif country == "CN" and not (province == nil) and province == "FJ" then
+                                        -- 福建
+					if switchFujian == 0 then
+						ban = 1;
+					end
+				elseif country == "CN" and not (province == nil) and province == "JX" then
+                                        -- 江西
+					if switchJiangxi == 0 then
+						ban = 1;
+					end
+				elseif country == "CN" and not (province == nil) and province == "HN" then
+                                        -- 湖南
+					if switchHunan == 0 then
+						ban = 1;
+					end
+				elseif country == "CN" and not (province == nil) and province == "ZJ" then
+                                        -- 浙江
+					if switchZhejiang == 0 then
+						ban = 1;
+					end
+				elseif country == "CN" and not (province == nil) and province == "CQ" then
+                                        -- 重庆
+					if switchChongqing == 0 then
+						ban = 1;
+					end
+				else
+					-- 其他省份
+					if country == "CN" and switchGlobal == 0 then
+						ban = 1;
+					end
+				end
+			end
+		else
+			-- 全球关闭
+			if switchGlobal == 0 then
+				ban = 1;
+			end
+		end
+
+		local keyLogTail = "geoIpLimitLogTail";
+		if ban == 1 and dictMyLimitReq:get(keyLogTail .. clientIp) == nil then
+			ngx.log(ngx.CRIT, "Client " .. clientIp .. " committed RegionForbidden");
+
+			-- 防止日志尾巴
+			dictMyLimitReq:set(keyLogTail .. clientIp, clientIp, 5);
+		end
+	end
 end
 
 return _M
