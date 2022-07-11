@@ -95,6 +95,10 @@
   shell: tar -xvzf /tmp/libmaxminddb-1.6.0.tar.gz -C /tmp
 - name: "cd /tmp/libmaxminddb-1.6.0 && ./configure && make && make check && make install"
   shell: cd /tmp/libmaxminddb-1.6.0 && ./configure && make && make check && make install
+- name: "保证/etc/ld.so.conf.d/local.conf存在"
+  file:
+    path: /etc/ld.so.conf.d/local.conf
+    state: touch
 - name: "/etc/ld.so.conf.d/local.conf添加/usr/local/lib"
   lineinfile:
     path: /etc/ld.so.conf.d/local.conf
