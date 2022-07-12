@@ -116,7 +116,7 @@ end
 
 -- https://blog.csdn.net/yinjinshui/article/details/118702545
 function _M.ccGeoIpLimitation(clientIp, dictMyLimitReq,
-                switchGlobal, switchHongkong, switchTaiwan, switchBeijing, switchFujian,
+                switchGlobal, switchChinaMainland, switchHongkong, switchTaiwan, switchBeijing, switchFujian,
                 switchJiangxi, switchHunan, switchZhejiang, switchChongqing)
 	if not (switchGlobal == 1 and switchHongkong == 1 and
 		switchTaiwan == 1 and switchBeijing == 1 and
@@ -159,33 +159,33 @@ function _M.ccGeoIpLimitation(clientIp, dictMyLimitReq,
 						ban = 1;
 					end
 				elseif country == "CN" and not (province == nil) and province == "FJ" then
-                                        -- 福建
+                    -- 福建
 					if switchFujian == 0 then
 						ban = 1;
 					end
 				elseif country == "CN" and not (province == nil) and province == "JX" then
-                                        -- 江西
+                    -- 江西
 					if switchJiangxi == 0 then
 						ban = 1;
 					end
 				elseif country == "CN" and not (province == nil) and province == "HN" then
-                                        -- 湖南
+                    -- 湖南
 					if switchHunan == 0 then
 						ban = 1;
 					end
 				elseif country == "CN" and not (province == nil) and province == "ZJ" then
-                                        -- 浙江
+                    -- 浙江
 					if switchZhejiang == 0 then
 						ban = 1;
 					end
 				elseif country == "CN" and not (province == nil) and province == "CQ" then
-                                        -- 重庆
+                    -- 重庆
 					if switchChongqing == 0 then
 						ban = 1;
 					end
 				else
 					-- 其他省份
-					if country == "CN" and switchGlobal == 0 then
+					if country == "CN" and switchChinaMainland == 0 then
 						ban = 1;
 					end
 				end
