@@ -122,7 +122,7 @@ function _M.ccGeoIpLimitation(clientIp, dictMyLimitReq,
 		switchTaiwan == 1 and switchBeijing == 1 and
 		switchFujian == 1 and switchJiangxi == 1 and
 		switchHunan == 1 and switchZhejiang == 1 and
-		switchChongqing == 1)
+		switchChongqing == 1 and switchChinaMainland == 1)
 	then
 		local ban = 0;
 		local res,err = geo.lookup(clientIp);
