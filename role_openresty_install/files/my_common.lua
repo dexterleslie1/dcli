@@ -114,6 +114,7 @@ function _M.ccDetectionReqAccLimit(clientIp, requestUrl, dictMyLimitReq)
     dictMyLimitReq:incr(keySituation2RequestCount .. clientIp, 1);
 end
 
+-- https://blog.csdn.net/yinjinshui/article/details/118702545
 function _M.ccGeoIpLimitation(clientIp, dictMyLimitReq,
                 switchGlobal, switchHongkong, switchTaiwan, switchBeijing, switchFujian,
                 switchJiangxi, switchHunan, switchZhejiang, switchChongqing)
