@@ -202,6 +202,13 @@ function _M.ccGeoIpLimitation(clientIp, dictMyLimitReq,
 
 			-- 防止日志尾巴
 			dictMyLimitReq:set(keyLogTail .. clientIp, clientIp, 5);
+
+			-- 打印geoip2解析结果到日志
+            local resString = "";
+            if not (res == nil) then
+                resString = cjson.encode(res);
+            end
+            ngx.log(ngx.ERR, "客户端ip地址: " .. clientIp .. " 解析结果: " .. resString);
 		end
 	end
 end
