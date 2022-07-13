@@ -1,0 +1,18 @@
+# aws cli安装参考
+# https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+- file:
+   path: /tmp/awscliv2.zip
+   state: absent
+- file:
+   path: /tmp/aws
+   state: absent
+- file:
+    path: /usr/local/aws-cli
+    state: absent
+- name: "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip\" -o \"/tmp/awscliv2.zip\""
+  shell: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+- name: "cd /tmp/ && unzip awscliv2.zip"
+  shell: cd /tmp/ && unzip awscliv2.zip
+- name: "cd /tmp/ && ./aws/install -i /usr/local/aws-cli -b /usr/bin"
+  shell: cd /tmp/ && ./aws/install -i /usr/local/aws-cli -b /usr/bin

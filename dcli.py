@@ -33,6 +33,7 @@ import cli_jmeter
 import cli_os
 import cli_k8s
 import cli_selenium
+import cli_awscli
 import logging
 
 
@@ -69,6 +70,7 @@ class Dcli(object):
         self.os = cli_os.OsCli()
         self.k8s = cli_k8s.K8sCli()
         self.selenium = cli_selenium.SeleniumCli()
+        self.awscli = cli_awscli.AwsCli()
 
 
 if __name__ == "__main__":
