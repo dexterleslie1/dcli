@@ -3,6 +3,7 @@ import os
 import getpass
 import shutil
 import datetime
+import json
 
 
 class MariadbCli(object):
@@ -417,6 +418,21 @@ class MariadbCli(object):
                     varProjectName = varContainerName.replace("slave-", "")
                     varProjectName = varProjectName.replace("-live", "")
                     self.__slave_fullbackup_internal(varProjectName)
+
+        # 删除过期的amazon备份
+        varResult = cli_common.execute_command_by_subprocess_run("aws s3api list-objects --bucket backup-db-all")
+        varResultStr = varResult.stdout
+        varJsonResponse = json.loads(varResultStr)
+        varJsonContents = varJsonResponse["Contents"]
+        for entry in varJsonContents:
+            varKey = entry["Key"]
+            if varKey.startswith("backup-") and len(varKey.split("/")) >= 3:
+                varYyyymmddStr = varKey.split("/")[1]
+                varDatetime30daysAgo = datetime.datetime.now() - datetime.timedelta(days=30)
+                varDatetimeObject = datetime.datetime.strptime(varYyyymmddStr, "%Y-%m-%d")
+                if varDatetime30daysAgo >= varDatetimeObject:
+                    varCommand = "aws s3api delete-object --bucket backup-db-all --key " + varKey
+                    cli_common.execute_command_by_subprocess_run(varCommand)
 
 
     def __slave_fullbackup_internal(self, varProjectName = None):
