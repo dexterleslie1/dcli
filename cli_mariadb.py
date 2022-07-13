@@ -428,7 +428,7 @@ class MariadbCli(object):
             varKey = entry["Key"]
             if varKey.startswith("backup-") and len(varKey.split("/")) >= 3:
                 varYyyymmddStr = varKey.split("/")[1]
-                varDatetime30daysAgo = datetime.datetime.now() - datetime.timedelta(days=30)
+                varDatetime30daysAgo = datetime.datetime.now() - datetime.timedelta(days=60)
                 varDatetimeObject = datetime.datetime.strptime(varYyyymmddStr, "%Y-%m-%d")
                 if varDatetime30daysAgo >= varDatetimeObject:
                     varCommand = "aws s3api delete-object --bucket backup-db-all --key " + varKey
