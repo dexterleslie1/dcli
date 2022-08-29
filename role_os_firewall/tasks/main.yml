@@ -1,3 +1,9 @@
+- name: "yum install firewalld -y"
+  yum:
+   name: firewalld
+   state: installed
+  when: ansible_distribution == "CentOS"
+
 # https://stackoverflow.com/questions/30328506/check-if-service-exists-with-ansible
 - name: "判断firewalld服务是否存在"
   stat:
