@@ -472,7 +472,17 @@ class MariadbCli(object):
         varFullbackupFile =  varFullbackupDirectory + "/" + varFilename
         varCommand = "docker exec -i slave-" + varProjectName + "-live mysqldump -uroot -p123456 --single-transaction --quick --lock-tables=false --master-data=2 " + varDatabaseName + " | gzip -c > " + varFullbackupFile
         cli_common.execute_command_by_subprocess_run(varCommand)
-        print(varDatetimeStr + " 成功全量备份数据库同步容器数据到文件" + varFullbackupFile)
+
+        # 调用awscli命令上传全量备份
+        varS3Key = "slave-" + varProjectName + "-docker-live-fully-backup/" + varFilename
+        varCommand = "aws s3api put-object --bucket backup-db-all --key " + varS3Key + " --body " + varFullbackupFile
+        cli_common.execute_command_by_subprocess_run(varCommand)
+
+        # 删除本地全量备份
+        varCommand = "rm -rf " + varFullbackupDirectory + "/*"
+        cli_common.execute_command_by_subprocess_run(varCommand)
+
+        print(varDatetimeStr + " 成功上传docker live全量备份到亚马逊存储/" + varS3Key)
 
         # 删除过期的全量数据备份
         varDatetime30daysAgo = datetime.datetime.now() - datetime.timedelta(days=30)
