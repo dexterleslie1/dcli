@@ -12,6 +12,12 @@
     state: absent
 - name: "curl \"https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip\" -o \"/tmp/awscliv2.zip\""
   shell: curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+
+- name: "yum install unzip -y"
+  yum:
+    name: unzip
+    state: installed
+
 - name: "cd /tmp/ && unzip awscliv2.zip"
   shell: cd /tmp/ && unzip awscliv2.zip
 - name: "cd /tmp/ && ./aws/install -i /usr/local/aws-cli -b /usr/bin"
