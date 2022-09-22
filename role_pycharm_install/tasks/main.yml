@@ -2,11 +2,14 @@
 # ubuntu安装pycharm
 - name: "下载pycharm程序"
   get_url:
-    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/pycharm/pycharm-community-2021.3.1.tar.gz
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/pycharm/pycharm-community-2021.3.1.tar.gz
     dest: /tmp/pycharm-community-2021.3.1.tar.gz
     checksum: md5:eaa2d9a36c580346a43da0097b8bf9e7
   when: ansible_distribution == "Ubuntu"
 
-- name: "解压pycharm到目录/home/{{ varUser }}/software"
-  shell: tar -xvzf /tmp/pycharm-community-2021.3.1.tar.gz -C /home/{{ varUser }}/software
-  when: ansible_distribution == "Ubuntu" and varUser is defined and varUser|length>0
+- file:
+    path: /usr/local/software
+    state: directory
+- name: "解压pycharm到目录/usr/local/software"
+  shell: tar -xvzf /tmp/pycharm-community-2021.3.1.tar.gz -C /usr/local/software
+  when: ansible_distribution == "Ubuntu"

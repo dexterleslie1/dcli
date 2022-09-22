@@ -2,6 +2,7 @@
 
 import cli_common
 import os
+import getpass
 
 
 class PycharmCli(object):
@@ -19,20 +20,26 @@ class PycharmCli(object):
         # Full path of python file locates in
         var_full_path = os.path.dirname(os.path.realpath(__file__))
 
+        varHostSshIp = ""
+        varHostSshUser = ""
+        varHostSshPassword = ""
+        varSudoPassword = ""
+        varInstallLocally = "n"
+
         var_install = input("安装pycharm吗? [y/n]: ")
         if var_install.lower() == "y":
-            var_host_target = input("请输入目标主机ip地址（例如： 192.168.1.20:8080）： ")
-            var_host_target_user = input("请输入目标主机登录用户（默认： root）： ") or "root"
+            varInstallLocally = input("是否本地安装？ [y/n]: ") or "n"
+            if not varInstallLocally == "y":
+                varHostSshIp = input("安装主机（例如： 192.168.1.20:8080）：")
+                varHostSshUser = input("安装主机的SSH用户（默认 root）：") or "root"
+                varHostSshPassword = getpass.getpass("输入SSH密码：")
+
+            varSudoPassword = getpass.getpass("输入sudo密码，如果当前为root用户不需要输入：")
 
         if var_install.lower() == "y":
-            var_user = input(
-                            "输入安装用户名称，pycharm程序将会安装在用户目录下的software子目录中"
-                            "（例如：用户名称“dexterleslie”，程序安装在目录/home/dexterleslie/software中）：")
-
             var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_pycharm_install.yml"
-            var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user)
-
-            if var_user:
-                var_command = var_command + " -e varUser=" + var_user
+            var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
+                                                    varHostSshPassword, varSudoPassword,
+                                                    varInstallLocally.lower() == "y")
 
             cli_common.execute_command(var_command)
