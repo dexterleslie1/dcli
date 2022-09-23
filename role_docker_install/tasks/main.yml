@@ -110,7 +110,7 @@
 - name: "systemctl enable docker and systemctl start docker"
   systemd:
     name: docker
-    state: started
+    state: restarted
     enabled: yes
 
 - name: "Download docker-compose-Linux-x86_64"
