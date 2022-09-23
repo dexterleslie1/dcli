@@ -2,7 +2,7 @@
 # 安装配置maven
 - name: 下载maven
   get_url:
-   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/apache-maven-3.5.4-bin.tar.gz
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/maven/apache-maven-3.5.4-bin.tar.gz
    dest: /tmp/apache-maven-3.5.4-bin.tar.gz
    checksum: md5:89eea39183139e5f8a0c1601d495b3b6
 
