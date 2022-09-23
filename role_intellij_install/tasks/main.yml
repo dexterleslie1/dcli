@@ -23,8 +23,8 @@
    dest: /home/{{ lookup('env', 'USER') }}/.m2/settings.xml
 - file:
    path: /home/{{ lookup('env', 'USER') }}/.m2
-   group: {{ lookup('env', 'USER') }}
-   owner: {{ lookup('env', 'USER') }}
+   group: "{{ lookup('env', 'USER') }}"
+   owner: "{{ lookup('env', 'USER') }}"
    recurse: yes
 
 - name: "下载jetbrains-agent.jar到用户目录"
