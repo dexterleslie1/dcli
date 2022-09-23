@@ -26,3 +26,7 @@
   get_url:
     url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/intelliJ-IDEA/jetbrains-agent.jar
     dest: /home/{{ lookup('env', 'USER') }}/jetbrains-agent.jar
+- file:
+    path: /home/{{ lookup('env', 'USER') }}/jetbrains-agent.jar
+    owner: "{{ lookup('env', 'USER') }}"
+    group: "{{ lookup('env', 'USER') }}"

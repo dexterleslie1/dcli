@@ -93,4 +93,4 @@ class DevelopEnvCli(object):
         cli_common.execute_command(var_command)
 
         if include_intellij:
-            print("intellij idea破解文件jetbrains-agent.jar已经下载到当前用户目录/home中，打开idea后直接拖动此文件到序列号提示框即可破解")
+            print("intellij idea破解文件jetbrains-agent.jar已经下载到当前用户目录/home中，打开idea后直接拖动此文件到欢迎界面即可破解")
