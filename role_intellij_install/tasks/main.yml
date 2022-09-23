@@ -21,3 +21,8 @@
 - copy:
    src: ./settings.xml
    dest: /home/{{ lookup('env', 'USER') }}/.m2/settings.xml
+
+- name: "下载jetbrains-agent.jar到用户目录"
+  get_url:
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/intelliJ-IDEA/jetbrains-agent.jar
+    dest: /home/{{ lookup('env', 'USER') }}/jetbrains-agent.jar
