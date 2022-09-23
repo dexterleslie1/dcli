@@ -1,23 +1,23 @@
 ---
 # 安装intellJ IDEA开发工具
 - file:
-   name: /usr/local/intelliJ-IDEA
+   name: /usr/local/software/intelliJ-IDEA
    state: directory
 - stat:
-   path: /usr/local/intelliJ-IDEA/idea-IC-193.6911.18
+   path: /usr/local/software/intelliJ-IDEA/idea-IU-201.7223.91
   register: ideaFolderVar
 - get_url:
-   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/intelliJ-IDEA/ideaIC-2019.3.4.tar.gz
-   dest: /usr/local/intelliJ-IDEA/ideaIC-2019.3.4.tar.gz
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/intelliJ-IDEA/ideaIU-2020.1.1.tar.gz
+   dest: /usr/local/software/intelliJ-IDEA/ideaIU-2020.1.1.tar.gz
   when: not ideaFolderVar.stat.exists
-- shell: cd /usr/local/intelliJ-IDEA && tar -xvzf ideaIC-2019.3.4.tar.gz
+- shell: cd /usr/local/software/intelliJ-IDEA && tar -xvzf ideaIU-2020.1.1.tar.gz
   when: not ideaFolderVar.stat.exists
 - file:
-   name: /usr/local/intelliJ-IDEA/ideaIC-2019.3.4.tar.gz
+   name: /usr/local/software/intelliJ-IDEA/ideaIU-2020.1.1.tar.gz
    state: absent
 - file:
-   name: /root/.m2
+   name: /home/{{ lookup('env', 'USER') }}/.m2
    state: directory
 - copy:
    src: ./settings.xml
-   dest: /root/.m2/settings.xml
+   dest: /home/{{ lookup('env', 'USER') }}/.m2/settings.xml
