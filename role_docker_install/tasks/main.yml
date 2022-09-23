@@ -96,6 +96,10 @@
       - containerd.io
     state: present
   when: ansible_distribution == "Ubuntu"
+# 把当前用户添加到docker用户组，否则在使用docker-compose时会报告permission denied错误
+# https://www.linuxrumen.com/rmxx/1665.html
+- shell: usermod -aG docker {{ lookup('env', 'USER') }}
+  when: ansible_distribution == "Ubuntu"
 
 - name: "mkdir -p /etc/docker"
   shell: mkdir -p /etc/docker

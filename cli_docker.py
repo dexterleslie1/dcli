@@ -41,3 +41,5 @@ class DockerCli(object):
                                                     varSudoPassword, var_install_locally.lower() == "y")
 
             cli_common.execute_command(var_command)
+
+            print("安装完成后重启系统以加载最新环境变量，否则docker-compose使用时报告异常")
