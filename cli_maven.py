@@ -40,3 +40,5 @@ class MavenCli(object):
                                                     varSudoPassword, varInstallLocally.lower() == "y")
 
             cli_common.execute_command(var_command)
+
+            print("成功安装maven，Ubuntu操作系统请logout当前登录用户再login，否则mvn命令会提示command not found错误")
