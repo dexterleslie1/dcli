@@ -50,6 +50,8 @@ setup_install_git_cli() {
     elif [[ $varUname =~ $varUbuntu ]]; then
         sudo apt-get install git -y
     fi
+
+    git config --global http.sslVerify false
   else
     echo "Git cli is installed already"
   fi
