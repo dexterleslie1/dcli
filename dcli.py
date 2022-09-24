@@ -27,7 +27,7 @@ import cli_centos_eol
 import cli_tomcat
 import cli_redis
 import cli_zookeeper
-import cli_lhc
+import cli_kgx
 import cli_fail2ban
 import cli_jmeter
 import cli_os

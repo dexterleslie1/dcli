@@ -4,14 +4,14 @@ import getpass
 import logging
 
 
-class LhcCli(object):
+class KgxCli(object):
     """
-    lhc管理工具。支持操作系统： centOS8
+    kgx管理工具。支持操作系统： centOS8
     """
 
     def install(self):
         """
-        安装lhc
+        安装kgx
 
         :return:
         """
@@ -21,7 +21,7 @@ class LhcCli(object):
 
         varCurrentWorkingDirectory = os.getcwd()
 
-        varInstall = input("是否安装lhc？ [y/n]： ")
+        varInstall = input("是否安装kgx？ [y/n]： ")
         varInstallLocally = "n"
 
         varHostSshIp = None
@@ -40,10 +40,10 @@ class LhcCli(object):
         varInstallTomcat = "n"
 
         if varInstall.lower() == "y":
-            varInstallLocally = input("是否本地安装lhc？ [y/n]: ") or "n"
+            varInstallLocally = input("是否本地安装kgx？ [y/n]: ") or "n"
             if not varInstallLocally == "y":
-                varHostSshIp = input("安装lhc主机（例如： 192.168.1.20:22）：")
-                varHostSshUser = input("安装lhc主机的SSH用户（默认 root）：") or "root"
+                varHostSshIp = input("安装kgx主机（例如： 192.168.1.20:22）：")
+                varHostSshUser = input("安装kgx主机的SSH用户（默认 root）：") or "root"
                 varHostSshPassword = getpass.getpass("输入SSH密码：")
 
             varSudoPassword = getpass.getpass("输入sudo密码，如果当前为root用户不需要输入：")
@@ -279,7 +279,7 @@ class LhcCli(object):
 
                 cli_common.execute_command(var_command)
 
-            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_lhc_install.yml"
+            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_kgx_install.yml"
             var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser,
                                                     varHostSshPassword, varSudoPassword,
                                                     varInstallLocally.lower() == "y")
