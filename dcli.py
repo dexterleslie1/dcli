@@ -64,7 +64,7 @@ class Dcli(object):
         self.tomcat = cli_tomcat.TomcatCli()
         self.redis = cli_redis.RedisCli()
         self.zookeeper = cli_zookeeper.ZookeeperCli()
-        self.lhc = cli_lhc.LhcCli()
+        self.kgx = cli_kgx.KgxCli()
         self.fail2ban = cli_fail2ban.Fail2banCli()
         self.jmeter = cli_jmeter.JmeterCli()
         self.os = cli_os.OsCli()
