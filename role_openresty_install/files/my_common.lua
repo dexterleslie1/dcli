@@ -214,4 +214,47 @@ function _M.ccGeoIpLimitation(clientIp, dictMyLimitReq,
 	end
 end
 
+-- 延迟客户端请求，控制频率
+function _M.delay(clientIp)
+        local dictMyLimitReq = ngx.shared.my_limit_req_store
+        local keyDelayReqAccCount = "delayReqAccCount#"
+        local valueDefaultObservationPeriodInSeconds = 2
+        local valueDelayReqAccCountMaximumAllow = 15
+        local requestCount = dictMyLimitReq:get(keyDelayReqAccCount .. clientIp);
+        if not requestCount then
+                dictMyLimitReq:set(keyDelayReqAccCount .. clientIp, 1, valueDefaultObservationPeriodInSeconds)
+        end
+        local requestCount = dictMyLimitReq:get(keyDelayReqAccCount .. clientIp)
+        if requestCount > valueDelayReqAccCountMaximumAllow then
+		        local randomSeconds = math.random(2, 5)
+                ngx.log(ngx.ERR, "客户端 " .. clientIp .. " " .. valueDefaultObservationPeriodInSeconds .. "秒内请求" .. requestCount .. "次超过最大允许值" .. valueDelayReqAccCountMaximumAllow .. "次，请求被延迟" .. randomSeconds .. "秒")
+                ngx.sleep(randomSeconds)
+        end
+        dictMyLimitReq:incr(keyDelayReqAccCount .. clientIp, 1);
+end
+
+function _M.intercept(clientIp,
+                switchGlobal, switchChinaMainland, switchHongkong, switchTaiwan, switchBeijing, switchFujian,
+                switchJiangxi, switchHunan, switchZhejiang, switchChongqing)
+	-- 判断是否为aws health checker
+    local userAgent = ngx.req.get_headers()["user-agent"]
+    if not (userAgent == nil) and not (string.find(userAgent, "HealthChecker") == nil and string.find(userAgent, "Edge Health") == nil) then
+        --ngx.log(ngx.ERR, "是health checker, user-agent：", userAgent)
+        return
+    --else
+        --ngx.log(ngx.ERR, "不是health checker")
+    end
+
+	_M.delay(clientIp)
+
+    local varDictLogTail = ngx.shared.dict_log_tail
+    local requestUrl = _M.getRequestUrl();
+    local dictMyLimitReq = ngx.shared.my_limit_req_store;
+
+    _M.ccDetectionReqLimit(clientIp, requestUrl, dictMyLimitReq, varDictLogTail);
+    _M.ccDetectionReqAccLimit(clientIp, requestUrl, dictMyLimitReq, varDictLogTail);
+
+    _M.ccGeoIpLimitation(clientIp, dictMyLimitReq, switchGlobal, switchChinaMainland, switchHongkong, switchTaiwan, switchBeijing, switchFujian, switchJiangxi, switchHunan, switchZhejiang, switchChongqing);
+end
+
 return _M
