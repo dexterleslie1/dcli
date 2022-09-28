@@ -110,6 +110,7 @@
   get_url:
     url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nginx/GeoLite2-City.mmdb
     dest: /usr/local/openresty/
+    checksum: md5:ecf44a0f615d61edb270bc90a05412ca
 
 - name: "systemctl restart openresty && systemctl enable openresty"
   systemd:
