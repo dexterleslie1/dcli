@@ -1,6 +1,6 @@
 [my-limit-req]
 enabled  = true
-action   = iptables[blocktype="DROP",port="1:65535"]
+action   = iptables-ipset-proto4[blocktype="DROP",port="1:65535"]
 logpath  = /usr/local/openresty/nginx/logs/error.log
 maxretry = 1
 findtime = 60

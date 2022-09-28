@@ -60,6 +60,13 @@
     dest: /etc/fail2ban/jail.d/my-limit-req.local
   when: varBackend is defined and varBackend
 
+# 设置ipset 容量为100w
+- name: "配置/etc/fail2ban/action.d/iptables-ipset-proto4.conf actionstart = ipset --create f2b-<name> iphash maxelem 1000000"
+  lineinfile:
+    path: /etc/fail2ban/action.d/iptables-ipset-proto4.conf
+    regexp: "^actionstart = ipset --create f2b-<name> iphash"
+    line: "actionstart = ipset --create f2b-<name> iphash maxelem 1000000"
+
 - name: "创建/usr/local/openresty/nginx/logs/目录"
   file:
     path: /usr/local/openresty/nginx/logs/
@@ -68,7 +75,6 @@
   file:
     path: /usr/local/openresty/nginx/logs/error.log
     state: touch
-
 
 - name: "复制sshd.local到/etc/fail2ban/jail.d目录"
   copy:
