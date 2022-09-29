@@ -1,10 +1,17 @@
 local cjson=require 'cjson'
-local geo=require 'resty.maxminddb'
+-- local geo=require 'resty.maxminddb'
+--
+-- -- 初始化geo
+-- if not geo.initted() then
+--     geo.init("/usr/local/openresty/GeoLite2-City.mmdb")
+-- end
 
--- 初始化geo
-if not geo.initted() then
-    geo.init("/usr/local/openresty/GeoLite2-City.mmdb")
-end
+local ip2region = require 'resty.ip2region'
+local ip2regionLocation = ip2region.new({
+        file = "/usr/local/openresty/ip2region.db",
+        dict = "ip_data",
+        mode = "memory" -- maybe memory,binary or btree
+});
 
 local _M = { _VERSION = '1.0.0' }
 
@@ -128,104 +135,166 @@ end
 
 -- https://blog.csdn.net/yinjinshui/article/details/118702545
 function _M.ccGeoIpLimitation(clientIp, dictMyLimitReq, dictLogTail,
-                switchGlobal, switchChinaMainland, switchHongkong, switchTaiwan, switchBeijing, switchFujian,
-                switchJiangxi, switchHunan, switchZhejiang, switchChongqing)
-    local keyLogTail = "logTail"
+                enableGeoGlobal, enableGeoChinaMainland, enableGeoHongkong, enableGeoTaiwan, enableGeoBeijing, enableGeoFujian,
+                enableGeoJiangxi, enableGeoHunan, enableGeoZhejiang, enableGeoChongqing)
+    local keyLogTail = "logTail";
     if dictLogTail:get(keyLogTail .. clientIp) == nil then
-        if not (switchGlobal == 1 and switchHongkong == 1 and
-            switchTaiwan == 1 and switchBeijing == 1 and
-            switchFujian == 1 and switchJiangxi == 1 and
-            switchHunan == 1 and switchZhejiang == 1 and
-            switchChongqing == 1 and switchChinaMainland == 1)
+        if enableGeoGlobal == nil then
+            enableGeoGlobal = true
+        end
+        if enableGeoChinaMainland == nil then
+            enableGeoChinaMainland = true
+        end
+        if enableGeoHongkong == nil then
+            enableGeoHongkong = true
+        end
+        if enableGeoTaiwan == nil then
+            enableGeoTaiwan = true
+        end
+        if enableGeoBeijing == nil then
+            enableGeoBeijing = true
+        end
+        if enableGeoFujian == nil then
+            enableGeoFujian = true
+        end
+        if enableGeoJiangxi == nil then
+            enableGeoJiangxi = true
+        end
+        if enableGeoHunan == nil then
+            enableGeoHunan = true
+        end
+        if enableGeoZhejiang == nil then
+            enableGeoZhejiang = true
+        end
+        if enableGeoChongqing == nil then
+            enableGeoChongqing = true
+        end
+
+        if not (enableGeoGlobal and enableGeoHongkong and
+            enableGeoTaiwan and enableGeoBeijing and
+            enableGeoFujian and enableGeoJiangxi and
+            enableGeoHunan and enableGeoZhejiang and
+            enableGeoChongqing and enableGeoChinaMainland)
         then
-            local ban = 0;
-            local res,err = geo.lookup(clientIp);
-            -- ngx.log(ngx.CRIT, cjson.encode(res));
+            local ban = false;
+            --local res,err = geo.lookup(clientIp);
+            local res, err = ip2regionLocation:search(clientIp)
             if res then
                 local province = nil;
                 local country = nil;
-                if not (res["subdivisions"] == nil) then
+                --[[if not (res["subdivisions"] == nil) then
                     province = res["subdivisions"][1]["iso_code"];
                 end
                 if not (res["country"] == nil) then
                     country = res["country"]["iso_code"];
+                end]]
+
+                country = res["country"]
+                province = res["province"]
+                if country == "中国" and province == "香港" then
+                        country = "HK"
+                elseif country == "中国" and province == "台湾" then
+                        country = "TW"
+                elseif country == "中国" then
+                        country = "CN"
+                else
+                        -- 非中国
+                        country = "NCN"
+                end
+                if province == "广东" then
+                        province = "GD"
+                elseif province == "北京" then
+                        province = "BJ"
+                elseif province == "福建" then
+                        province = "FJ"
+                elseif province == "江西" then
+                        province = "JX"
+                elseif province == "湖南" then
+                        province = "HN"
+                elseif province == "浙江" then
+                        province = "ZJ"
+                elseif province == "重庆" then
+                        province = "CQ"
+                else
+                        -- 其他省份
+                        province = "OP"
                 end
 
                 if country == "CN" and not (province == nil) and province == "GD" then
-                    ban = 0;
+                    ban = false;
                 else
-                    if not (country == "CN" or country == "HK" or country == "TW") and switchGlobal == 0 then
+                    if not (country == "CN" or country == "HK" or country == "TW") and not enableGeoGlobal then
                         -- 全球关闭
-                        ban = 1;
+                        ban = true;
                     elseif country == "HK" then
                         -- 香港
-                        if switchHongkong == 0 then
-                            ban = 1;
+                        if not enableGeoHongkong then
+                            ban = true;
                         end
                     elseif country == "TW" then
                         -- 台湾
-                        if switchTaiwan == 0 then
-                            ban = 1;
+                        if not enableGeoTaiwan then
+                            ban = true;
                         end
                     elseif country == "CN" and not (province == nil) and province == "BJ" then
                         -- 北京
-                        if switchBeijing == 0 then
-                            ban = 1;
+                        if not enableGeoBeijing then
+                            ban = true;
                         end
                     elseif country == "CN" and not (province == nil) and province == "FJ" then
-                        -- 福建
-                        if switchFujian == 0 then
-                            ban = 1;
+                                    -- 福建
+                        if not enableGeoFujian then
+                            ban = true;
                         end
                     elseif country == "CN" and not (province == nil) and province == "JX" then
-                        -- 江西
-                        if switchJiangxi == 0 then
-                            ban = 1;
+                                    -- 江西
+                        if not enableGeoJiangxi then
+                            ban = true;
                         end
                     elseif country == "CN" and not (province == nil) and province == "HN" then
-                        -- 湖南
-                        if switchHunan == 0 then
-                            ban = 1;
+                                    -- 湖南
+                        if not enableGeoHunan then
+                            ban = true;
                         end
                     elseif country == "CN" and not (province == nil) and province == "ZJ" then
-                        -- 浙江
-                        if switchZhejiang == 0 then
-                            ban = 1;
+                                    -- 浙江
+                        if not enableGeoZhejiang then
+                            ban = true;
                         end
                     elseif country == "CN" and not (province == nil) and province == "CQ" then
-                        -- 重庆
-                        if switchChongqing == 0 then
-                            ban = 1;
+                                    -- 重庆
+                        if not enableGeoChongqing then
+                            ban = true;
                         end
                     else
                         -- 其他省份
-                        if country == "CN" and switchChinaMainland == 0 then
-                            ban = 1;
+                        if country == "CN" and not enableGeoChinaMainland then
+                            ban = true;
                         end
                     end
                 end
             else
                 -- 全球关闭
-                if switchGlobal == 0 then
-                    ban = 1;
+                if not enableGeoGlobal then
+                    ban = true;
                 end
             end
 
-            if ban == 1 then
+            if ban then
                 ngx.log(ngx.CRIT, "Client " .. clientIp .. " committed RegionForbidden");
 
                 -- 防止日志尾巴
                 dictLogTail:set(keyLogTail .. clientIp, clientIp, 60);
 
                 -- 打印geoip2解析结果到日志
---                 local resString = "";
---                 if not (res == nil) then
---                     resString = cjson.encode(res);
---                 end
---                 ngx.log(ngx.ERR, "客户端ip地址: " .. clientIp .. " 解析结果: " .. resString);
+                --[[local resString = "";
+                if not (res == nil) then
+                    resString = cjson.encode(res);
+                end
+                ngx.log(ngx.ERR, "客户端ip地址: " .. clientIp .. " 解析结果: " .. resString);]]
             end
         end
-    end
+	end
 end
 
 -- 延迟客户端请求，控制频率

@@ -72,6 +72,19 @@
 - name: "chmod 755 /usr/local/openresty/nginx/conf/lua/my_common.lua"
   shell: chmod 755 /usr/local/openresty/nginx/conf/lua/my_common.lua
 
+# 配置ip2region
+- name: "复制ip2region.lua到/usr/local/openresty/lualib/resty"
+  copy:
+    src: ip2region.lua
+    dest: /usr/local/openresty/lualib/resty
+- name: "chmod 755 /usr/local/openresty/lualib/resty/ip2region.lua"
+  shell: chmod 755 /usr/local/openresty/lualib/resty/ip2region.lua
+- name: "下载https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ip/ip2region.db"
+  get_url:
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ip/ip2region.db
+    dest: /usr/local/openresty/ip2region.db
+    checksum: md5:c8f4c82b2cbe02d7797dd6568533ae5a
+
 - name: "复制nginx.conf到/usr/local/openresty/nginx/conf/nginx.conf"
   template:
     src: nginx.frontend.conf
@@ -84,33 +97,33 @@
   when: varBackend is defined and varBackend
 
 # 配置geoip2
-- name: "/usr/local/openresty/bin/opm get anjia0532/lua-resty-maxminddb"
-  shell: /usr/local/openresty/bin/opm get anjia0532/lua-resty-maxminddb
-- name: "下载libmaxminddb-1.6.0.tar.gz"
-  get_url:
-    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nginx/libmaxminddb-1.6.0.tar.gz
-    dest: /tmp/libmaxminddb-1.6.0.tar.gz
-    checksum: md5:34beeef1cd60e0269516d0576868cf28
-- name: "解压libmaxminddb-1.6.0.tar.gz"
-  shell: tar -xvzf /tmp/libmaxminddb-1.6.0.tar.gz -C /tmp
-- name: "cd /tmp/libmaxminddb-1.6.0 && ./configure && make && make check && make install"
-  shell: cd /tmp/libmaxminddb-1.6.0 && ./configure && make && make check && make install
-- name: "保证/etc/ld.so.conf.d/local.conf存在"
-  file:
-    path: /etc/ld.so.conf.d/local.conf
-    state: touch
-- name: "/etc/ld.so.conf.d/local.conf添加/usr/local/lib"
-  lineinfile:
-    path: /etc/ld.so.conf.d/local.conf
-    regexp: "/usr/local/lib"
-    line: "/usr/local/lib"
-- name: "ldconfig"
-  shell: ldconfig
-- name: "下载GeoLite2-City.mmdb"
-  get_url:
-    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nginx/GeoLite2-City.mmdb
-    dest: /usr/local/openresty/
-    checksum: md5:ecf44a0f615d61edb270bc90a05412ca
+#- name: "/usr/local/openresty/bin/opm get anjia0532/lua-resty-maxminddb"
+#  shell: /usr/local/openresty/bin/opm get anjia0532/lua-resty-maxminddb
+#- name: "下载libmaxminddb-1.6.0.tar.gz"
+#  get_url:
+#    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nginx/libmaxminddb-1.6.0.tar.gz
+#    dest: /tmp/libmaxminddb-1.6.0.tar.gz
+#    checksum: md5:34beeef1cd60e0269516d0576868cf28
+#- name: "解压libmaxminddb-1.6.0.tar.gz"
+#  shell: tar -xvzf /tmp/libmaxminddb-1.6.0.tar.gz -C /tmp
+#- name: "cd /tmp/libmaxminddb-1.6.0 && ./configure && make && make check && make install"
+#  shell: cd /tmp/libmaxminddb-1.6.0 && ./configure && make && make check && make install
+#- name: "保证/etc/ld.so.conf.d/local.conf存在"
+#  file:
+#    path: /etc/ld.so.conf.d/local.conf
+#    state: touch
+#- name: "/etc/ld.so.conf.d/local.conf添加/usr/local/lib"
+#  lineinfile:
+#    path: /etc/ld.so.conf.d/local.conf
+#    regexp: "/usr/local/lib"
+#    line: "/usr/local/lib"
+#- name: "ldconfig"
+#  shell: ldconfig
+#- name: "下载GeoLite2-City.mmdb"
+#  get_url:
+#    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nginx/GeoLite2-City.mmdb
+#    dest: /usr/local/openresty/
+#    checksum: md5:ecf44a0f615d61edb270bc90a05412ca
 
 - name: "systemctl restart openresty && systemctl enable openresty"
   systemd:
