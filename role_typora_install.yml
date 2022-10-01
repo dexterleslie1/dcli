@@ -1,0 +1,8 @@
+---
+
+- name: "安装和配置typora"
+  hosts: all
+  # sudo为root用户
+  become: yes
+  roles:
+    - role: role_typora_install

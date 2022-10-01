@@ -1,0 +1,7 @@
+- name: "下载https://bucketxyh.oss-cn-hongkong.aliyuncs.com/typora/typora_1.4.7_amd64.deb"
+  get_url:
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/typora/typora_1.4.7_amd64.deb
+   dest: /tmp/typora_1.4.7_amd64.deb
+   checksum: md5:b4755906507fcaee5f96f66314efe37e
+- name: "sudo dpkg -i /tmp/typora_1.4.7_amd64.deb"
+  shell: dpkg -i /tmp/typora_1.4.7_amd64.deb
