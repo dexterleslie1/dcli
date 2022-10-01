@@ -1,14 +1,20 @@
 ---
 # 安装 smartgit
-- stat:
-   path: /usr/local/smartgit
-  register: smartgitFolderVar
+- name: "删除/usr/local/software/smartgit目录"
+  file:
+    path: /usr/local/software/smartgit
+    state: absent
+#- stat:
+#   path: /usr/local/software/smartgit
+#  register: smartgitFolderVar
 - get_url:
-   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/smartgit/smartgit-linux-20_2_0.tar.gz
-   dest: /usr/local/smartgit-linux-20_2_0.tar.gz
-  when: not smartgitFolderVar.stat.exists
-- shell: cd /usr/local && tar -xvzf smartgit-linux-20_2_0.tar.gz
-  when: not smartgitFolderVar.stat.exists
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/smartgit/smartgit-linux-21_2_4.tar.gz
+   dest: /usr/local/software/smartgit-linux-21_2_4.tar.gz
+#  when: not smartgitFolderVar.stat.exists
+- shell: cd /usr/local/software && tar -xvzf smartgit-linux-21_2_4.tar.gz
+#  when: not smartgitFolderVar.stat.exists
+- name: "修改/usr/local/software/smartgit目录属主和组为root"
+  shell: chown -R root:root /usr/local/software/smartgit
 - file:
-   name: /usr/local/smartgit-linux-20_2_0.tar.gz
+   name: /usr/local/software/smartgit-linux-21_2_4.tar.gz
    state: absent

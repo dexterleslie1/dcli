@@ -30,7 +30,7 @@ class MavenCli(object):
 
             if not varInstallLocally.lower() == "y":
                 var_host_target = input("输入目标主机IP（例如： 192.168.1.20:8080）：")
-                var_host_target_user = input("E输入目标主机SSH用户（默认 root）：") or "root"
+                var_host_target_user = input("输入目标主机SSH用户（默认 root）：") or "root"
                 varSshPassword = getpass.getpass("输入SSH密码：")
 
             varSudoPassword = getpass.getpass("输入主机的sudo密码，如果当前为root用户不需要输入：")
