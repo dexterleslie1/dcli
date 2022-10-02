@@ -35,8 +35,6 @@ server {
         proxy_pass http://backend;
 
         #content_by_lua_block {
-        #        local common = require("my_common");
-        #        local clientIp = common.getClientIp();
         #        ngx.header.content_type = "text/plain;charset=utf-8";
         #        local response = "你好，中国";
         #        ngx.say(response);

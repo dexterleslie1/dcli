@@ -15,36 +15,6 @@ local ip2regionLocation = ip2region.new({
 
 local _M = { _VERSION = '1.0.0' }
 
--- 获取客户端真实ip地址
-function _M.getClientIp()
-        local varHeaders = ngx.req.get_headers()
-        local clientIp;
-        local varXForwardedFor = varHeaders["x-forwarded-for"];
-        if (varXForwardedFor == nil or varXForwardedFor == "") then
-                varXForwardedFor = "";
-
-                -- 没有x-forwarded-for表示客户端直接访问openresty
-                -- 此时需要设置ngx.var.remote_addr为x-forwarded-for的值
-                ngx.req.set_header("x-forwarded-for", ngx.var.remote_addr);
-        end
-        -- ngx.log(ngx.WARN, "x-forwarded-for=" .. varXForwardedFor);
-        if varXForwardedFor then
-                local count = 0;
-                for k, v in string.gmatch(varXForwardedFor, "[^,]+") do
-                        if count==0 then
-                                clientIp = k;
-                                -- ngx.log(ngx.CRIT, "x-forwarded-for=" .. varXForwardedFor .. "提取到客户端ip地址:" .. clientIp);
-                                break;
-                        end
-                        count = count+1;
-                end
-        end
-        if not clientIp then
-                clientIp = ngx.var.remote_addr;
-        end
-        return clientIp;
-end
-
 -- 获取客户端请求url
 function _M.getRequestUrl()
         local fullUrl = ngx.var.scheme .. "://" .. ngx.var.http_host .. ngx.var.request_uri;
