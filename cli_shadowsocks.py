@@ -20,9 +20,9 @@ class ShadowsocksCli(object):
 
         var_install = input("Install Shadowsocks? [y/n]: ")
         if var_install.lower() == "y":
-            var_host_target = None
-            var_host_target_user = None
-            varDeploymentHostSshPassword = None
+            var_host_target = ""
+            var_host_target_user = ""
+            varDeploymentHostSshPassword = ""
 
             var_install_locally = input("是否本地部署？ [y/n]: ") or "n"
             if not var_install_locally == "y":
