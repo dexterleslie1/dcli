@@ -14,6 +14,9 @@
   template:
     src: config.json
     dest: /etc/shadowsocks-libev/config.json
+- name: "ln -s /usr/lib64/libmbedcrypto.so.2.28.1 /usr/lib64/libmbedcrypto.so.3"
+  shell: ln -s /usr/lib64/libmbedcrypto.so.2.28.1 /usr/lib64/libmbedcrypto.so.3
+
 - name: "systemctl restart shadowsocks-libev && systemctl enable shadowsocks-libev"
   systemd:
     name: shadowsocks-libev
