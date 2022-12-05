@@ -74,4 +74,6 @@ class K8sCli(object):
 
             print("提示： -------------------------------------------------------------"
                   "\n在master节点运行kubeadm token create --print-join-command获取加入worker节点命令"
-                  "\n在worker节点运行kubeadm join命令加入master节点")
+                  "\n在worker节点运行kubeadm join命令加入master节点"
+                  "\n在master节点运行kubectl get pods -n kube-system查看master节点基础容器运行状态"
+                  "\n在master节点运行kubectl get nodes查看所有节点状态")
