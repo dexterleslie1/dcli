@@ -14,7 +14,7 @@
     path: /etc/hosts
     regexp: "{{ varHostIp }} {{ varHostname }}"
     line: "{{ varHostIp }} {{ varHostname }}"
-  when: varMasterNode is defined and varMasterNode|bool
+  when: varMasterNode is defined and varMasterNode|bool and varHostname is defined and varHostname|length>0
 
 - name: "配置kubernetes yum源"
   copy:

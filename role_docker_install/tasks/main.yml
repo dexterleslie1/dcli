@@ -1,3 +1,7 @@
+- package_facts:
+   manager: auto
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
+
 # centOS安装docker
 - name: "yum install yum-utils -y"
   yum:
@@ -29,7 +33,7 @@
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
 - name: "yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing"
   shell: yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing
-  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8" and 'docker' not in ansible_facts.packages
 
 # centOS7下载和安装docker-ce
 - name: "centOS7下载docker-ce rpm安装程序"
@@ -39,7 +43,9 @@
     checksum: md5:4004a06a68002e59797264fce3c9defe
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 - name: "centOS7安装docker-ce"
-  shell: yum install -y /tmp/docker-ce-20.10.6-3.el7.x86_64.rpm
+  yum:
+    name: /tmp/docker-ce-20.10.6-3.el7.x86_64.rpm
+    state: installed
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 
 # ubuntu安装docker参考

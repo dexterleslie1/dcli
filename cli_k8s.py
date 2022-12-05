@@ -44,9 +44,7 @@ class K8sCli(object):
                 varHostname = ""
                 varHostIp = ""
 
-                varSetHostname = input("是否设置hostname？ [y/n]： ") or "n"
-                if varSetHostname.lower() == "y":
-                    varHostname = input("输入hostname（默认k8s-master）： ") or "k8s-master"
+                varHostname = input("输入hostname（默认k8s-master）： ") or "k8s-master"
 
                 varHostIp = input("输入host ip： ")
                 if len(varHostIp.strip()) == 0:
@@ -57,18 +55,17 @@ class K8sCli(object):
                     var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + varHostname + "\""
                 var_command = var_command + " -e varHostIp=\"" + varHostIp + "\""
                 var_command = var_command + " -e varMasterNode=true"
-                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword, varSudoPassword, varInstallLocally.lower() == "y")
+                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword,
+                                                        varSudoPassword, varInstallLocally.lower() == "y")
                 cli_common.execute_command(var_command)
             else:
                 # 是否设置主机名称
                 varSetHostname = "n"
                 varHostname = ""
 
-                varSetHostname = input("是否设置hostname？ [y/n]： ") or "n"
-                if varSetHostname.lower() == "y":
-                    varHostname = input("输入hostname： ")
-                    if len(varHostname.strip()) == 0:
-                        raise Exception("必须输入hostname！")
+                varHostname = input("输入hostname： ")
+                if len(varHostname.strip()) == 0:
+                    raise Exception("必须输入hostname！")
 
                 var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_k8s_install.yml"
                 if varSetHostname.lower() == "y":
