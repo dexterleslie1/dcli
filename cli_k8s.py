@@ -51,8 +51,7 @@ class K8sCli(object):
                     raise Exception("必须输入host ip！")
 
                 var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_k8s_install.yml"
-                if varSetHostname.lower() == "y":
-                    var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + varHostname + "\""
+                var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + varHostname + "\""
                 var_command = var_command + " -e varHostIp=\"" + varHostIp + "\""
                 var_command = var_command + " -e varMasterNode=true"
                 var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword,
@@ -68,8 +67,7 @@ class K8sCli(object):
                     raise Exception("必须输入hostname！")
 
                 var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_k8s_install.yml"
-                if varSetHostname.lower() == "y":
-                    var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + varHostname + "\""
+                var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + varHostname + "\""
                 var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword,
                                                         varSudoPassword, varInstallLocally.lower() == "y")
                 cli_common.execute_command(var_command)
