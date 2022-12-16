@@ -1,0 +1,6 @@
+---
+- name: "安装helm cli"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_helm_config

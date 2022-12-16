@@ -36,6 +36,7 @@ import cli_selenium
 import cli_awscli
 import cli_typora
 import logging
+import cli_helm
 
 
 class Dcli(object):
@@ -73,6 +74,7 @@ class Dcli(object):
         self.selenium = cli_selenium.SeleniumCli()
         self.awscli = cli_awscli.AwsCli()
         self.typora = cli_typora.TyporaCli()
+        self.helm = cli_helm.Helm()
 
 
 if __name__ == "__main__":

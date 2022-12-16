@@ -1,0 +1,22 @@
+# helm cli安装
+# https://helm.sh/docs/intro/install/
+
+- file:
+   path: /tmp/helm-v3.10.3-linux-amd64.tar.gz
+   state: absent
+- file:
+   path: /tmp/linux-amd64
+   state: absent
+- file:
+    path: /usr/local/bin/helm
+    state: absent
+- name: "下载helm cli二进制程序"
+  get_url:
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/kubernetes/helm-v3.10.3-linux-amd64.tar.gz
+    dest: /tmp/helm-v3.10.3-linux-amd64.tar.gz
+    checksum: md5:4951a3dfaec9251009b6c37aaffd52db
+
+- name: "cd /tmp/ && tar -xvzf helm-v3.10.3-linux-amd64.tar.gz"
+  shell: cd /tmp/ && tar -xvzf helm-v3.10.3-linux-amd64.tar.gz
+- name: "cd /tmp/ && mv linux-amd64/helm /usr/local/bin/"
+  shell: cd /tmp/ && mv linux-amd64/helm /usr/local/bin/
