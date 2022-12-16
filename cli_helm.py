@@ -40,4 +40,4 @@ class Helm(object):
             var_command = cli_common.concat_command(var_command, varSshIp, varSshUser, varSshPassword, varSudoPassword, varInstallLocally.lower() == "y")
             cli_common.execute_command(var_command)
 
-            print("helm cli安装成功，如果安装目标主机不为kubernetes主机，则需要手动配置~/.kube/config配置")
+            print("helm cli安装成功，如果安装目标主机不为kubernetes主机，则需要手动配置~/.kube/config配置，使用命令测试helm是否安装成功 helm version")
