@@ -37,6 +37,7 @@ import cli_awscli
 import cli_typora
 import logging
 import cli_helm
+import cli_golang
 
 
 class Dcli(object):
@@ -75,6 +76,7 @@ class Dcli(object):
         self.awscli = cli_awscli.AwsCli()
         self.typora = cli_typora.TyporaCli()
         self.helm = cli_helm.Helm()
+        self.golang = cli_golang.Golang()
 
 
 if __name__ == "__main__":

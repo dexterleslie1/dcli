@@ -1,0 +1,6 @@
+---
+- name: "安装golang"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_golang_config

@@ -1,0 +1,32 @@
+- name: "判断操作支持的操作系统"
+  assert:
+    that:
+      - ansible_distribution == "Ubuntu" or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "8")
+    fail_msg: "golang目前只支持ubuntu、centOS8系统配置"
+
+- file:
+   path: /tmp/go1.19.4.linux-amd64.tar.gz
+   state: absent
+- file:
+   path: /tmp/go
+   state: absent
+- file:
+    path: /usr/local/go
+    state: absent
+
+- name: "下载go二进制程序"
+  get_url:
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/golang/go1.19.4.linux-amd64.tar.gz
+   dest: /tmp/go1.19.4.linux-amd64.tar.gz
+   checksum: md5:b169b57d37b5d10df5fb2652ec6add06
+
+- name: "cd /tmp/ && tar -xvzf go1.19.4.linux-amd64.tar.gz"
+  shell: cd /tmp/ && tar -xvzf go1.19.4.linux-amd64.tar.gz
+- name: "cd /tmp/ && mv go /usr/local/"
+  shell: cd /tmp/ && mv go /usr/local/
+
+- name: "复制go.sh到/etc/profile.d/go.sh"
+  copy:
+    src: go.sh
+    dest: /etc/profile.d/go.sh
+    force: yes
