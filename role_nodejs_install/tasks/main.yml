@@ -10,9 +10,8 @@
 - name: "解压nodejs安装包到/usr/local目录"
   shell: tar -xvzf /tmp/node-v15.14.0-linux-x64.tar.gz -C /usr/local
 
-- name: "创建/usr/local/bin/node链接"
-  shell: ln -s /usr/local/node-v15.14.0-linux-x64/bin/node /usr/local/bin/node
-  ignore_errors: yes
-- name: "创建/usr/local/bin/npm链接"
-  shell: ln -s /usr/local/node-v15.14.0-linux-x64/bin/npm /usr/local/bin/npm
-  ignore_errors: yes
+- name: "复制go.sh到/etc/profile.d/nodejs.sh"
+  copy:
+    src: nodejs.sh
+    dest: /etc/profile.d/nodejs.sh
+    force: yes
