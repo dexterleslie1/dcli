@@ -21,10 +21,6 @@
   get_url:
     url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/intelliJ-IDEA/jetbrains-agent-datagrip-2019.1.2.jar
     dest: /usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/jetbrains-agent.jar
-- file:
-    path: /usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/jetbrains-agent.jar
-    owner: "{{ lookup('env', 'USER') }}"
-    group: "{{ lookup('env', 'USER') }}"
 
 - name: "配置datagrip64.vmoptions"
   lineinfile:
