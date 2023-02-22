@@ -11,7 +11,7 @@ Description=JMeter Slave
 
 # 使用-Djava.rmi.server.hostname=解决： An error occurred: Cannot start. xxxxx is a loopback address.
 # https://stackoverflow.com/questions/3150448/jmeter-loopback-address-error-when-launching-jmeter-server-on-linux
-ExecStart=/usr/local/jmeter/bin/jmeter-server -Jserver.rmi.ssl.disable=true -Djava.rmi.server.hostname={{ varRmiListenIp }}
+ExecStart=/usr/local/software/jmeter/bin/jmeter-server -Jserver.rmi.ssl.disable=true -Djava.rmi.server.hostname={{ varRmiListenIp }}
 
 SuccessExitStatus=143
 TimeoutStopSec=15
