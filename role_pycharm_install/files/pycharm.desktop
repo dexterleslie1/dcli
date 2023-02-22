@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=PyCharm
+Exec=sh /usr/local/software/pycharm-community-2021.3.1/bin/pycharm.sh
+Icon=/usr/local/software/pycharm-community-2021.3.1/bin/pycharm.png
+Terminal=false
+Type=Application
+StartupNotify=true
