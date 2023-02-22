@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=intelliJ IDEA
+Exec=sh /usr/local/software/intelliJ-IDEA/idea-IU-201.7223.91/bin/idea.sh
+Icon=/usr/local/software/intelliJ-IDEA/idea-IU-201.7223.91/bin/idea.png
+Terminal=false
+Type=Application
+StartupNotify=true

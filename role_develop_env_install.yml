@@ -22,6 +22,8 @@
       when: var_include_redis|default(false)
     - role: role_intellij_install
       when: var_include_intellij|default(false)
+    - role: role_intellij_datagrip_install
+      when: var_include_datagrip|default(false)
     - role: role_smartgit_install
       when: var_include_smartgit|default(false)
     - role: role_jmeter_install

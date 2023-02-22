@@ -30,8 +30,12 @@
 - name: "下载jetbrains-agent.jar到用户目录"
   get_url:
     url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/intelliJ-IDEA/jetbrains-agent.jar
-    dest: /home/{{ lookup('env', 'USER') }}/jetbrains-agent.jar
+    dest: /usr/local/software/intelliJ-IDEA/idea-IU-201.7223.91/jetbrains-agent.jar
 - file:
-    path: /home/{{ lookup('env', 'USER') }}/jetbrains-agent.jar
+    path: /usr/local/software/intelliJ-IDEA/idea-IU-201.7223.91/jetbrains-agent.jar
     owner: "{{ lookup('env', 'USER') }}"
     group: "{{ lookup('env', 'USER') }}"
+
+- copy:
+   src: ./idea.desktop
+   dest: /usr/share/applications/idea.desktop

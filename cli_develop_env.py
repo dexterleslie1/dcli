@@ -18,7 +18,8 @@ class DevelopEnvCli(object):
                 include_intellij=False,
                 include_smartgit=False,
                 include_xrdp=False,
-                include_jmeter=False):
+                include_jmeter=False,
+                include_datagrip=False):
         """
         Install develop environment.
 
@@ -59,6 +60,8 @@ class DevelopEnvCli(object):
             var_command = var_command + " -e var_include_redis=true"
         if include_intellij:
             var_command = var_command + " -e var_include_intellij=true"
+        if include_datagrip:
+            var_command = var_command + " -e var_include_datagrip=true"
         if include_smartgit:
             var_command = var_command + " -e var_include_smartgit=true"
         if include_xrdp:
@@ -93,4 +96,6 @@ class DevelopEnvCli(object):
         cli_common.execute_command(var_command)
 
         if include_intellij:
-            print("intellij idea破解文件jetbrains-agent.jar已经下载到当前用户目录/home中，打开idea后直接拖动此文件到欢迎界面即可破解")
+            print("intellij idea破解文件jetbrains-agent.jar已经下载到目录/usr/local/software/intelliJ-IDEA/idea-IU-201.7223.91中，打开idea后直接拖动此文件到欢迎界面(注意是欢迎界面)即可破解")
+        if include_datagrip:
+            print("点击菜单IDE Help -> Regiter...选择填入Activation Code(/usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/activation_code.txt)即可破解datagrip")

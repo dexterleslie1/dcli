@@ -1,0 +1,40 @@
+---
+# 安装datagrip开发工具
+# datagrip破解 https://www.cnblogs.com/coloz/p/10901453.html
+- file:
+   name: /usr/local/software/intelliJ-datagrip
+   state: directory
+- stat:
+   path: /usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2
+  register: ideaFolderVar
+- get_url:
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/intelliJ-IDEA/datagrip-2019.1.2.tar.gz
+   dest: /usr/local/software/intelliJ-datagrip/datagrip-2019.1.2.tar.gz
+  when: not ideaFolderVar.stat.exists
+- shell: cd /usr/local/software/intelliJ-datagrip && tar -xvzf datagrip-2019.1.2.tar.gz
+  when: not ideaFolderVar.stat.exists
+- file:
+   name: /usr/local/software/intelliJ-datagrip/datagrip-2019.1.2.tar.gz
+   state: absent
+
+- name: "下载jetbrains-agent.jar"
+  get_url:
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/intelliJ-IDEA/jetbrains-agent-datagrip-2019.1.2.jar
+    dest: /usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/jetbrains-agent.jar
+- file:
+    path: /usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/jetbrains-agent.jar
+    owner: "{{ lookup('env', 'USER') }}"
+    group: "{{ lookup('env', 'USER') }}"
+
+- name: "配置datagrip64.vmoptions"
+  lineinfile:
+    path: /usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/bin/datagrip64.vmoptions
+    regexp: "^-javaagent:/usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/jetbrains-agent.jar"
+    line: "-javaagent:/usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/jetbrains-agent.jar"
+
+- copy:
+   src: ./datagrip.desktop
+   dest: /usr/share/applications/datagrip.desktop
+- copy:
+   src: ./activation_code.txt
+   dest: /usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/activation_code.txt

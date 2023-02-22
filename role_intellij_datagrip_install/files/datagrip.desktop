@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=DataGrip
+Exec=sh /usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/bin/datagrip.sh
+Icon=/usr/local/software/intelliJ-datagrip/DataGrip-2019.1.2/bin/datagrip.png
+Terminal=false
+Type=Application
+StartupNotify=true
