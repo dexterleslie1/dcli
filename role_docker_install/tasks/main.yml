@@ -104,7 +104,14 @@
   when: ansible_distribution == "Ubuntu"
 # 把当前用户添加到docker用户组，否则在使用docker-compose时会报告permission denied错误
 # https://www.linuxrumen.com/rmxx/1665.html
-- shell: usermod -aG docker {{ lookup('env', 'USER') }}
+# 获取/home目录下的子目录
+- find:
+   paths: /home
+   file_type: directory
+  register: varFiles
+- shell: usermod -aG docker {{ item.path.split('/').2 }}
+  with_items:
+   - "{{ varFiles.files }}"
   when: ansible_distribution == "Ubuntu"
 
 - name: "mkdir -p /etc/docker"
