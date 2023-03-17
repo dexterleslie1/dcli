@@ -39,3 +39,32 @@
    path: ~/.bash_profile
    line: 'export MAVEN_OPTS="-Xmx1024m"'
   when: ansible_distribution=="CentOS" and var_grep_result.stdout == "0"
+
+- find:
+   paths: /home
+   file_type: directory
+  register: varFiles
+- file:
+   name: /home/{{ item.path.split('/').2 }}/.m2
+   state: directory
+  with_items:
+    - "{{ varFiles.files }}"
+- copy:
+   src: ./settings.xml
+   dest: /home/{{ item.path.split('/').2 }}/.m2/settings.xml
+  with_items:
+    - "{{ varFiles.files }}"
+- file:
+   path: /home/{{ item.path.split('/').2 }}/.m2
+   group: "{{ item.path.split('/').2 }}"
+   owner: "{{ item.path.split('/').2 }}"
+   recurse: yes
+  with_items:
+    - "{{ varFiles.files }}"
+
+- file:
+   name: /root/.m2
+   state: directory
+- copy:
+   src: ./settings.xml
+   dest: /root/.m2/settings.xml
