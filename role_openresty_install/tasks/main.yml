@@ -60,6 +60,21 @@
     dest: /usr/local/openresty/nginx/conf/
   with_fileglob: "{{ varCurrentWorkingDirectory }}/*.rules"
 
+# 恢复编译前备份的 *.crt、*.pem、*.key
+- name: "恢复*.crt、*.pem、*.key等文件到/usr/local/openresty/nginx/conf/"
+  shell: "mv /tmp/openresty-tmp-bak/*.crt /usr/local/openresty/nginx/conf/"
+  ignore_errors: true
+- name: "恢复*.crt、*.pem、*.key等文件到/usr/local/openresty/nginx/conf/"
+  shell: "mv /tmp/openresty-tmp-bak/*.pem /usr/local/openresty/nginx/conf/"
+  ignore_errors: true
+- name: "恢复*.crt、*.pem、*.key等文件到/usr/local/openresty/nginx/conf/"
+  shell: "mv /tmp/openresty-tmp-bak/*.key /usr/local/openresty/nginx/conf/"
+  ignore_errors: true
+- name: "删除/tmp/openresty-tmp-bak/"
+  file:
+    path: /tmp/openresty-tmp-bak
+    state: absent
+
 # 配置lua公共库
 - name: "创建目录/usr/local/openresty/nginx/conf/lua"
   file:

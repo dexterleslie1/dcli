@@ -23,10 +23,26 @@
   file:
     path: /tmp/naxsi-0.56
     state: absent
+
+# 删除/usr/local/openresty之前备份 *.crt、*.pem、*.key
+- name: "创建目录/tmp/openresty-tmp-bak"
+  file:
+    path: /tmp/openresty-tmp-bak
+    state: directory
+- name: "备份*.crt、*.pem、*.key等文件到/tmp/openresty-tmp-bak"
+  shell: "mv /usr/local/openresty/nginx/conf/*.crt /tmp/openresty-tmp-bak/"
+  ignore_errors: true
+- name: "备份*.crt、*.pem、*.key等文件到/tmp/openresty-tmp-bak"
+  shell: "mv /usr/local/openresty/nginx/conf/*.pem /tmp/openresty-tmp-bak/"
+  ignore_errors: true
+- name: "备份*.crt、*.pem、*.key等文件到/tmp/openresty-tmp-bak"
+  shell: "mv /usr/local/openresty/nginx/conf/*.key /tmp/openresty-tmp-bak/"
+  ignore_errors: true
 - name: "删除目录/usr/local/openresty"
   file:
     path: /usr/local/openresty
     state: absent
+
 - name: "删除文件/usr/local/openresty.tar.gz"
   file:
     path: /usr/local/openresty.tar.gz
