@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=VSCode
+Exec=/usr/local/software/VSCode-linux-x64/bin/code
+Terminal=false
+Type=Application
+StartupNotify=true

@@ -7,6 +7,11 @@
     checksum: md5:b9fefab4e28d08d22d04d255ede9fc67
   when: ansible_distribution == "Ubuntu"
 
-- name: "解压vscode到目录/home/{{ varUser }}/software"
-  shell: tar -xvzf /tmp/code-stable-x64-1643864266.tar.gz -C /home/{{ varUser }}/software
-  when: ansible_distribution == "Ubuntu" and varUser is defined and varUser|length>0
+- name: "解压vscode到目录/usr/local/software"
+  shell: tar -xvzf /tmp/code-stable-x64-1643864266.tar.gz -C /usr/local/software
+  when: ansible_distribution == "Ubuntu"
+
+- copy:
+    src: ./vscode.desktop
+    dest: /usr/share/applications/vscode.desktop
+  when: ansible_distribution == "Ubuntu"
