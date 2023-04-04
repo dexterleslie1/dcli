@@ -15,3 +15,12 @@
     src: nodejs.sh
     dest: /etc/profile.d/nodejs.sh
     force: yes
+
+# ubuntu设置 /etc/sysctl.conf fs.inotify.max_user_watches = 5000000
+# 否则报错: Error: ENOSPC: System limit for number of file watchers reached
+# https://blog.csdn.net/lxyoucan/article/details/116736501
+- name: "配置fs.inotify.max_user_watches = 5000000"
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: "^fs.inotify.max_user_watches"
+    line: "fs.inotify.max_user_watches = 5000000"
