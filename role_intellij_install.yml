@@ -1,0 +1,8 @@
+- name: "安装idea"
+  hosts: all
+  become: yes
+  roles:
+    - role: role_os_firewall
+    - role: role_os_selinux
+    - role: role_os_timezone
+    - role: role_intellij_install

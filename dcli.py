@@ -38,6 +38,7 @@ import cli_typora
 import logging
 import cli_helm
 import cli_golang
+import cli_intellij
 
 
 class Dcli(object):
@@ -77,6 +78,7 @@ class Dcli(object):
         self.typora = cli_typora.TyporaCli()
         self.helm = cli_helm.Helm()
         self.golang = cli_golang.Golang()
+        self.intellij = cli_intellij.IntellijCli()
 
 
 if __name__ == "__main__":
