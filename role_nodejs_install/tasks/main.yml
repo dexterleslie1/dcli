@@ -3,37 +3,54 @@
 
 - name: "下载nodejs安装包"
   get_url:
-   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/nodejs/node-v15.14.0-linux-x64.tar.gz
-   dest: /tmp/node-v15.14.0-linux-x64.tar.gz
-   checksum: md5:66c4a66693a46df811602d37dff6b57b
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nodejs/node-{{ varVersion }}-linux-x64.tar.gz
+   dest: /tmp/node-{{ varVersion }}-linux-x64.tar.gz
 
 - name: "如果/usr/local/software目录不存在，则创建"
   file:
    name: /usr/local/software
    state: directory
 - name: "解压nodejs安装包到/usr/local目录"
-  shell: tar -xvzf /tmp/node-v15.14.0-linux-x64.tar.gz -C /usr/local/software
+  shell: tar -xvzf /tmp/node-{{ varVersion }}-linux-x64.tar.gz -C /usr/local/software
 
 # 不能删除这个配置，否则使用 sudo npm install -g 安装程序后，调用该cli程序会报告 command not found 错误
 # 例如： 使用命令安装sudo npm install -g testem后，命令行调用 testem cli程序 > testem 会报告 command not found 错误
+#- name: "复制node.js.sh到/etc/profile.d/nodejs.sh"
+#  copy:
+#    src: nodejs.sh
+#    dest: /etc/profile.d/nodejs.sh
+#    force: yes
 - name: "复制node.js.sh到/etc/profile.d/nodejs.sh"
-  copy:
+  template:
     src: nodejs.sh
     dest: /etc/profile.d/nodejs.sh
-    force: yes
 
 # https://stackoverflow.com/questions/31472755/sudo-npm-command-not-found
 # 需要链接 npm和node 命令到 /usr/local/bin 中，否则 sudo npm install -g 会报告 npm command not found 错误
-- name: "rm /usr/local/bin/node || true && ln -s /usr/local/node-v15.14.0-linux-x64/bin/node /usr/local/bin/node"
-  shell: rm /usr/local/bin/node || true && ln -s /usr/local/software/node-v15.14.0-linux-x64/bin/node /usr/local/bin/node
-- name: "rm /usr/local/bin/npm || true && ln -s /usr/local/node-v15.14.0-linux-x64/bin/npm /usr/local/bin/npm"
-  shell: rm /usr/local/bin/npm || true && ln -s /usr/local/software/node-v15.14.0-linux-x64/bin/npm /usr/local/bin/npm
+- name: "rm /usr/local/bin/node || true && ln -s /usr/local/node-{{ varVersion }}-linux-x64/bin/node /usr/local/bin/node"
+  shell: rm /usr/local/bin/node || true && ln -s /usr/local/software/node-{{ varVersion }}-linux-x64/bin/node /usr/local/bin/node
+- name: "rm /usr/local/bin/npm || true && ln -s /usr/local/node-{{ varVersion }}-linux-x64/bin/npm /usr/local/bin/npm"
+  shell: rm /usr/local/bin/npm || true && ln -s /usr/local/software/node-{{ varVersion }}-linux-x64/bin/npm /usr/local/bin/npm
 
 # ubuntu设置 /etc/sysctl.conf fs.inotify.max_user_watches = 5000000
-# 否则报错: Error: ENOSPC: System limit for number of file watchers reached
+# 否则某些情况下使用 node 运行程序报错: Error: ENOSPC: System limit for number of file watchers reached
 # https://blog.csdn.net/lxyoucan/article/details/116736501
 - name: "配置fs.inotify.max_user_watches = 5000000"
   lineinfile:
     path: /etc/sysctl.conf
     regexp: "^fs.inotify.max_user_watches"
     line: "fs.inotify.max_user_watches = 5000000"
+
+# 设置 npm 仓库指向阿里仓库后再安装 yarn
+- name: "npm config set registry https://registry.npm.taobao.org/ -g"
+  shell: "npm config set registry https://registry.npm.taobao.org/ -g"
+- name: "npm config set registry https://registry.npm.taobao.org/"
+  shell: "npm config set registry https://registry.npm.taobao.org/"
+
+- name: "npm install -g yarn"
+  shell: "npm install -g yarn"
+
+# todo 下面设置不成功所以暂时注释
+## NOTE: 必须使用 /bin/bash -l 模拟shell登录(会自动加载/etc/profile.d/nodejs.sh)，否则会报告 yarn command not found 错误
+#- name: "/bin/bash -l -c 'yarn config set registry https://registry.npm.taobao.org/ -g'"
+#  shell: "/bin/bash -l -c 'yarn config set registry https://registry.npm.taobao.org/ -g'"
