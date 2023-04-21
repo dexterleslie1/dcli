@@ -10,8 +10,15 @@
 - file:
    path: /tmp/go
    state: absent
-- file:
-    path: /usr/local/go
+
+- name: "保证目录 /usr/local/software 存在"
+  file:
+    path: /usr/local/software
+    state: directory
+
+- name: "删除 /usr/local/software/go 目录"
+  file:
+    path: /usr/local/software/go
     state: absent
 
 - name: "下载go二进制程序"
@@ -22,8 +29,8 @@
 
 - name: "cd /tmp/ && tar -xvzf go1.19.4.linux-amd64.tar.gz"
   shell: cd /tmp/ && tar -xvzf go1.19.4.linux-amd64.tar.gz
-- name: "cd /tmp/ && mv go /usr/local/"
-  shell: cd /tmp/ && mv go /usr/local/
+- name: "cd /tmp/ && mv go /usr/local/software/"
+  shell: cd /tmp/ && mv go /usr/local/software/
 
 - name: "复制go.sh到/etc/profile.d/go.sh"
   copy:
