@@ -1,3 +1,9 @@
+- name: "判断操作支持的操作系统"
+  assert:
+    that:
+      - ansible_distribution == "Ubuntu" or (ansible_distribution == "CentOS" and ansible_distribution_major_version == "8")
+    fail_msg: "docker目前只支持ubuntu、centOS8系统安装"
+
 - package_facts:
    manager: auto
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
@@ -25,28 +31,34 @@
   when: ansible_distribution == "CentOS"
 
 # centOS8下载和安装docker-ce
-- name: "Download docker-ce-20.10.6-3.el8.x86_64.rpm"
+- name: "下载docker-23.0.5-1-rpms.zip到目录/tmp"
   get_url:
-    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-ce-20.10.6-3.el8.x86_64.rpm
-    dest: /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm
-    checksum: md5:653317773036a6d924e708e5c4e008a8
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/docker/docker-23.0.5-1-rpms.zip
+    dest: /tmp/docker-23.0.5-1-rpms.zip
+    checksum: md5:4e08a727cd89b9f7ea33a4de5464723b
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
-- name: "yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing"
-  shell: yum install -y /tmp/docker-ce-20.10.6-3.el8.x86_64.rpm --allowerasing
+
+- name: "解压/tmp/docker-23.0.5-1-rpms.zip到/tmp/docker-23.0.5-1-rpms"
+  shell: unzip /tmp/docker-23.0.5-1-rpms.zip -d /tmp/docker-23.0.5-1-rpms
+  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
+
+- name: "使用yum命令安装docker"
+  shell: cd /tmp/docker-23.0.5-1-rpms && yum install -y *.rpm --allowerasing
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8" and 'docker' not in ansible_facts.packages
 
-# centOS7下载和安装docker-ce
-- name: "centOS7下载docker-ce rpm安装程序"
-  get_url:
-    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-ce-20.10.6-3.el7.x86_64.rpm
-    dest: /tmp/docker-ce-20.10.6-3.el7.x86_64.rpm
-    checksum: md5:4004a06a68002e59797264fce3c9defe
-  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
-- name: "centOS7安装docker-ce"
-  yum:
-    name: /tmp/docker-ce-20.10.6-3.el7.x86_64.rpm
-    state: installed
-  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+# NOTE: 不再支持centOS7安装docker
+## centOS7下载和安装docker-ce
+#- name: "centOS7下载docker-ce rpm安装程序"
+#  get_url:
+#    url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-ce-20.10.6-3.el7.x86_64.rpm
+#    dest: /tmp/docker-ce-20.10.6-3.el7.x86_64.rpm
+#    checksum: md5:4004a06a68002e59797264fce3c9defe
+#  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
+#- name: "centOS7安装docker-ce"
+#  yum:
+#    name: /tmp/docker-ce-20.10.6-3.el7.x86_64.rpm
+#    state: installed
+#  when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "7"
 
 # ubuntu安装docker参考
 # https://docs.docker.com/engine/install/ubuntu/
@@ -94,14 +106,30 @@
     update_cache: yes
   when: ansible_distribution == "Ubuntu"
 
-- name: "安装docker相关组件"
-  apt:
-    name:
-      - docker-ce=5:20.10.6~3-0~ubuntu-focal
-      - docker-ce-cli=5:20.10.6~3-0~ubuntu-focal
-      - containerd.io
-    state: present
+#- name: "安装docker相关组件"
+#  apt:
+#    name:
+#      - docker-ce=5:20.10.6~3-0~ubuntu-focal
+#      - docker-ce-cli=5:20.10.6~3-0~ubuntu-focal
+#      - containerd.io
+#    state: present
+#  when: ansible_distribution == "Ubuntu"
+
+- name: "下载docker-23.0.5-1-debs.zip到目录/tmp"
+  get_url:
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/docker/docker-23.0.5-1-debs.zip
+    dest: /tmp/docker-23.0.5-1-debs.zip
+    checksum: md5:f87a10921ca90ad87c0dcd42e8c9fde5
   when: ansible_distribution == "Ubuntu"
+
+- name: "解压/tmp/docker-23.0.5-1-debs.zip到/tmp/docker-23.0.5-1-debs"
+  shell: unzip /tmp/docker-23.0.5-1-debs.zip -d /tmp/docker-23.0.5-1-debs
+  when: ansible_distribution == "Ubuntu"
+
+- name: "使用dpkg命令安装docker"
+  shell: cd /tmp/docker-23.0.5-1-debs && dpkg -i *.deb
+  when: ansible_distribution == "Ubuntu"
+
 # 把当前用户添加到docker用户组，否则在使用docker-compose时会报告permission denied错误
 # https://www.linuxrumen.com/rmxx/1665.html
 # 获取/home目录下的子目录
@@ -132,7 +160,7 @@
 
 - name: "Download docker-compose-Linux-x86_64"
   get_url:
-   url: https://bucketxy.oss-cn-hangzhou.aliyuncs.com/docker/docker-compose-Linux-x86_64
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/docker/docker-compose-Linux-x86_64
    dest: /tmp/docker-compose-Linux-x86_64
    checksum: md5:8f68ae5d2334eecb0ee50b809b5cec58
 - name: "cp /tmp/docker-compose-Linux-x86_64 /usr/local/bin/docker-compose"
