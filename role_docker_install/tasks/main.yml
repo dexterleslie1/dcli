@@ -8,6 +8,11 @@
    manager: auto
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
 
+- name: "保证unzip命令已经安装"
+  yum:
+    name: unzip
+    state: installed
+
 # centOS安装docker
 - name: "yum install yum-utils -y"
   yum:
