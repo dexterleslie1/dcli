@@ -44,7 +44,7 @@
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
 
 - name: "解压/tmp/docker-23.0.5-1-rpms.zip到/tmp/docker-23.0.5-1-rpms"
-  shell: unzip /tmp/docker-23.0.5-1-rpms.zip -d /tmp/docker-23.0.5-1-rpms
+  shell: rm -rf /tmp/docker-23.0.5-1-rpms && unzip /tmp/docker-23.0.5-1-rpms.zip -d /tmp/docker-23.0.5-1-rpms
   when: ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
 
 - name: "使用yum命令安装docker"
@@ -128,7 +128,7 @@
   when: ansible_distribution == "Ubuntu"
 
 - name: "解压/tmp/docker-23.0.5-1-debs.zip到/tmp/docker-23.0.5-1-debs"
-  shell: unzip /tmp/docker-23.0.5-1-debs.zip -d /tmp/docker-23.0.5-1-debs
+  shell: rm -rf /tmp/docker-23.0.5-1-debs && unzip /tmp/docker-23.0.5-1-debs.zip -d /tmp/docker-23.0.5-1-debs
   when: ansible_distribution == "Ubuntu"
 
 - name: "使用dpkg命令安装docker"
@@ -152,10 +152,50 @@
   ignore_errors: yes
   when: ansible_distribution == "CentOS"
 
+# 如果之前已经部署过docker，则先备份旧的/etc/docker/daemon.json文件
+# 新和旧的daemon.json合并
+- name: "删除/tmp/daemon.json文件"
+  shell: rm -f /tmp/daemon.json
+  ignore_errors: yes
+- name: "判断/etc/docker/daemon.json文件是否存在"
+  stat:
+    path: /etc/docker/daemon.json
+  register: varDaemonJSONFileExists
+- name: "备份/etc/docker/daemon.json文件到/tmp/daemon.json"
+  shell: cp /etc/docker/daemon.json /tmp/daemon.json
+  when: varDaemonJSONFileExists.stat.exists
+
 - name: "copy daemon.json to /etc/docker/daemon.json"
   copy:
     src: daemon.json
     dest: /etc/docker/daemon.json
+
+# 合并新和旧的daemon.json文件
+- name: "使用cat命令读取/tmp/daemon.json文件"
+  shell: cat /tmp/daemon.json
+  register: varOldDaemonJSONFileContent
+  when: varDaemonJSONFileExists.stat.exists
+- name: "把/tmp/daemon.json文件的内容转换为JSON对象并保存到varOldDaemonJSONObject中"
+  set_fact:
+    varOldDaemonJSONObject: "{{ varOldDaemonJSONFileContent.stdout | from_json }}"
+  when: varDaemonJSONFileExists.stat.exists
+- name: "使用cat命令读取/etc/docker/daemon.json文件"
+  shell: cat /etc/docker/daemon.json
+  register: varNewDaemonJSONFileContent
+  when: varDaemonJSONFileExists.stat.exists
+- name: "把/etc/docker/daemon.json文件的内容转换为JSON对象并保存到varNewDaemonJSONObject中"
+  set_fact:
+    varNewDaemonJSONObject: "{{ varNewDaemonJSONFileContent.stdout | from_json }}"
+  when: varDaemonJSONFileExists.stat.exists
+- name: "合并新和旧daemon.json文件"
+  set_fact:
+    varMergedDaemonJSONObject: "{{ varOldDaemonJSONObject | combine(varNewDaemonJSONObject) }}"
+  when: varDaemonJSONFileExists.stat.exists
+- name: "输出新daemon.json文件到/etc/docker/daemon.json文件"
+  copy:
+    dest: /etc/docker/daemon.json
+    content: "{{ varMergedDaemonJSONObject | to_nice_json }}"
+  when: varDaemonJSONFileExists.stat.exists
 
 - name: "systemctl enable docker and systemctl start docker"
   systemd:
