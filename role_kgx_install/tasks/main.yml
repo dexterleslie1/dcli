@@ -1,75 +1,40 @@
-- name: "创建目录/root/lhc"
-  file:
-    path: /root/lhc
-    state: directory
+# 每5天的 01:12 重启一次
+- name: "创建kgx-facadea重启任务"
+  cron:
+    name: "kgx-facadea-restart-task"
+    job: "cd /data/workspace-git/kgx-docker/service-facadea && docker-compose restart kgx-facadea && docker-compose restart kgx-facadea-openresty"
+    minute: "12"
+    hour: "1"
+    day: "*/5"
 
-- name: "创建目录/root/lhc/logos"
-  file:
-    path: /root/lhc/logos
-    state: directory
+- name: "创建kgx-facadez重启任务"
+  cron:
+    name: "kgx-facadez-restart-task"
+    job: "cd /data/workspace-git/kgx-docker/service-facadez && docker-compose restart kgx-facadez && docker-compose restart kgx-facadez-openresty"
+    minute: "12"
+    hour: "1"
+    day: "*/5"
 
-- name: "复制文件config.propertie到/root/lhc/目录"
-  copy:
-    src: config.properties
-    dest: /root/lhc/config.properties
-- name: "复制文件configmanagement.propertie到/root/lhc/目录"
-  copy:
-    src: configmanagement.properties
-    dest: /root/lhc/configmanagement.properties
-- name: "复制文件configfacade.propertie到/root/lhc/目录"
-  copy:
-    src: configfacade.properties
-    dest: /root/lhc/configfacade.properties
+- name: "创建kgx-facaded重启任务"
+  cron:
+    name: "kgx-facaded-restart-task"
+    job: "cd /data/workspace-git/kgx-docker/service-facaded && docker-compose restart kgx-facaded && docker-compose restart kgx-facaded-openresty"
+    minute: "12"
+    hour: "1"
+    day: "*/5"
 
-- name: "复制lhcclientmanagement.war到/data/tomcat-lhc-management/webapps/目录"
-  copy:
-    src: "{{ varCurrentWorkingDirectory }}/lhcclientmanagement.war"
-    dest: "/data/tomcat-lhc-management/webapps/lhcclientmanagement.war"
-- name: "复制lhcclient.war到/data/tomcat-lhc-datanode/webapps/目录"
-  copy:
-    src: "{{ varCurrentWorkingDirectory }}/lhcclient.war"
-    dest: "/data/tomcat-lhc-datanode/webapps/lhcclient.war"
-- name: "复制lhccronb.war到/data/tomcat-lhc-cronb/webapps/目录"
-  copy:
-    src: "{{ varCurrentWorkingDirectory }}/lhccronb.war"
-    dest: "/data/tomcat-lhc-cronb/webapps/lhccronb.war"
-- name: "复制lhcfacadea.war到/data/tomcat-lhc-facadea/webapps/目录"
-  copy:
-    src: "{{ varCurrentWorkingDirectory }}/lhcfacadea.war"
-    dest: "/data/tomcat-lhc-facadea/webapps/lhcfacadea.war"
-- name: "复制lhcfacadez.war到/data/tomcat-lhc-facadez/webapps/目录"
-  copy:
-    src: "{{ varCurrentWorkingDirectory }}/lhcfacadez.war"
-    dest: "/data/tomcat-lhc-facadez/webapps/lhcfacadez.war"
-- name: "复制lhcfacaded.war到/data/tomcat-lhc-facaded/webapps/目录"
-  copy:
-    src: "{{ varCurrentWorkingDirectory }}/lhcfacaded.war"
-    dest: "/data/tomcat-lhc-facaded/webapps/lhcfacaded.war"
+- name: "创建kgx-datanode-client重启任务"
+  cron:
+    name: "kgx-datanode-client-restart-task"
+    job: "cd /data/workspace-git/kgx-docker/service-datanode && docker-compose restart kgx-datanode-client"
+    minute: "12"
+    hour: "1"
+    day: "*/5"
 
-- name: "配置lhcfacadea <Context path=\"\" docBase=\"lhcfacadea\" debug=\"0\" reloadable=\"false\"/>"
-  lineinfile:
-    path: "/data/tomcat-lhc-facadea/conf/server.xml"
-    line: "<Context path=\"\" docBase=\"lhcfacadea\" debug=\"0\" reloadable=\"false\"/>"
-    regexp: "<Context path=\"\" docBase=\"lhcfacadea\" debug=\"0\" reloadable=\"false\"/>"
-    insertbefore: "</Host>"
-- name: "配置lhcfacadez <Context path=\"\" docBase=\"lhcfacadez\" debug=\"0\" reloadable=\"false\"/>"
-  lineinfile:
-    path: "/data/tomcat-lhc-facadez/conf/server.xml"
-    line: "<Context path=\"\" docBase=\"lhcfacadez\" debug=\"0\" reloadable=\"false\"/>"
-    regexp: "<Context path=\"\" docBase=\"lhcfacadez\" debug=\"0\" reloadable=\"false\"/>"
-    insertbefore: "</Host>"
-- name: "配置lhcfacaded <Context path=\"\" docBase=\"lhcfacaded\" debug=\"0\" reloadable=\"false\"/>"
-  lineinfile:
-    path: "/data/tomcat-lhc-facaded/conf/server.xml"
-    line: "<Context path=\"\" docBase=\"lhcfacaded\" debug=\"0\" reloadable=\"false\"/>"
-    regexp: "<Context path=\"\" docBase=\"lhcfacaded\" debug=\"0\" reloadable=\"false\"/>"
-    insertbefore: "</Host>"
-
-- name: "授权root用户连接127.0.0.1"
-  mysql_user:
-    name: root
-    host: 127.0.0.1
-    login_unix_socket: /var/lib/mysql/mysql.sock
-    state: present
-    password: "123456"
-    priv: "*.*:ALL"
+- name: "创建kgx-management-client重启任务"
+  cron:
+    name: "kgx-management-client-restart-task"
+    job: "cd /data/workspace-git/kgx-docker/service-management && docker-compose restart kgx-management-client"
+    minute: "12"
+    hour: "1"
+    day: "*/5"
