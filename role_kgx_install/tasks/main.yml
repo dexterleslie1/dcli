@@ -38,3 +38,19 @@
     minute: "12"
     hour: "1"
     day: "*/5"
+
+- name: "保证/data/backup目录存在"
+  file:
+    path: /data/backup
+    state: directory
+- name: "复制autobackup.sh到/data/backup/autobackup.sh"
+  copy:
+    src: autobackup.sh
+    dest: /data/backup/autobackup.sh
+    force: yes
+- name: "创建kgx-datanode-db数据备份任务"
+  cron:
+    name: "kgx-datanode-db-fullybackup-task"
+    job: "cd /data/backup/ && sh autobackup.sh >> /tmp/autobackup.log"
+    minute: "0"
+    hour: "23"

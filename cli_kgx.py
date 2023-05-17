@@ -42,3 +42,5 @@ class KgxCli(object):
                                                     varInstallLocally.lower() == "y")
 
             cli_common.execute_command(var_command)
+
+            print("kgx相关组建已成功安装和配置，但是/data/backup/autobackup.sh需要手动配置")
