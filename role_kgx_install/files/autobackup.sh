@@ -8,6 +8,10 @@ bucketBaseDir=backup-lhcxxx
 
 basedir=`pwd`
 
+# https://askubuntu.com/questions/47800/command-not-found-when-running-a-script-via-cron
+# 導出/usr/local/bin和/usr/local/sbin路勁，否則aws command not found
+PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin"
+
 {
 LOCK=$basedir/autobackup.lockfile
 if [ -f $LOCK ]; then
