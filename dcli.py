@@ -32,7 +32,6 @@ import cli_fail2ban
 import cli_jmeter
 import cli_os
 import cli_k8s
-import cli_selenium
 import cli_awscli
 import cli_typora
 import logging
@@ -73,7 +72,6 @@ class Dcli(object):
         self.jmeter = cli_jmeter.JmeterCli()
         self.os = cli_os.OsCli()
         self.k8s = cli_k8s.K8sCli()
-        self.selenium = cli_selenium.SeleniumCli()
         self.awscli = cli_awscli.AwsCli()
         self.typora = cli_typora.TyporaCli()
         self.helm = cli_helm.Helm()
