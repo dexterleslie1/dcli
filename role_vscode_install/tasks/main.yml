@@ -20,3 +20,7 @@
     src: ./vscode.desktop
     dest: /usr/share/applications/vscode.desktop
   when: ansible_distribution == "Ubuntu"
+
+- name: "创建vscode命令行快捷方式: code ."
+  shell: ln -f -s /usr/local/software/VSCode-linux-x64/bin/code /usr/bin/code
+  when: ansible_distribution == "Ubuntu"
