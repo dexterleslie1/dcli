@@ -32,7 +32,7 @@ class JdkCli(object):
                 varHostSshUser = input("输入目标主机SSH用户（默认 root）：") or "root"
                 varHostSshPassword = getpass.getpass("输入SSH密码：")
 
-            varSudoPassword = getpass.getpass("输入编译openresty主机的sudo密码，如果当前为root用户不需要输入：")
+            varSudoPassword = getpass.getpass("输入主机的sudo密码，如果当前为root用户不需要输入：")
 
             varFullPath = os.path.dirname(os.path.realpath(__file__))
 

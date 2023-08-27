@@ -13,48 +13,55 @@
 # centOS安装jdk
 - name: 下载jdk rpm
   get_url:
-   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/jdk/jdk-8u144-linux-x64.rpm
-   dest: /tmp/jdk-8u144-linux-x64.rpm
-  when: var_java_version is failed and ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/jdk/jdk-11.0.19_linux-x64_bin.rpm
+   dest: /tmp/jdk-11.0.19_linux-x64_bin.rpm
+#  when: var_java_version is failed and ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
+  when: var_java_version is failed and ansible_distribution == "CentOS"
 
 - name: 安装jdk
   yum:
-   name: /tmp/jdk-8u144-linux-x64.rpm
+   name: /tmp/jdk-11.0.19_linux-x64_bin.rpm
    state: installed
    disable_gpg_check: yes
-  when: var_java_version is failed and ansible_distribution == "CentOS" and "jdk1.8.0_144" not in ansible_facts.packages
+  when: var_java_version is failed and ansible_distribution == "CentOS"
 
 # debian10、ubuntu安装和配置jdk
-- stat: path=/usr/local/jdk1.8.0_271
+#- stat: path=/usr/local/jdk1.8.0_271
+#  register: var_folder_jdk
+#  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
+- stat: path=/usr/local/jdk-11.0.19
   register: var_folder_jdk
   when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
-- name: "下载jdk-8u271-linux-x64.tar.gz"
+- name: "下载jdk-11.0.19_linux-x64_bin.tar.gz"
   get_url:
-   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/jdk/jdk-8u271-linux-x64.tar.gz
-   dest: /tmp/jdk-8u271-linux-x64.tar.gz
-   checksum: md5:bd8dc95a810b095996acf5f5b0dd2a69
+   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/jdk/jdk-11.0.19_linux-x64_bin.tar.gz
+   dest: /tmp/jdk-11.0.19_linux-x64_bin.tar.gz
+   checksum: md5:03d0b244642b1f0a7d7fc0d8ea0aa38d
   when: (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu") and not var_folder_jdk.stat.exists
 
-- name: "解压/tmp/jdk-8u271-linux-x64.tar.gz到/usr/local目录"
-  shell: tar -xvzf /tmp/jdk-8u271-linux-x64.tar.gz -C /usr/local
+- name: "解压/tmp/jdk-11.0.19_linux-x64_bin.tar.gz到/usr/local目录"
+  shell: tar -xvzf /tmp/jdk-11.0.19_linux-x64_bin.tar.gz -C /usr/local
   when: (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu") and not var_folder_jdk.stat.exists
 
 - name: "复制文件初始化java环境变量jdk.sh到/etc/profile.d/jdk.sh"
   copy:
     src: jdk.sh
     dest: /etc/profile.d/jdk.sh
-    force: no
-  when: var_java_version is failed and (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
+#  when: var_java_version is failed and (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
-- name: "执行update-alternatives --install '/usr/bin/java' 'java' '/usr/local/jdk1.8.0_271/bin/java' 1500"
-  shell: update-alternatives --install "/usr/bin/java" "java" "/usr/local/jdk1.8.0_271/bin/java" 1500
-  when: var_java_version is failed and (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
+# https://askubuntu.com/questions/613016/removing-oracle-jdk-and-re-configuring-update-alternatives
+# update-alternatives --config java
+# update-alternatives --remove java /usr/local/jdk-11.0.19/bin/java
+- name: "执行update-alternatives --install '/usr/bin/java' 'java' '/usr/local/jdk-11.0.19/bin/java' 1500"
+  shell: update-alternatives --install "/usr/bin/java" "java" "/usr/local/jdk-11.0.19/bin/java" 1500
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
-- name: "执行update-alternatives --install '/usr/bin/javac' 'javac' '/usr/local/jdk1.8.0_271/bin/javac' 1500"
-  shell: update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/jdk1.8.0_271/bin/javac" 1500
-  when: var_java_version is failed and (ansible_distribution == "Debian" or ansible_distribution == "Ubuntu")
+- name: "执行update-alternatives --install '/usr/bin/javac' 'javac' '/usr/local/jdk-11.0.19/bin/javac' 1500"
+  shell: update-alternatives --install "/usr/bin/javac" "javac" "/usr/local/jdk-11.0.19/bin/javac" 1500
+  when: ansible_distribution == "Debian" or ansible_distribution == "Ubuntu"
 
 - file:
-   path: /tmp/jdk-8u144-linux-x64.rpm
+   path: /tmp/jdk-11.0.19_linux-x64_bin.rpm
    state: absent
