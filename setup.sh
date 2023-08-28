@@ -119,7 +119,8 @@ setup_ansible() {
       yum -y install https://bucketxyh.oss-cn-hongkong.aliyuncs.com/ansible/ansible-2.9.27-1.el7.noarch.rpm
   elif [[ $varUname =~ $varUbuntu ]]; then
       # sudo apt-get install software-properties-common
-      sudo apt-add-repository ppa:ansible/ansible -y
+      # NOTE: 使用ppa安装ansible在国内有时候很慢
+      # sudo apt-add-repository ppa:ansible/ansible -y
       sudo apt-get update
       sudo apt-get install ansible -y
   else
