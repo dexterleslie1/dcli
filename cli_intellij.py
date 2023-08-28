@@ -43,3 +43,5 @@ class IntellijCli(object):
                                                     varInstallLocally.lower() == "y")
 
             cli_common.execute_command(var_command)
+
+            print("intellij idea破解文件jetbrains-agent.jar已经下载到目录/usr/local/software/intelliJ-IDEA/idea-IU-201.7223.91中，打开idea后直接拖动此文件到欢迎界面(注意是欢迎界面)即可破解")
