@@ -137,6 +137,10 @@
   shell: rm -rf /tmp/docker-23.0.5-1-debs && unzip /tmp/docker-23.0.5-1-debs.zip -d /tmp/docker-23.0.5-1-debs
   when: ansible_distribution == "Ubuntu"
 
+- name: "升级libseccomp2"
+  shell: apt install libseccomp2 -y
+  when: ansible_distribution == "Ubuntu"
+
 - name: "使用dpkg命令安装docker"
   shell: cd /tmp/docker-23.0.5-1-debs && dpkg -i *.deb
   when: ansible_distribution == "Ubuntu"
