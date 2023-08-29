@@ -1,24 +1,57 @@
+# 安装shadowsocks服务端
 - name: "Download outman-shadowsocks-libev-epel-8.repo"
   get_url:
    url: https://copr.fedorainfracloud.org/coprs/outman/shadowsocks-libev/repo/epel-8/outman-shadowsocks-libev-epel-8.repo
    dest: /etc/yum.repos.d/outman-shadowsocks-libev-epel-8.repo
+  when: var_install_server|bool
+
 - name: "yum install -y epel-release"
   yum:
     name: epel-release
     state: installed
+  when: var_install_server|bool
+
 - name: "yum install -y shadowsocks-libev"
   yum:
     name: shadowsocks-libev
     state: installed
+  when: var_install_server|bool
+
 - name: "Copy config.json to /etc/shadowsocks-libev/config.json"
   template:
     src: config.json
     dest: /etc/shadowsocks-libev/config.json
-- name: "ln -s /usr/lib64/libmbedcrypto.so.2.28.1 /usr/lib64/libmbedcrypto.so.3"
-  shell: ln -s /usr/lib64/libmbedcrypto.so.2.28.1 /usr/lib64/libmbedcrypto.so.3
+  when: var_install_server|bool
+
+- name: "ln -f -s /usr/lib64/libmbedcrypto.so.2.28.4 /usr/lib64/libmbedcrypto.so.3"
+  shell: ln -f -s /usr/lib64/libmbedcrypto.so.2.28.4 /usr/lib64/libmbedcrypto.so.3
+  when: var_install_server|bool
 
 - name: "systemctl restart shadowsocks-libev && systemctl enable shadowsocks-libev"
   systemd:
     name: shadowsocks-libev
     state: restarted
     enabled: yes
+  when: var_install_server|bool
+
+
+# 安装shadowsocks客户端sslocal
+# https://medium.com/@ATheCoder/how-to-setup-shadowsocks-client-on-centos-f7f104a54363
+- name: "pip3 install https://bucketxyh.oss-cn-hongkong.aliyuncs.com/shadowsocks/shadowsocks-3.0-src.zip -U"
+  shell: pip3 install https://bucketxyh.oss-cn-hongkong.aliyuncs.com/shadowsocks/shadowsocks-3.0-src.zip -U
+  when: not var_install_server|bool
+- name: "复制shadowsocks-client.json到/etc/shadowsocks-client.json"
+  copy:
+    src: shadowsocks-client.json
+    dest: /etc/shadowsocks-client.json
+  when: not var_install_server|bool
+- name: "复制shadowsocks-client.service到/usr/lib/systemd/system/shadowsocks-client.service"
+  copy:
+    src: shadowsocks-client.service
+    dest: /usr/lib/systemd/system/shadowsocks-client.service
+  when: not var_install_server|bool
+- name: "systemctl enable shadowsocks-client"
+  systemd:
+    name: shadowsocks-client
+    enabled: yes
+  when: not var_install_server|bool

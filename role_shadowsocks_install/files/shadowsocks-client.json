@@ -1,0 +1,9 @@
+{
+    "server":"shadowsocks服务器ip",
+    "server_port":11080,
+    "local_address":"0.0.0.0",
+    "local_port":1080,
+    "password":"shadowsocks服务密码",
+    "timeout":600,
+    "method":"aes-256-cfb"
+}
