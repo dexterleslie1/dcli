@@ -165,7 +165,8 @@ setup_python() {
   if [[ $varUname =~ $varCentOS ]]; then
       yum -y install epel-release
       # centOS8安装python3
-      yum -y install python3-pip
+      # NOTE: 安装指定版本的pip3，有些版本和pip3 install fire不兼容导致无法使用pip3 install
+      yum -y install python3-pip-9.0.3-22.el8
   elif [[ $varUname =~ $varUbuntu ]]; then
       sudo apt-get install python3-pip -y
       pip3 install setuptools
