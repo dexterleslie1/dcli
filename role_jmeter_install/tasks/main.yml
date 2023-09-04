@@ -69,3 +69,7 @@
 - name: "配置/usr/bin/jmeter"
   shell: ln -s /usr/local/software/jmeter/bin/jmeter /usr/bin/jmeter
   when: not varUsrBinJmeter.stat.exists
+
+- name: "jmeter slave安装完成后重启系统，使selinux disabled生效"
+  reboot:
+  when: var_slave_mode is defined and var_slave_mode
