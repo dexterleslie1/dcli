@@ -54,7 +54,7 @@ class JmeterCli(object):
             var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_jmeter_install.yml"
             var_command = cli_common.concat_command(var_command, target_host, target_host_user
                                                     , target_host_password, sudo_password,
-                                                    install_locally.lower() == "y")
+                                                    install_locally.lower() == "y", unattended_intall)
 
             if not unattended_intall:
                 options = ["master", "slave"]

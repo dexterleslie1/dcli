@@ -19,7 +19,7 @@ def execute_command_by_subprocess_run(command, isLogging=False):
     return varResult
 
 
-def concat_command(command, remote_hosts, remote_user, remotePassword = None, sudoPassword = None, installLocally = False):
+def concat_command(command, remote_hosts, remote_user, remotePassword = None, sudoPassword = None, installLocally = False, unattended_intall = False):
     if remotePassword is None:
         if remote_hosts:
             if not remote_hosts.endswith(","):
@@ -28,7 +28,8 @@ def concat_command(command, remote_hosts, remote_user, remotePassword = None, su
         if remote_user:
             command = command + " --user " + remote_user
 
-        command = command + " --ask-pass"
+        if not unattended_intall:
+            command = command + " --ask-pass"
     else:
         if remote_hosts:
             if not remote_hosts.endswith(","):
