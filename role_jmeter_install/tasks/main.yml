@@ -70,6 +70,10 @@
   shell: ln -s /usr/local/software/jmeter/bin/jmeter /usr/bin/jmeter
   when: not varUsrBinJmeter.stat.exists
 
+- name: "jmeter master首次安装完成后重启系统，使selinux disabled生效"
+  reboot:
+  when: varMasterMode is defined and varMasterMode and not jmeter_folder.stat.exists
+
 - name: "jmeter slave安装完成后重启系统，使selinux disabled生效"
   reboot:
   when: var_slave_mode is defined and var_slave_mode
