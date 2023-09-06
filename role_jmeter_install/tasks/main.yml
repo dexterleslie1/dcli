@@ -1,8 +1,8 @@
-- name: "从https://bucketxyh.oss-cn-hongkong.aliyuncs.com/jmeter/apache-jmeter-5.4.1.tgz下载Jmeter"
+- name: "从https://bucketxyh.oss-cn-hongkong.aliyuncs.com/jmeter/apache-jmeter-5.6.2.tgz下载Jmeter"
   get_url:
-    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/jmeter/apache-jmeter-5.4.1.tgz
-    dest: /tmp/apache-jmeter-5.4.1.tgz
-    checksum: md5:ea44a5ff72c25069e6c4b76467292899
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/jmeter/apache-jmeter-5.6.2.tgz
+    dest: /tmp/apache-jmeter-5.6.2.tgz
+    checksum: md5:eebd530ed165e4e3f2cabe68f8088ab8
 
 - file:
    name: /usr/local/software
@@ -12,17 +12,17 @@
   stat: path=/usr/local/software/jmeter
   register: jmeter_folder
 
-- name: "rm -rf /tmp/apache-jmeter-5.4.1"
+- name: "rm -rf /tmp/apache-jmeter-5.6.2"
   file:
-    path: /tmp/apache-jmeter-5.4.1
+    path: /tmp/apache-jmeter-5.6.2
     state: absent
   when: not jmeter_folder.stat.exists
 
-- name: "tar -xvzf apache-jmeter-5.4.1.tgz"
-  shell: cd /tmp && tar -xvzf apache-jmeter-5.4.1.tgz
+- name: "tar -xvzf apache-jmeter-5.6.2.tgz"
+  shell: cd /tmp && tar -xvzf apache-jmeter-5.6.2.tgz
   when: not jmeter_folder.stat.exists
-- name: "mv /tmp/apache-jmeter-5.4.1 /usr/local/software/jmeter"
-  shell: mv /tmp/apache-jmeter-5.4.1 /usr/local/software/jmeter
+- name: "mv /tmp/apache-jmeter-5.6.2 /usr/local/software/jmeter"
+  shell: mv /tmp/apache-jmeter-5.6.2 /usr/local/software/jmeter
   when: not jmeter_folder.stat.exists
 
 - name: "修改#server.rmi.ssl.disable=false为server.rmi.ssl.disable=true"
