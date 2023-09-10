@@ -40,6 +40,11 @@ class DockerCli(object):
             var_command = cli_common.concat_command(var_command, var_host_target, var_host_target_user,
                                                     varSshPassword, varSudoPassword,
                                                     var_install_locally.lower() == "y")
+
+            # 是否本地安装，否则完成安装后重启服务器
+            var_command = var_command + " -e \"install_locally=" + str(var_install_locally.lower() == "y") + "\""
+
             cli_common.execute_command(var_command)
 
-            print("安装完成后重启系统以加载最新环境变量，否则docker-compose使用时报告异常，通过 cp -rp /var/lib/docker /data/data-docker 和配置 /etc/docker/daemon.json \"data-root\": \"/data/data-docker\" 指定docker数据目录")
+            print(
+                "安装完成后重启系统以加载最新环境变量，否则docker-compose使用时报告异常，通过 cp -rp /var/lib/docker /data/data-docker 和配置 /etc/docker/daemon.json \"data-root\": \"/data/data-docker\" 指定docker数据目录")
