@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  demo-locust-master:
+    container_name: demo-locust-master
+    image: locustio/locust
+    ports:
+     - "8089:8089"
+     - "5557:5557"
+    restart: always
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py
+    command: -f /mnt/locust/locustfile.py --master -H http://0.0.0.0:8089

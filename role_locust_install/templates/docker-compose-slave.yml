@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  demo-locust-worker:
+    image: locustio/locust
+    deploy:
+      # 多少个worker，和cpu数量相等为宜
+      replicas: {{ cpu_count }}
+    restart: always
+    volumes:
+      - ./locustfile.py:/mnt/locust/locustfile.py
+    command: -f /mnt/locust/locustfile.py --worker --master-host {{ master_host }}

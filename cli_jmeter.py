@@ -1,7 +1,5 @@
 import cli_common
-import os
 import enquiries
-import getpass
 
 
 class JmeterCli(object):
@@ -27,35 +25,11 @@ class JmeterCli(object):
         :return:
         """
 
-        # 无人值守安装
-        unattended_intall = install and install.strip() == "y"
-
-        if not unattended_intall:
-            install = input("是否安装和配置Jmeter？ [y/n]：") or "n"
+        unattended_intall, var_command, install = \
+            cli_common.prompt("jmeter", install, target_host, target_host_user, target_host_password, sudo_password,
+                              ansible_role_file="role_jmeter_install.yml")
 
         if install.lower() == "y":
-
-            if not unattended_intall:
-                install_locally = input("是否本地安装？ [y/n]: ") or "n"
-            else:
-                install_locally = "y" if not target_host or not target_host.strip() else "n"
-
-            if not unattended_intall and not install_locally == "y":
-                target_host = input("目标主机（例如： 192.168.1.20:8080）：")
-                target_host_user = input("目标主机SSH用户（默认 root）：") or "root"
-                target_host_password = getpass.getpass("输入SSH密码：")
-
-            if not unattended_intall:
-                sudo_password = getpass.getpass("输入主机的sudo密码，如果当前为root用户不需要输入：")
-
-            # Full path of python file locates in
-            var_full_path = os.path.dirname(os.path.realpath(__file__))
-
-            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + var_full_path + "/role_jmeter_install.yml"
-            var_command = cli_common.concat_command(var_command, target_host, target_host_user
-                                                    , target_host_password, sudo_password,
-                                                    install_locally.lower() == "y", unattended_intall)
-
             if not unattended_intall:
                 options = ["master", "slave"]
                 mode = enquiries.choose("选择Jmeter安装和配置模式：", options)

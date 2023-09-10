@@ -228,4 +228,4 @@
 
 - name: "如果非本地安装则在完成安装docker后重启服务器"
   reboot:
-  when: not install_locally | default(False) | bool
+  when: not install_locally | default(True) | bool

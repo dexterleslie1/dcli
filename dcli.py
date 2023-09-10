@@ -38,6 +38,7 @@ import logging
 import cli_helm
 import cli_golang
 import cli_intellij
+import cli_locust
 
 
 class Dcli(object):
@@ -77,6 +78,7 @@ class Dcli(object):
         self.helm = cli_helm.Helm()
         self.golang = cli_golang.Golang()
         self.intellij = cli_intellij.IntellijCli()
+        self.locust = cli_locust.LocustCli()
 
 
 if __name__ == "__main__":
