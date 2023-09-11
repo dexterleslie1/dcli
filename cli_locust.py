@@ -48,7 +48,7 @@ class LocustCli(object):
 
                 if not master_host or not master_host.strip():
                     raise Exception("必须输入locust master ip地址！")
-                if int(slave_cpu_count) <= 0:
+                if not slave_cpu_count or int(slave_cpu_count) <= 0:
                     raise Exception("必须指定locust slave cpu个数！")
 
                 var_command = var_command + " -e mode_slave=True"
