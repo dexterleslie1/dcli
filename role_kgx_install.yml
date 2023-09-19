@@ -1,4 +1,4 @@
-- name: "安装lhc"
+- name: "安装kgx"
   hosts: all
   become: yes
   roles:

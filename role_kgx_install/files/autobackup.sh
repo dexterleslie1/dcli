@@ -4,7 +4,7 @@ spassword=123456
 database=datanode
 
 bucket=backup-db-all
-bucketBaseDir=backup-lhcxxx
+bucketBaseDir=backup-kgxxx
 
 basedir=`pwd`
 
