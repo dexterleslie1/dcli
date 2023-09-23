@@ -2,9 +2,9 @@
 # ubuntu安装vscode
 - name: "下载vscode程序"
   get_url:
-    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/vscode/code-stable-x64-1681293081.tar.gz
-    dest: /tmp/code-stable-x64-1681293081.tar.gz
-    checksum: md5:01df7c5b895f99da1fb15ce8c1eb8639
+    url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/vscode/code-stable-x64-1694670691.tar.gz
+    dest: /tmp/code-stable-x64-1694670691.tar.gz
+    checksum: md5:08dcaddba49647fc1b126ae5d4c2749a
   when: ansible_distribution == "Ubuntu"
 
 - name: "删除 /usr/local/software/VSCode-linux-x64"
@@ -13,7 +13,7 @@
     state: absent
 
 - name: "解压vscode到目录/usr/local/software"
-  shell: tar -xvzf /tmp/code-stable-x64-1681293081.tar.gz -C /usr/local/software
+  shell: tar -xvzf /tmp/code-stable-x64-1694670691.tar.gz -C /usr/local/software
   when: ansible_distribution == "Ubuntu"
 
 - copy:
