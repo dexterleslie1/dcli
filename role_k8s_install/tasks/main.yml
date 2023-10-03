@@ -32,6 +32,14 @@
     name: kubelet
     enabled: yes
 
+- name: "检测端口10250是否打开用于判断kubeadm init命令是否已执行过"
+  wait_for:
+    port: 10250
+    delay: 0
+    timeout: 5
+    msg: "port 10250 is not listening"
+  register: port_10250_checking
+  ignore_errors: yes
 - name: "master节点kubeadm init"
   shell: >
     kubeadm init
@@ -40,7 +48,7 @@
     --kubernetes-version v1.20.0
     --service-cidr=10.1.0.0/16
     --pod-network-cidr=10.244.0.0/16
-  when: varMasterNode is defined and varMasterNode|bool
+  when: varMasterNode is defined and varMasterNode|bool and port_10250_checking.failed == true
 
 - name: "master节点配置kubectl命令运行环境"
   shell: |
