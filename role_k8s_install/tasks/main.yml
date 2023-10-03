@@ -2,7 +2,7 @@
   assert:
     that:
 #      - ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
-#      - ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
+      - ansible_distribution == "CentOS" and ansible_distribution_major_version == "8"
     fail_msg: "k8s目前只支持centOS8系统部署"
 
 - name: "设置主机名称"
@@ -22,9 +22,9 @@
     dest: /etc/yum.repos.d/kubernetes.repo
     force: yes
 
-- name: "使用yum安装kubelet、kubeadm、kubectl"
+- name: "使用yum安装kubelet-1.20.0、kubeadm-1.20.0、kubectl-1.20.0"
   yum:
-    name: kubelet,kubeadm,kubectl
+    name: kubelet-1.20.0,kubeadm-1.20.0,kubectl-1.20.0
     state: installed
 
 - name: "systemctl enable kubelet"
@@ -37,7 +37,7 @@
     kubeadm init
     --apiserver-advertise-address={{ varHostIp }}
     --image-repository registry.aliyuncs.com/google_containers
-    --kubernetes-version v1.28
+    --kubernetes-version v1.20.0
     --service-cidr=10.1.0.0/16
     --pod-network-cidr=10.244.0.0/16
   when: varMasterNode is defined and varMasterNode|bool
