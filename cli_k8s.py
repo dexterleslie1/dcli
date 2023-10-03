@@ -1,76 +1,64 @@
-import cli_common
-import os
 import enquiries
-import getpass
+
+import cli_common
 
 
 class K8sCli(object):
     """
-    k8s管理工具。支持操作系统： centOS7
+    k8s管理工具。支持操作系统： centOS8
     """
 
-    def install(self):
+    def install(self, install=None, target_host=None, target_host_user='root', target_host_password=None,
+                sudo_password=None,
+                mode=None, hostname="", hostip=""):
         """
         安装和配置k8s
 
+        :param install: 是否安装和配置Jmeter？ [y/n]
+        :param target_host: 目标主机（例如： 192.168.1.20:8080）
+        :param target_host_user: 目标主机SSH用户（默认 root）
+        :param target_host_password: 目标主机SSH密码
+        :param sudo_password: 目标主机的sudo密码，如果当前为root用户不需要输入
+        :param mode: k8s安装模式，master或者worker
+        :param hostname: 主机hostname
+        :param hostip: 主机ip地址
         :return:
         """
 
-        # Full path of python file locates in
-        varFullPath = os.path.dirname(os.path.realpath(__file__))
+        unattended_intall, var_command, install = \
+            cli_common.prompt("k8s", install, target_host, target_host_user, target_host_password, sudo_password,
+                              ansible_role_file="role_k8s_install.yml")
 
-        varInstall = input("是否安装和配置k8s？ [y/n]： ") or "n"
-        varInstallLocally = "n"
-        varHostSshIp = ""
-        varHostSshUser = ""
-        varHostSshPassword = ""
-        varSudoPassword = ""
+        if install.lower() == "y":
+            if not unattended_intall:
+                options = ["master", "worker"]
+                mode = enquiries.choose("选择k8s安装和配置模式：", options)
 
-        if varInstall.lower() == "y":
-            varInstallLocally = input("是否本地安装配置？ [y/n]: ") or "n"
-            if not varInstallLocally == "y":
-                varHostSshIp = input("主机（例如： 192.168.1.20:8080）：")
-                varHostSshUser = input("主机的SSH用户（默认 root）：") or "root"
-                varHostSshPassword = getpass.getpass("输入SSH密码：")
+            if mode == "master":
+                if not unattended_intall:
+                    hostname = input("输入hostname（默认k8s-master）： ") or "k8s-master"
+                    hostip = input("输入host ip： ")
 
-            varSudoPassword = getpass.getpass("输入主机的sudo密码，如果当前为root用户不需要输入：")
+                if len(hostname.strip()) == 0:
+                    hostname = "k8s-master"
 
-            varOptions = ["安装和配置master节点", "安装和配置worker节点"]
-            varChoice = enquiries.choose("选择操作：", varOptions)
-
-            if varChoice == "安装和配置master节点":
-                # 是否设置主机名称
-                varSetHostname = "n"
-                varHostname = ""
-                varHostIp = ""
-
-                varHostname = input("输入hostname（默认k8s-master）： ") or "k8s-master"
-
-                varHostIp = input("输入host ip： ")
-                if len(varHostIp.strip()) == 0:
+                if len(hostip.strip()) == 0:
                     raise Exception("必须输入host ip！")
 
-                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_k8s_install.yml"
-                var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + varHostname + "\""
-                var_command = var_command + " -e varHostIp=\"" + varHostIp + "\""
+                var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + hostname + "\""
+                var_command = var_command + " -e varHostIp=\"" + hostip + "\""
                 var_command = var_command + " -e varMasterNode=true"
-                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword,
-                                                        varSudoPassword, varInstallLocally.lower() == "y")
-                cli_common.execute_command(var_command)
-            else:
-                # 是否设置主机名称
-                varSetHostname = "n"
-                varHostname = ""
 
-                varHostname = input("输入hostname： ")
-                if len(varHostname.strip()) == 0:
+            else:
+                if not unattended_intall:
+                    hostname = input("输入hostname： ")
+
+                if len(hostname.strip()) == 0:
                     raise Exception("必须输入hostname！")
 
-                var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_k8s_install.yml"
-                var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + varHostname + "\""
-                var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword,
-                                                        varSudoPassword, varInstallLocally.lower() == "y")
-                cli_common.execute_command(var_command)
+                var_command = var_command + " -e varSetHostname=true -e varHostname=\"" + hostname + "\""
+
+            cli_common.execute_command(var_command)
 
             print("提示： -------------------------------------------------------------"
                   "\n在master节点运行kubeadm token create --print-join-command获取加入worker节点命令"
