@@ -75,4 +75,4 @@
   when: varMasterNode is defined and varMasterNode|bool
 - name: "master节点启动flannel"
   shell: kubectl apply -f $HOME/kube-flannel.yml
-  when: varMasterNode is defined and varMasterNode|bool
+  when: varMasterNode is defined and varMasterNode|bool and port_10250_checking.failed == true
