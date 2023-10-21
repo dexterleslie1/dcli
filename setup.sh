@@ -169,11 +169,11 @@ setup_python() {
       yum -y install python3-pip-9.0.3-22.el8
   elif [[ $varUname =~ $varUbuntu ]]; then
       sudo apt-get install python3-pip -y
-      pip3 install setuptools
+      pip3 install setuptools -i https://mirrors.aliyun.com/pypi/simple/
   fi
 
-  pip3 install fire
-  pip3 install enquiries
+  pip3 install fire -i https://mirrors.aliyun.com/pypi/simple/
+  pip3 install enquiries -i https://mirrors.aliyun.com/pypi/simple/
 }
 
 ########################
