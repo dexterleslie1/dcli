@@ -72,7 +72,7 @@ def concat_command(command, remote_hosts, remote_user, remotePassword=None, sudo
         if remote_user:
             command = command + " --user " + remote_user
 
-        if not unattended_intall:
+        if not unattended_intall and not installLocally:
             command = command + " --ask-pass"
     else:
         if remote_hosts:
