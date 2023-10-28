@@ -23,8 +23,8 @@
     dest: /etc/shadowsocks-libev/config.json
   when: var_install_server|bool
 
-- name: "ln -f -s /usr/lib64/libmbedcrypto.so.2.28.4 /usr/lib64/libmbedcrypto.so.3"
-  shell: ln -f -s /usr/lib64/libmbedcrypto.so.2.28.4 /usr/lib64/libmbedcrypto.so.3
+- name: "ln -f -s /usr/lib64/libmbedcrypto.so.2.28.5 /usr/lib64/libmbedcrypto.so.3"
+  shell: ln -f -s /usr/lib64/libmbedcrypto.so.2.28.5 /usr/lib64/libmbedcrypto.so.3
   when: var_install_server|bool
 
 - name: "systemctl restart shadowsocks-libev && systemctl enable shadowsocks-libev"
