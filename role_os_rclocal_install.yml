@@ -1,0 +1,8 @@
+---
+
+- name: "配置rc.local服务"
+  hosts: all
+  # sudo为root用户
+  become: yes
+  roles:
+    - role: role_os_rclocal

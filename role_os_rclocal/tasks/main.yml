@@ -1,0 +1,33 @@
+# centOS7、centOS8配置rc.local
+- name: "chmod +x /etc/rc.d/rc.local"
+  shell: chmod +x /etc/rc.d/rc.local
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "修改/usr/lib/systemd/system/rc-local.service WantedBy=multi-user.target"
+  lineinfile:
+    path: /usr/lib/systemd/system/rc-local.service
+    regexp: "^WantedBy=multi-user.target"
+    line: "WantedBy=multi-user.target\n"
+    insertafter: '^# systemd-rc-local-generator'
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "修改/usr/lib/systemd/system/rc-local.service [Install]"
+  lineinfile:
+    path: /usr/lib/systemd/system/rc-local.service
+    regexp: "^\\[Install\\]"
+    line: "[Install]"
+    insertafter: '^# systemd-rc-local-generator'
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "修改/usr/lib/systemd/system/rc-local.service After=network.target为After=network-online.target"
+  replace:
+    path: /usr/lib/systemd/system/rc-local.service
+    regexp: "^After=network.target"
+    replace: "After=network-online.target"
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "systemctl daemon-reload"
+  shell: systemctl daemon-reload
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")
+- name: "systemctl enable rc-local.service && systemctl start rc-local.service"
+  systemd:
+   name: rc-local.service
+   state: restarted
+   enabled: yes
+  when: ansible_distribution == "CentOS" and (ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8")

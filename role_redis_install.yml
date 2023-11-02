@@ -8,4 +8,5 @@
     - role: role_os_firewall
     - role: role_os_selinux
     - role: role_os_chrony
+    - role: role_os_rclocal
     - role: role_redis_install

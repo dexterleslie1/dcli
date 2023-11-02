@@ -24,6 +24,7 @@ class OsCli(object):
         # 是否修改ssh端口
         # 是否修改时区为上海
         # 是否配置防止ssh密码暴力破解
+        # 是否启用rc.local服务
 
         varDisableFirewall = "n"
         varDisableSelinux = "n"
@@ -34,6 +35,7 @@ class OsCli(object):
         varNewSshPort = 22
         varChangeTimezone = "n"
         varSshBurstAttackProtection = "n"
+        enable_rc_local_service = "n"
 
         varConfigLocally = "n"
         varHostSshIp = ""
@@ -66,6 +68,8 @@ class OsCli(object):
 
         varChangeTimezone = input("是否修改时区为上海？ [y/n]：") or "n"
         varSshBurstAttackProtection = input("是否配置防止ssh密码暴力破解？ [y/n]：") or "n"
+
+        enable_rc_local_service = input("是否启用rc.local服务？ [y/n]：") or "n"
 
         varFullPath = os.path.dirname(os.path.realpath(__file__))
 
@@ -118,7 +122,16 @@ class OsCli(object):
 
             cli_common.execute_command(var_command)
 
+        if enable_rc_local_service.lower() == "y":
+            var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_os_rclocal_install.yml"
+            var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword
+                                                    , varSudoPassword, varConfigLocally.lower() == "y")
+            cli_common.execute_command(var_command)
+
         var_command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook " + varFullPath + "/role_os_chrony_install.yml"
         var_command = cli_common.concat_command(var_command, varHostSshIp, varHostSshUser, varHostSshPassword
                                                 , varSudoPassword, varConfigLocally.lower() == "y")
         cli_common.execute_command(var_command)
+
+        if enable_rc_local_service.lower() == "y":
+            print("启用rc.local服务后通过手动编辑/etc/rc.d/rc.local文件加入开机自启动命令")
