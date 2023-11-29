@@ -18,7 +18,7 @@
 - name: "创建kgx-facaded重启任务"
   cron:
     name: "kgx-facaded-restart-task"
-    job: "cd /data/workspace-git/kgx-docker/service-facaded && docker-compose restart kgx-facaded && docker-compose restart kgx-facaded-openresty"
+    job: "cd /data/workspace-git/kgx-docker/service-facaded && docker-compose restart kgx-facaded-login && docker-compose restart kgx-facaded-nonelogin && docker-compose restart kgx-facaded-openresty"
     minute: "12"
     hour: "1"
     day: "*/5"
