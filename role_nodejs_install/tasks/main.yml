@@ -42,10 +42,10 @@
     line: "fs.inotify.max_user_watches = 5000000"
 
 # 设置 npm 仓库指向阿里仓库后再安装 yarn
-- name: "npm config set registry https://registry.npm.taobao.org/ -g"
-  shell: "npm config set registry https://registry.npm.taobao.org/ -g"
-- name: "npm config set registry https://registry.npm.taobao.org/"
-  shell: "npm config set registry https://registry.npm.taobao.org/"
+- name: "npm config set registry http://mirrors.cloud.tencent.com/npm/ -g"
+  shell: "npm config set registry http://mirrors.cloud.tencent.com/npm/ -g"
+- name: "npm config set registry http://mirrors.cloud.tencent.com/npm/"
+  shell: "npm config set registry http://mirrors.cloud.tencent.com/npm/"
 
 - name: "npm install -g yarn"
   shell: "npm install -g yarn"
