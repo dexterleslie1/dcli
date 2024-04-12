@@ -3,7 +3,7 @@
 
 - name: "下载nodejs安装包"
   get_url:
-   url: https://bucketxyh.oss-cn-hongkong.aliyuncs.com/nodejs/node-{{ varVersion }}-linux-x64.tar.gz
+   url: https://hk010.oss-cn-hongkong.aliyuncs.com/nodejs/node-{{ varVersion }}-linux-x64.tar.gz
    dest: /tmp/node-{{ varVersion }}-linux-x64.tar.gz
 
 - name: "如果/usr/local/software目录不存在，则创建"

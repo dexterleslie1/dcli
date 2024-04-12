@@ -31,7 +31,7 @@ class NodejsCli(object):
         if varInstall.lower() == "y":
 
             # 选择nodejs安装版本
-            varOptions = ["v15.14.0", "v16.20.0"]
+            varOptions = ["v15.14.0", "v16.20.0", "v20.12.2"]
             varVersion = enquiries.choose("选择版本：", varOptions)
 
             varInstallLocally = input("是否本地安装？ [y/n]: ") or "n"
